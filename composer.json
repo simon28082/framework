@@ -10,7 +10,6 @@
         "crcms/attribute-contract": "^1.0",
         "crcms/repository": "^2.0",
         "fideloper/proxy": "^4.0",
-        "folklore/graphql": "^1.0",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0"
     },
