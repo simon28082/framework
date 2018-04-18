@@ -12,14 +12,12 @@ class Start
 {
     /**
      * @param Container $container
-     * @param StartContract $startContract
+     * @param string $drive
      * @param array $params
      * @return void
      */
-    public static function run(Container $container, array $params): void
+    public static function run(Container $container, string $drive, array $params): void
     {
-        StartFactory::factory($container,
-            $params[0] ?? \CrCms\Foundation\StartFactory::TYPE_LARAVEL
-        )->run($container, $params);
+        StartFactory::factory($container, $drive)->run($container, $params);
     }
 }
