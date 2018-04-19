@@ -15,6 +15,17 @@ class ResourceCollection extends BaseResourceCollection
     use HideTrait;
 
     /**
+     * ResourceCollection constructor.
+     * @param $resource
+     * @param string $collect
+     */
+    public function __construct($resource, ?string $collect = null)
+    {
+        $this->collects = $collect ? $collect : get_called_class();
+        parent::__construct($resource);
+    }
+
+    /**
      * @param Request $request
      * @return array
      */

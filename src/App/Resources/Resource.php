@@ -55,8 +55,6 @@ class Resource extends BaseResource
      */
     public static function collection($resource)
     {
-        return new ResourceCollection(
-            new AnonymousResourceCollection($resource, get_called_class())
-        );
+        return new ResourceCollection($resource, get_called_class());
     }
 }
