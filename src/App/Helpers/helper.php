@@ -18,3 +18,12 @@ function date_to_timestamp($dates)
         return Carbon::parse($date)->getTimestamp();
     }, $dates);
 }
+
+/**
+ * @param string $sub
+ * @return string
+ */
+function sub_domain(string $sub): string
+{
+    return "{$sub}." . config('app.domain');
+}
