@@ -227,6 +227,16 @@ class ResponseFactory
     }
 
     /**
+     * @param array $data
+     * @param string $key
+     * @return JsonResponse
+     */
+    public function data(array $data, string $key = 'data'): JsonResponse
+    {
+        return $this->array([$key => $data]);
+    }
+
+    /**
      * Call magic methods beginning with "with".
      *
      * @param string $method
