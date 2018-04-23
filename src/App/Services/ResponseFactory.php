@@ -121,9 +121,7 @@ class ResponseFactory
         if (substr($collect, -10) === 'Collection') {
             return (new $collect($paginator))->hide($hide)->response();
         } elseif (substr($collect, -8) === 'Resource') {
-            return (new ResourceCollection(new AnonymousResourceCollection(
-                $paginator, $collect
-            )))->hide($hide)->response();
+            return (new ResourceCollection($paginator, $collect))->hide($hide)->response();
         } else {
             throw new InvalidArgumentException('Non-existent resource converter');
         }
