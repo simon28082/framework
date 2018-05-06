@@ -6,6 +6,7 @@ use CrCms\Foundation\App\Resources\Traits\HideTrait;
 use CrCms\Foundation\App\Resources\Traits\IncludeTrait;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\Resource as BaseResource;
 use Illuminate\Support\Collection;
@@ -20,6 +21,8 @@ class Resource extends BaseResource
      */
     public function resolve($request = null)
     {
+        $request = $request ?: Container::getInstance()->make('request');
+
         $data = $this->filterFields(
             $this->mergeData($request)
         );
@@ -36,16 +39,14 @@ class Resource extends BaseResource
     }
 
     /**
-     * @param null $request
+     * @param Request $request
      * @return array
      */
-    protected function mergeData($request = null): array
+    protected function mergeData(Request $request): array
     {
         return array_merge(
             $this->parseIncludes($request),
-            $this->toArray(
-                $request = $request ?: Container::getInstance()->make('request')
-            )
+            $this->toArray($request)
         );
     }
 

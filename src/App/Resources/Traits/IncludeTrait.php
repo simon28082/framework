@@ -63,10 +63,10 @@ trait IncludeTrait
     }
 
     /**
-     * @param $request
+     * @param Request $request
      * @return array
      */
-    protected function parseParams($request): array
+    protected function parseParams(Request $request): array
     {
         return array_merge(explode(',', $request->input($this->includeRequestKey)), $this->defaultIncludes);
     }
