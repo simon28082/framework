@@ -6,11 +6,14 @@ use CrCms\Foundation\App\Http\Resources\ResourceCollection;
 use Illuminate\Http\JsonResponse;
 use CrCms\Foundation\App\Http\Resources\Resource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use BadMethodCallException;
 use InvalidArgumentException;
+use JsonSerializable;
+use Traversable;
 
 class ResponseFactory
 {
@@ -225,12 +228,24 @@ class ResponseFactory
     }
 
     /**
-     * @param array $data
+     * @param array|Collection|JsonSerializable|Traversable $data
      * @param string $key
      * @return JsonResponse
      */
-    public function data(array $data, string $key = 'data'): JsonResponse
+    public function data($data, string $key = 'data'): JsonResponse
     {
+        if (is_array($data)) {
+
+        } elseif ($data instanceof Collection) {
+            $data = $data->all();
+        } elseif ($data instanceof JsonSerializable) {
+            $data = $data->jsonSerialize();
+        } elseif ($data instanceof Traversable) {
+            $data = iterator_to_array($data);
+        } else {
+            throw new InvalidArgumentException('Incorrect parameter format');
+        }
+
         return $this->array([$key => $data]);
     }
 
