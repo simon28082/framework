@@ -109,4 +109,13 @@ class Application extends BaseApplication implements Container
     {
         return $this->storagePath() . '/run-cache/routes.php';
     }
+
+    /**
+     * 
+     */
+    public function registerCoreContainerAliases()
+    {
+        parent::registerCoreContainerAliases();
+        $this->alias('app',self::class);
+    }
 }
