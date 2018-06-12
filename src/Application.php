@@ -22,14 +22,93 @@ class Application extends BaseApplication implements Container
     protected $extensionPath;
 
     /**
+     * @var string
+     */
+    protected $frameworkPath;
+
+    /**
+     * @var string
+     */
+    protected $frameworkConfigPath;
+
+    /**
+     * @var string
+     */
+    protected $frameworkResourcePath;
+
+    /**
      * @return void
      */
     protected function bindPathsInContainer()
     {
         parent::bindPathsInContainer();
 
+        $this->useFrameworkPath($this->frameworkPath());
+        $this->useFrameworkConfigPath($this->frameworkConfigPath());
+        $this->useFrameworkResourcePath($this->frameworkResourcePath());
         $this->useModulePath($this->modulePath());
         $this->useExtensionPath($this->extensionPath());
+    }
+
+    /**
+     * @return string
+     */
+    public function frameworkPath(string $path = ''): string
+    {
+        return realpath(__DIR__ . '/../') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkPath(string $path)
+    {
+        $this->frameworkPath = $path;
+        $this->instance('path.framework', $path);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function frameworkResourcePath(string $path = ''): string
+    {
+        return $this->frameworkPath('resources') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkResourcePath(string $path)
+    {
+        $this->frameworkPath = $path;
+        $this->instance('path.framework_resource', $path);
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function frameworkConfigPath(string $path = ''): string
+    {
+        return $this->frameworkPath('config') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkConfigPath(string $path)
+    {
+        $this->frameworkConfigPath = $path;
+        $this->instance('path.framework_config', $path);
+
+        return $this;
     }
 
     /**
@@ -111,11 +190,11 @@ class Application extends BaseApplication implements Container
     }
 
     /**
-     * 
+     *
      */
     public function registerCoreContainerAliases()
     {
         parent::registerCoreContainerAliases();
-        $this->alias('app',self::class);
+        $this->alias('app', self::class);
     }
 }
