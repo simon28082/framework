@@ -12,7 +12,7 @@ use Swoole\Async;
 use Swoole\Process;
 use Exception;
 use UnexpectedValueException;
-use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Http\Kernel;
 
 /**
  * Class Swoole
@@ -72,9 +72,17 @@ class Swoole implements StartContract
     /**
      * @return void
      */
+    protected function bootstrapBaseMiddleware(): void
+    {
+        $this->app->make(Kernel::class)->bootstrap();
+    }
+
+    /**
+     * @return void
+     */
     protected function setConfig(): void
     {
-        $this->config = require $this->app->configPath('swoole.php');
+        $this->config = $this->app->make('config')->get('swoole');
     }
 
     /**
@@ -85,6 +93,8 @@ class Swoole implements StartContract
     public function run(Container $app, array $params): void
     {
         $this->app = $app;
+
+        $this->bootstrapBaseMiddleware();
 
         $this->setConfig();
 
