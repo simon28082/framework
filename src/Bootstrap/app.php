@@ -12,7 +12,7 @@
 */
 
 $app = new \CrCms\Foundation\Application(
-    realpath(defined('BASE_PATH') ? BASE_PATH : __DIR__.'/../../../../')
+    realpath(__DIR__.'/../../../../')
 );
 
 /*
