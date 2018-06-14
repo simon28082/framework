@@ -11,7 +11,7 @@ class Kernel extends HttpKernel
      */
     protected $bootstrappers = [
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-        \CrCms\Foundation\Bootstrap\LoadConfiguration::class,
+        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
         \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
