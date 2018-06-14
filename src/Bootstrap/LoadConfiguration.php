@@ -2,6 +2,8 @@
 
 namespace CrCms\Foundation\Bootstrap;
 
+use function CrCms\Foundation\App\Helpers\array_merge_recursive_adv;
+use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
 use Exception;
 use SplFileInfo;
 use Illuminate\Config\Repository;
@@ -22,46 +24,17 @@ class LoadConfiguration extends BaseLoadConfiguration
      */
     protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
-        $files = $this->getConfigurationFiles($app);
+        $files = $this->getConfiguration($app);
 
-        $frameworkFiles = $this->getFrameworkConfigFiles($app);
+        $frameworkFiles = $this->getFrameworkConfiguration($app);
 
         if (!isset($files['app']) && !isset($frameworkFiles['app'])) {
             throw new Exception('Unable to load the "app" configuration file.');
         }
 
-        $this->setIntersectConfig($repository, $frameworkFiles, $files);
-
-        $this->setDiffConfig($repository, $frameworkFiles, $files);
-    }
-
-    /**
-     * @param RepositoryContract $repository
-     * @param array $frameworkFiles
-     * @param array $files
-     * @return void
-     */
-    protected function setIntersectConfig(RepositoryContract $repository, array $frameworkFiles, array $files)
-    {
-        $intersectKey = array_intersect_key($frameworkFiles, $files);
-        foreach ($intersectKey as $key => $path) {
-            $tmpArray = require $frameworkFiles[$key];
-            $repository->set($key, array_merge_recursive_adv($tmpArray, require $files[$key]));
-            unset($tmpArray);
-        }
-    }
-
-    /**
-     * @param RepositoryContract $repository
-     * @param array $frameworkFiles
-     * @param array $files
-     * @return void
-     */
-    protected function setDiffConfig(RepositoryContract $repository, array $frameworkFiles, array $files)
-    {
-        $diffKey = array_diff_key($frameworkFiles, $files);
-        foreach ($diffKey as $key => $path) {
-            $repository->set($key, require $path);
+        $mergeConfig = array_merge_recursive_distinct($frameworkFiles, $files);
+        foreach ($mergeConfig as $key => $items) {
+            $repository->set($key, $items);
         }
     }
 
@@ -71,7 +44,7 @@ class LoadConfiguration extends BaseLoadConfiguration
      * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return array
      */
-    protected function getFrameworkConfigFiles(\CrCms\Foundation\Application $app)
+    protected function getFrameworkConfiguration(\CrCms\Foundation\Application $app)
     {
         $files = [];
 
@@ -80,7 +53,7 @@ class LoadConfiguration extends BaseLoadConfiguration
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $directory = $this->getNestedDirectory($file, $configPath);
 
-            $files[$directory . basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $files[$directory . basename($file->getRealPath(), '.php')] = require $file->getRealPath();
         }
 
         ksort($files, SORT_NATURAL);
@@ -88,4 +61,26 @@ class LoadConfiguration extends BaseLoadConfiguration
         return $files;
     }
 
+    /**
+     * Get all of the configuration files for the application.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @return array
+     */
+    protected function getConfiguration(Application $app)
+    {
+        $files = [];
+
+        $configPath = realpath($app->configPath());
+
+        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
+            $directory = $this->getNestedDirectory($file, $configPath);
+
+            $files[$directory . basename($file->getRealPath(), '.php')] = require $file->getRealPath();
+        }
+
+        ksort($files, SORT_NATURAL);
+
+        return $files;
+    }
 }
