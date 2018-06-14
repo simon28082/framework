@@ -114,9 +114,9 @@ class Application extends BaseApplication implements Container
     /**
      * @return string
      */
-    public function modulePath(): string
+    public function modulePath(string $path = ''): string
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'modules';
+        return $this->basePath . DIRECTORY_SEPARATOR . 'modules' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
@@ -134,9 +134,9 @@ class Application extends BaseApplication implements Container
     /**
      * @return string
      */
-    public function extensionPath(): string
+    public function extensionPath(string $path = ''): string
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'extensions';
+        return $this->basePath . DIRECTORY_SEPARATOR . 'extensions' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
@@ -187,6 +187,15 @@ class Application extends BaseApplication implements Container
     public function getCachedRoutesPath()
     {
         return $this->storagePath() . '/run-cache/routes.php';
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function bootstrapPath($path = '')
+    {
+        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src/Bootstrap' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
