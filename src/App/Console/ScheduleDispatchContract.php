@@ -14,5 +14,5 @@ interface ScheduleDispatchContract
      * @param Schedule $schedule
      * @return void
      */
-    public function handle(Schedule $schedule);
+    public function handle(Schedule $schedule): void;
 }
