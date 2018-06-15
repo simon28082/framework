@@ -84,7 +84,7 @@ class Application extends BaseApplication implements Container
      */
     public function useFrameworkResourcePath(string $path)
     {
-        $this->frameworkPath = $path;
+        $this->frameworkResourcePath = $path;
         $this->instance('path.framework_resource', $path);
 
         return $this;
