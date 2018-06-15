@@ -30,7 +30,7 @@ class DirectoryMakeCommand extends Command
     /**
      * @var array
      */
-    protected $modules = ['storage', 'config', 'database'];
+    protected $modules = ['storage', 'config', 'database', 'modules' , 'extensions'];
 
     /**
      * AutoCreateStorageCommand constructor.
@@ -78,6 +78,8 @@ class DirectoryMakeCommand extends Command
             'storage' => $this->storageDirs(),
             'config' => $this->configDirs(),
             'database' => $this->databaseDirs(),
+            'extension' => $this->extensionDirs(),
+            'module' => $this->moduleDirs(),
         ];
 
         return empty($module) ? $modules : $modules[$module] ?? $modules;
@@ -116,6 +118,26 @@ class DirectoryMakeCommand extends Command
             database_path('factories'),
             database_path('migrations'),
             database_path('seeds'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function moduleDirs(): array
+    {
+        return [
+            base_path('modules'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function extensionDirs(): array
+    {
+        return [
+            base_path('extensions'),
         ];
     }
 
