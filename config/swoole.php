@@ -1,6 +1,70 @@
 <?php
 
 return [
+
+    'active_servers' => [
+        'master' => 'http',
+        'salve' => []
+    ],
+
+    'servers' => [
+        'http' => [
+            'drive' => Swoole\Http\Server::class,
+            'host' => '127.0.0.1',
+            'port' => 28080,
+            'mode' => SWOOLE_PROCESS,
+            'type' => SWOOLE_SOCK_TCP,
+            'settings' => [
+                'package_max_length' => 1024 * 1024 * 10//单位：B
+            ],
+            'events' => [
+
+            ]
+        ],
+        'rpc' => [
+            'drive' => \Swoole\Server::class,
+            'host' => '127.0.0.1',
+            'port' => 28081,
+//            'type' => SWOOLE_SOCK_TCP,
+            'settings' => [
+                'package_max_length' => 1024 * 1024 * 10//单位：B
+            ],
+        ]
+    ],
+
+    'public_settings' => [
+        'package_max_length' => 1024 * 1024 * 10//单位：B
+    ],
+
+    'public_events' => [
+        'start' => \CrCms\Foundation\Swoole\Events\StartEvent::class,
+        'worker_start' => \CrCms\Foundation\Swoole\Events\WorkerStartEvent::class,
+        'worker_stop' => '',
+        'worker_exit' => '',
+        'connect' => '',
+        'receive' => '',
+        'packet' => '',
+        'close' => \CrCms\Foundation\Swoole\Events\CloseEvent::class,
+        'buffer_full' => '',
+        'Buffer_empty' => '',
+        'task' => '',
+        'finish' => '',
+        'pipe_message' => '',
+        'worker_error' => '',
+        'manager_start' => \CrCms\Foundation\Swoole\Events\ManagerStartEvent::class,
+        'manager_stop' => '',
+
+        'http' => [
+            'request' => \CrCms\Foundation\Swoole\Events\Http\RequestEvent::class,
+        ],
+
+        'web_socket' => [
+            'open' => \CrCms\Foundation\Swoole\Events\WebSocket\OpenEvent::class,
+            'message' => \CrCms\Foundation\Swoole\Events\WebSocket\MessageEvent::class,
+//            'request' => \CrCms\Foundation\Swoole\Events\Http\RequestEvent::class,
+        ]
+    ],
+
     'host' => '127.0.0.1',
     'port' => 28080,
     'server_type' => 'http',
@@ -61,7 +125,7 @@ return [
         ],
 
         'web_socket' => [
-            'open'=>\CrCms\Foundation\Swoole\Events\WebSocket\OpenEvent::class,
+            'open' => \CrCms\Foundation\Swoole\Events\WebSocket\OpenEvent::class,
             'message' => \CrCms\Foundation\Swoole\Events\WebSocket\MessageEvent::class,
 //            'request' => \CrCms\Foundation\Swoole\Events\Http\RequestEvent::class,
         ]

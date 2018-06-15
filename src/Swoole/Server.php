@@ -25,15 +25,26 @@ class Server
      */
     protected $config;
 
+    const SERVER_TYPE_MASTER = 1;
+
+    const SERVER_TYPE_SALVE = 2;
+
     /**
      * Server constructor.
      * @param Container $app
      */
-    public function __construct(Container $app, array $config)
+    public function __construct(Container $app, array $config, \Swoole\Server $server = null)
     {
         $this->app = $app;
         $this->config = $config;
-        $this->initialization();
+
+        if ($server) {
+            $this->createSalve($server);
+        } else {
+            $this->createMaster();
+        }
+
+//        $this->initialization();
         $this->resolveEvents();
     }
 
@@ -53,24 +64,46 @@ class Server
         return $this->config;
     }
 
-    /**
-     * @return void
-     */
-    protected function initialization(): void
+
+    protected function createMaster()
     {
-        $serverDrive = $this->config['servers'][$this->config['server_type']]['drive'];
-        $serverParams = array_merge([$this->config['host'], $this->config['port']], $this->config['servers'][$this->config['server_type']]['params']);
+        $serverDrive = $this->config['drive'];
+        $serverParams = [
+            $this->config['host'],
+            $this->config['port'],
+            $this->config['mode'],
+            $this->config['type'],
+        ];//array_merge([$this->config['host'], $this->config['port']], $this->config['servers'][$this->config['server_type']]['params']);
         $this->server = new $serverDrive(...$serverParams);
         $this->server->set($this->config['settings']);
     }
 
-    /**
-     * @param Container $app
-     */
-    public function start(): void
+    protected function createSalve(\Swoole\Server $master)
     {
-        $this->server->start();
+        if ($master instanceof \Swoole\Http\Server || $master instanceof \Swoole\WebSocket\Server) {
+            $this->server = $master->addListener($this->config['host'],$this->config['port'],$this->config['type']);
+        } else {
+            $this->server = $master->listen($this->config['host'],$this->config['port'],$this->config['type']);
+        }
+        $this->server->set($this->config['settings']);
     }
+
+    /**
+     * @return void
+     */
+//    protected function initialization(): void
+//    {
+//        $serverDrive = $this->config['drive'];
+//        $serverParams = [
+//            $this->config['host'],
+//            $this->config['port'],
+//            $this->config['mode'],
+//            $this->config['type'],
+//        ];//array_merge([$this->config['host'], $this->config['port']], $this->config['servers'][$this->config['server_type']]['params']);
+//        $this->server = new $serverDrive(...$serverParams);
+//        $this->server->set($this->config['settings']);
+//    }
+
 
     /**
      * @return void

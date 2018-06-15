@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use CrCms\Foundation\Swoole\INotify;
 use CrCms\Foundation\Swoole\Server;
 use CrCms\Foundation\StartContract;
+use CrCms\Foundation\Swoole\ServerManage;
 use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use Illuminate\Contracts\Container\Container;
 use Swoole\Async;
@@ -32,10 +33,15 @@ class Swoole implements StartContract
      */
     protected $allows = ['start', 'stop', 'restart', 'reload'];
 
+//    /**
+//     * @var Server
+//     */
+//    protected $server;
+
     /**
-     * @var Server
+     * @var ServerManage
      */
-    protected $server;
+    protected $serverManage;
 
     /**
      * @var Container
@@ -47,9 +53,9 @@ class Swoole implements StartContract
      * @param array $config
      * @return void
      */
-    protected function setServer(Container $app, array $config): void
+    protected function setServerManage(): void
     {
-        $this->server = new Server($app, $config);
+        $this->serverManage = new ServerManage($this->app, $this->config);
     }
 
     /**
@@ -66,7 +72,7 @@ class Swoole implements StartContract
      */
     protected function initialization(): void
     {
-        $this->setServer($this->app, $this->config);
+        $this->setServerManage($this->app, $this->config);
     }
 
     /**
@@ -121,7 +127,7 @@ class Swoole implements StartContract
             throw new UnexpectedValueException('The process already exists and cannot be opened again');
         }
 
-        $this->initialization();
+        $this->setServerManage();
 
         try {
             $process = new Process(function (Process $process) {
@@ -129,7 +135,7 @@ class Swoole implements StartContract
                     $this->setINotifyProcess();
                 }
 
-                $this->server->getSwooleServer()->start();
+                $this->serverManage->start();
             });
 
             $pid = $process->start();
@@ -220,13 +226,13 @@ class Swoole implements StartContract
             static::setProcessName($this->config['process_prefix'] . 'notify');
             $iNotify->monitor(function ($events) {
                 if (!empty($events)) {
-                    $this->server->getSwooleServer()->reload();
+                    $this->serverManage->reload();
                     Async::writeFile($this->config['notify']['log_path'], 'The notify process is reload' . Carbon::now()->toDateTimeString() . PHP_EOL, null, FILE_APPEND);
                 }
             });
         });
 
-        $this->server->getSwooleServer()->addProcess($iNotifyProcess);
+        $this->serverManage->getMaster()->getSwooleServer()->addProcess($iNotifyProcess);
     }
 
     /**
