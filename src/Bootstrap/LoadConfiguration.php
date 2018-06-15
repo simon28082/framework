@@ -33,6 +33,7 @@ class LoadConfiguration extends BaseLoadConfiguration
         }
 
         $mergeConfig = array_merge_recursive_distinct($frameworkFiles, $files);
+
         foreach ($mergeConfig as $key => $items) {
             $repository->set($key, $items);
         }
@@ -71,7 +72,13 @@ class LoadConfiguration extends BaseLoadConfiguration
     {
         $files = [];
 
-        $configPath = realpath($app->configPath());
+        $configPath = $app->configPath();
+
+        if (file_exists($configPath) && is_dir($configPath)) {
+            $configPath = realpath($configPath);
+        } else {
+            return [];
+        }
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $directory = $this->getNestedDirectory($file, $configPath);
