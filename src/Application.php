@@ -41,13 +41,13 @@ class Application extends BaseApplication implements Container
      */
     protected function bindPathsInContainer()
     {
-        parent::bindPathsInContainer();
-
         $this->useFrameworkPath($this->frameworkPath());
         $this->useFrameworkConfigPath($this->frameworkConfigPath());
         $this->useFrameworkResourcePath($this->frameworkResourcePath());
         $this->useModulePath($this->modulePath());
         $this->useExtensionPath($this->extensionPath());
+
+        parent::bindPathsInContainer();
     }
 
     /**
