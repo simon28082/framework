@@ -2,6 +2,9 @@
 
 namespace CrCms\Foundation;
 
+use CrCms\Foundation\Foundation\PackageManifest;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as BaseApplication;
 
@@ -48,6 +51,20 @@ class Application extends BaseApplication implements Container
         $this->useExtensionPath($this->extensionPath());
 
         parent::bindPathsInContainer();
+    }
+
+    /**
+     * Register the basic bindings into the container.
+     *
+     * @return void
+     */
+    protected function registerBaseBindings()
+    {
+        parent::registerBaseBindings();
+
+        $this->instance(BasePackageManifest::class, new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 
     /**
