@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Service Unavailable</title>
+        <title>Forbidden</title>
 
         <style>
             html, body {
@@ -38,7 +38,7 @@
     <body>
         <div class="container">
             <div class="content">
-                <div class="title">503</div>
+                <div class="title">403</div>
             </div>
         </div>
     </body>
