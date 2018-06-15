@@ -155,11 +155,11 @@ return [
         /*
          * Application Service Providers...
          */
-        \CrCms\Foundation\App\Providers\AppServiceProvider::class,
+        CrCms\Foundation\App\Providers\EventServiceProvider::class,
+        CrCms\Foundation\App\Providers\RouteServiceProvider::class,
         //App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        \CrCms\Foundation\App\Providers\EventServiceProvider::class,
-        \CrCms\Foundation\App\Providers\RouteServiceProvider::class,
+        CrCms\Foundation\App\Providers\CrCmsServiceProvider::class,
     ],
 
     /*
