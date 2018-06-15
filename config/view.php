@@ -15,6 +15,7 @@ return [
 
     'paths' => [
         resource_path('views'),
+        \CrCms\Foundation\App\Helpers\framework_path('resources/views')
     ],
 
     /*
