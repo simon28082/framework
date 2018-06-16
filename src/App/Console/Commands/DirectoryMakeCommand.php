@@ -6,6 +6,10 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Class DirectoryMakeCommand
+ * @package CrCms\Foundation\Console\Commands
+ */
 class DirectoryMakeCommand extends Command
 {
     /**
@@ -30,7 +34,7 @@ class DirectoryMakeCommand extends Command
     /**
      * @var array
      */
-    protected $modules = ['storage', 'config', 'database', 'modules' , 'extensions'];
+    protected $modules = ['storage', 'config', 'database', 'modules', 'extensions', 'routes'];
 
     /**
      * AutoCreateStorageCommand constructor.
@@ -43,25 +47,56 @@ class DirectoryMakeCommand extends Command
     }
 
     /**
-     *
+     * @return void
      */
     public function handle(): void
     {
         $name = $this->argument('name');
 
         if (in_array($name, $this->modules, true)) {
-            $modules = $this->dirs($name);
-            foreach ($modules as $dir) {
-                if (!$this->files->exists($dir)) {
-                    $this->files->makeDirectory($dir, 0755, true);
-                }
-            }
+            call_user_func([$this, 'create' . ucfirst($name)]);
         } else {
             $path = base_path($name);
             if (!$this->files->exists($path)) {
                 $this->files->makeDirectory(base_path($name), 0755, true);
             }
         }
+    }
+
+    /**
+     * @return void
+     */
+    protected function createDatabase(): void
+    {
+        $this->autoCreateDirs([
+            database_path('factories'),
+            database_path('migrations'),
+            database_path('seeds'),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    protected function createConfig(): void
+    {
+        $this->autoCreateDirs(config_path());
+    }
+
+    /**
+     * @return void
+     */
+    protected function createStorage(): void
+    {
+        $this->autoCreateDirs([
+            'runCachePath' => storage_path('run-cache'),
+            'sessionFilePath' => config('session.files'),
+            'cachePath' => config('cache.stores.file.path'),
+            'viewPath' => config('view.compiled'),
+            'logPath' => storage_path('logs'),
+            'appPublicPath' => storage_path('app/public'),
+            'testingPath' => storage_path('framework/testing'),
+        ]);
 
         $gitignore = storage_path('.gitignore');
         if (!$this->files->exists($gitignore)) {
@@ -70,49 +105,44 @@ class DirectoryMakeCommand extends Command
     }
 
     /**
-     * @return array
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return void
      */
-    protected function dirs(string $module = ''): array
+    protected function createRoutes(): void
     {
-        $modules = [
-            'storage' => $this->storageDirs(),
-            'config' => $this->configDirs(),
-            'database' => $this->databaseDirs(),
-            'extension' => $this->extensionDirs(),
-            'module' => $this->moduleDirs(),
-        ];
+        $routePath = base_path('routes');
+        if (!$this->files->exists($routePath)) {
+            $this->files->makeDirectory($routePath, 0755, true);
+        }
 
-        return empty($module) ? $modules : $modules[$module] ?? $modules;
+        $webFile = base_path('routes/web.php');
+        if (!$this->files->exists($webFile)) {
+            $this->files->put($webFile, $this->files->get(__DIR__ . '/stubs/web-route.stub'));
+        }
+
+        $webFile = base_path('routes/api.php');
+        if (!$this->files->exists($webFile)) {
+            $this->files->put($webFile, $this->files->get(__DIR__ . '/stubs/api-route.stub'));
+        }
     }
 
     /**
-     * @return array
+     * @param array $dirs
+     * @return void
      */
-    protected function storageDirs(): array
+    protected function autoCreateDirs(array $dirs): void
     {
-        return [
-            'runCachePath' => storage_path('run-cache'),
-            'sessionFilePath' => config('session.files'),
-            'cachePath' => config('cache.stores.file.path'),
-            'viewPath' => config('view.compiled'),
-            'logPath' => storage_path('logs'),
-            'appPublicPath' => storage_path('app/public'),
-            'testingPath' => storage_path('framework/testing'),
-        ];
+        foreach ($dirs as $dir) {
+            if (!$this->files->exists($dir)) {
+                $this->files->makeDirectory($dir, 0755, true);
+            }
+        }
     }
 
     /**
-     * @return array
+     * @return void
      */
-    protected function configDirs(): array
-    {
-        return [config_path()];
-    }
-
-    /**
-     * @return array
-     */
-    protected function databaseDirs(): array
+    protected function databaseDirs(): void
     {
         return [
             database_path('factories'),
@@ -122,23 +152,23 @@ class DirectoryMakeCommand extends Command
     }
 
     /**
-     * @return array
+     * @return void
      */
-    protected function moduleDirs(): array
+    protected function createModules(): void
     {
-        return [
+        return $this->autoCreateDirs([
             base_path('modules'),
-        ];
+        ]);
     }
 
     /**
-     * @return array
+     * @return void
      */
-    protected function extensionDirs(): array
+    protected function createExtensions(): void
     {
-        return [
+        return $this->autoCreateDirs([
             base_path('extensions'),
-        ];
+        ]);
     }
 
     /**
