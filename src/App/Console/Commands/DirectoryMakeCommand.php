@@ -142,18 +142,6 @@ class DirectoryMakeCommand extends Command
     /**
      * @return void
      */
-    protected function databaseDirs(): void
-    {
-        return [
-            database_path('factories'),
-            database_path('migrations'),
-            database_path('seeds'),
-        ];
-    }
-
-    /**
-     * @return void
-     */
     protected function createModules(): void
     {
         return $this->autoCreateDirs([
