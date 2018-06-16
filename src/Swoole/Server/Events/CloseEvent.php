@@ -1,8 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Events;
+namespace CrCms\Foundation\Swoole\Server\Events;
 
-use CrCms\Foundation\Swoole\Server;
+use CrCms\Foundation\Swoole\Server\AbstractServer;
+use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 class CloseEvent extends AbstractEvent implements EventContract
 {
@@ -21,7 +22,7 @@ class CloseEvent extends AbstractEvent implements EventContract
         $this->reactorId = $reactorId;
     }
 
-    public function handle(Server $server): void
+    public function handle(AbstractServer $server): void
     {
     }
 }

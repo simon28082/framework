@@ -1,11 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Events\Http;
+namespace CrCms\Foundation\Swoole\Server\Http\Events;
 
 use Carbon\Carbon;
-use CrCms\Foundation\Swoole\Server;
-use CrCms\Foundation\Swoole\Events\AbstractEvent;
-use CrCms\Foundation\Swoole\Events\EventContract;
+use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;
+use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 use Illuminate\Http\Response as IlluminateResponse;
 use Swoole\Async;
 use Swoole\Http\Request as SwooleRequest;
@@ -15,6 +14,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use CrCms\Foundation\Swoole\Server\AbstractServer;
 
 /**
  * Class RequestEvent
@@ -43,6 +43,11 @@ class RequestEvent extends AbstractEvent implements EventContract
     protected $illuminateResponse;
 
     /**
+     * @var Kernel
+     */
+    protected $kernel;
+
+    /**
      * Request constructor.
      * @param SwooleRequest $request
      * @param SwooleResponse $response
@@ -51,6 +56,7 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         $this->request = $request;
         $this->response = $response;
+        $this->kernel = app(Kernel::class);
         $this->illuminateRequest = $this->createIlluminateRequest();
         $this->illuminateResponse = $this->createIlluminateResponse();
     }
@@ -58,11 +64,11 @@ class RequestEvent extends AbstractEvent implements EventContract
     /**
      * @return void
      */
-    public function handle(Server $server): void
+    public function handle(AbstractServer $server): void
     {
         parent::handle($server);
 
-        $this->requestLog();
+//        $this->requestLog();
 
         $this->setResponse();
     }
@@ -94,8 +100,7 @@ class RequestEvent extends AbstractEvent implements EventContract
 
         $this->response->end($this->illuminateResponse->getContent());
 
-        $kernel = app()->make(Kernel::class);
-        $kernel->terminate($this->illuminateRequest, $this->illuminateResponse);
+        $this->kernel->terminate($this->illuminateRequest, $this->illuminateResponse);
     }
 
     /**
@@ -103,9 +108,7 @@ class RequestEvent extends AbstractEvent implements EventContract
      */
     protected function createIlluminateResponse(): Response
     {
-        $kernel = app()->make(Kernel::class);
-
-        return $kernel->handle($this->illuminateRequest);
+        return $this->kernel->handle($this->illuminateRequest);
     }
 
     /**

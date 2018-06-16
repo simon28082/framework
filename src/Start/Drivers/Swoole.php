@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use CrCms\Foundation\Swoole\INotify;
 use CrCms\Foundation\Swoole\Server;
 use CrCms\Foundation\StartContract;
-use CrCms\Foundation\Swoole\ServerManage;
 use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use Illuminate\Contracts\Container\Container;
 use Swoole\Async;
@@ -55,7 +54,7 @@ class Swoole implements StartContract
      */
     protected function setServerManage(): void
     {
-        $this->serverManage = new ServerManage($this->app, $this->config);
+        $this->serverManage = new Server\ServerManage($this->app);
     }
 
     /**
@@ -70,10 +69,10 @@ class Swoole implements StartContract
     /**
      * @return void
      */
-    protected function initialization(): void
-    {
-        $this->setServerManage($this->app, $this->config);
-    }
+//    protected function initialization(): void
+//    {
+//        $this->setServerManage($this->app, $this->config);
+//    }
 
     /**
      * @return void
@@ -100,22 +99,30 @@ class Swoole implements StartContract
     {
         $this->app = $app;
 
-        $this->bootstrapBaseMiddleware();
-
-        $this->setConfig();
+//        $this->bootstrapBaseMiddleware();
+//
+//        $this->setConfig();
+//
+//        //all  http websocket  socket
+//        $type = $params[1];
+//        if (in_array($params[1]))
 
         $action = $params[1] ?? 'start';
 
-        if (in_array($action, $this->allows, true)) {
-            try {
-                $this->{$action}();
-            } catch (Exception $exception) {
-                $this->log($exception->getMessage());
-                echo $exception->getMessage() . PHP_EOL;
-            }
-        } else {
-            echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
-        }
+        $this->setServerManage();
+
+        $this->serverManage->start();
+//
+//        if (in_array($action, $this->allows, true)) {
+//            try {
+//                $this->{$action}();
+//            } catch (Exception $exception) {
+//                $this->log($exception->getMessage());
+//                echo $exception->getMessage() . PHP_EOL;
+//            }
+//        } else {
+//            echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
+//        }
     }
 
     /**

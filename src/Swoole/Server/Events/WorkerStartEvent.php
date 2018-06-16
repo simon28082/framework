@@ -1,9 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Events;
+namespace CrCms\Foundation\Swoole\Server\Events;
 
-use CrCms\Foundation\Swoole\Server;
+use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
+use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 /**
  * Class WorkStartEvent
@@ -30,11 +31,11 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
     /**
      * @param Server $server
      */
-    public function handle(Server $server): void
+    public function handle(AbstractServer $server): void
     {
         parent::handle($server);
 
-        $this->setWorkOrTaskProcessName();
+//        $this->setWorkOrTaskProcessName();
     }
 
     /**
