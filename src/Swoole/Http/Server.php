@@ -7,10 +7,10 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\Server\Http;
+namespace CrCms\Foundation\Swoole\Http;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\Server\Http\Events\RequestEvent;
+use CrCms\Foundation\Swoole\Http\Events\RequestEvent;
 use Illuminate\Contracts\Http\Kernel;
 use Swoole\Http\Server as HttpServer;
 use Swoole\Server as SwooleServer;

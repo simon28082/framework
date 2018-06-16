@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Server\Http\Events;
+namespace CrCms\Foundation\Swoole\Http\Events;
 
 use Carbon\Carbon;
 use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;

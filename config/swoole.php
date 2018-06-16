@@ -12,7 +12,7 @@ return [
     ],
 
     'drives' => [
-        'http' => \CrCms\Foundation\Swoole\Server\Http\Server::class
+        'http' => \CrCms\Foundation\Swoole\Http\Server::class
     ],
 
     'notify' => [
