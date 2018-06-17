@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use CrCms\Foundation\Swoole\INotify;
 use CrCms\Foundation\Swoole\Server;
 use CrCms\Foundation\StartContract;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use Illuminate\Contracts\Container\Container;
 use Swoole\Async;
 use Swoole\Process;
@@ -20,25 +19,13 @@ use Illuminate\Contracts\Http\Kernel;
  */
 class Swoole implements StartContract
 {
-    use ProcessNameTrait;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
     /**
      * @var array
      */
     protected $allows = ['start', 'stop', 'restart', 'reload'];
 
-//    /**
-//     * @var Server
-//     */
-//    protected $server;
-
     /**
-     * @var ServerManage
+     * @var Server\ServerManage
      */
     protected $serverManage;
 
@@ -48,9 +35,7 @@ class Swoole implements StartContract
     protected $app;
 
     /**
-     * @param Container $app
-     * @param array $config
-     * @return void
+     *
      */
     protected function setServerManage(): void
     {
@@ -67,33 +52,8 @@ class Swoole implements StartContract
     }
 
     /**
-     * @return void
-     */
-//    protected function initialization(): void
-//    {
-//        $this->setServerManage($this->app, $this->config);
-//    }
-
-    /**
-     * @return void
-     */
-    protected function bootstrapBaseMiddleware(): void
-    {
-        $this->app->make(Kernel::class)->bootstrap();
-    }
-
-    /**
-     * @return void
-     */
-    protected function setConfig(): void
-    {
-        $this->config = $this->app->make('config')->get('swoole');
-    }
-
-    /**
      * @param Container $app
-     * @param string $action
-     * @return void
+     * @param array $params
      */
     public function run(Container $app, array $params): void
     {
@@ -103,7 +63,6 @@ class Swoole implements StartContract
 
         $this->setServerManage();
 
-//
         if (in_array($action, $this->allows, true)) {
             try {
                 $this->serverManage->{$action}();
@@ -117,122 +76,5 @@ class Swoole implements StartContract
         } else {
             echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
         }
-    }
-
-    /**
-     * @return void
-     */
-    protected function start(): void
-    {
-        if ($this->killProcess($this->getPid(), 0)) {
-            throw new UnexpectedValueException('The process already exists and cannot be opened again');
-        }
-
-        $this->setServerManage();
-
-        try {
-            $process = new Process(function (Process $process) {
-                if ($this->config['notify']['monitor']) {
-                    $this->setINotifyProcess();
-                }
-
-                $this->serverManage->start();
-            });
-
-            $pid = $process->start();
-
-            $this->setPid($pid);
-
-            echo "Server PID[{$pid}] start success" . PHP_EOL;
-
-        } catch (Exception $exception) {
-            $this->stop();
-            $this->log($exception->getMessage());
-            echo $exception->getMessage() . PHP_EOL;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function stop(): void
-    {
-        $pid = $this->getPid();
-
-        if (!$this->killProcess($pid, 0)) {
-            throw new UnexpectedValueException('The process does not exist and cannot terminate the process');
-        }
-
-        try {
-            if ($this->killProcess($pid, SIGTERM)) {
-                @unlink($this->config['pid_file']);
-            }
-            echo "The process[{$pid}] is stopped" . PHP_EOL;
-        } catch (Exception $exception) {
-            $this->log($exception);
-            echo $exception->getMessage() . PHP_EOL;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function restart(): void
-    {
-        $this->stop();
-        sleep(3);
-        $this->start();
-
-        echo "The process is restart" . PHP_EOL;
-    }
-
-    /**
-     * @return void
-     */
-    protected function reload(): void
-    {
-        $pid = $this->getPid();
-        if (!$this->killProcess($pid, 0)) {
-            throw new UnexpectedValueException('The process does not exist and cannot be restarted');
-        }
-
-        try {
-            if ($this->killProcess($pid, SIGUSR1)) {
-                echo "The process is reload" . PHP_EOL;
-            }
-        } catch (Exception $exception) {
-            $this->log($exception);
-            echo $exception->getMessage() . PHP_EOL;
-        }
-    }
-
-    /**
-     * @param int $pid
-     * @param int $sign
-     * @return bool
-     */
-    protected function killProcess(int $pid, int $sign): bool
-    {
-        return Process::kill($pid, $sign);
-    }
-
-    /**
-     * @return void
-     */
-    protected function setINotifyProcess(): void
-    {
-        $iNotify = new INotify($this->config['notify']['targets']);
-
-        $iNotifyProcess = new Process(function (Process $process) use ($iNotify) {
-            static::setProcessName($this->config['process_prefix'] . 'notify');
-            $iNotify->monitor(function ($events) {
-                if (!empty($events)) {
-                    $this->serverManage->reload();
-                    Async::writeFile($this->config['notify']['log_path'], 'The notify process is reload' . Carbon::now()->toDateTimeString() . PHP_EOL, null, FILE_APPEND);
-                }
-            });
-        });
-
-        $this->serverManage->getMaster()->getSwooleServer()->addProcess($iNotifyProcess);
     }
 }
