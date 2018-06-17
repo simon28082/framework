@@ -11,7 +11,6 @@ namespace CrCms\Foundation\Swoole\Server;
 
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Swoole\Process;
@@ -26,8 +25,6 @@ use function CrCms\Foundation\App\Helpers\framework_config_path;
  */
 class ServerManage implements StartActionContract
 {
-    use ProcessNameTrait;
-
     /**
      * @var Container
      */
@@ -68,8 +65,8 @@ class ServerManage implements StartActionContract
                 // 放内，在进程内再创建Server，合理一点
                 $server->createServer();
                 $server->start();
-            }, true, false);
-            $process->name('swoole_main_' . strval($key));
+            });//, true, false
+            $process->name('swoole_main_process_' . strval($key));
             //file_put_contents(storage_path('abc'),$process->read());
             return $process->start();
         });
