@@ -26,6 +26,7 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
     public function __construct(int $workId)
     {
         $this->workId = $workId;
+        $this->setWorkOrTaskProcessName();
     }
 
     /**
@@ -34,8 +35,6 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
     public function handle(AbstractServer $server): void
     {
         parent::handle($server);
-
-        $this->setWorkOrTaskProcessName();
     }
 
     /**
