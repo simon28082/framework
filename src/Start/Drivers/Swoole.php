@@ -99,30 +99,24 @@ class Swoole implements StartContract
     {
         $this->app = $app;
 
-//        $this->bootstrapBaseMiddleware();
-//
-//        $this->setConfig();
-//
-//        //all  http websocket  socket
-//        $type = $params[1];
-//        if (in_array($params[1]))
-
         $action = $params[1] ?? 'start';
 
         $this->setServerManage();
 
-        $this->serverManage->start();
 //
-//        if (in_array($action, $this->allows, true)) {
-//            try {
-//                $this->{$action}();
-//            } catch (Exception $exception) {
-//                $this->log($exception->getMessage());
-//                echo $exception->getMessage() . PHP_EOL;
-//            }
-//        } else {
-//            echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
-//        }
+        if (in_array($action, $this->allows, true)) {
+            try {
+                $this->serverManage->{$action}();
+
+                echo "{$action} successfully" . PHP_EOL;
+
+            } catch (Exception $exception) {
+                //$this->log($exception->getMessage());
+                echo $exception->getMessage() . PHP_EOL;
+            }
+        } else {
+            echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
+        }
     }
 
     /**
@@ -240,29 +234,5 @@ class Swoole implements StartContract
         });
 
         $this->serverManage->getMaster()->getSwooleServer()->addProcess($iNotifyProcess);
-    }
-
-    /**
-     * @return int
-     */
-    protected function getPid(): int
-    {
-        if (file_exists($this->config['pid_file'])) {
-            $pid = file_get_contents($this->config['pid_file']);
-            if (is_numeric($pid)) {
-                return intval($pid);
-            }
-        }
-
-        return -100000000;
-    }
-
-    /**
-     * @param int $pid
-     * @return int
-     */
-    protected function setPid(int $pid): int
-    {
-        return file_put_contents($this->config['pid_file'], $pid);
     }
 }
