@@ -15,15 +15,18 @@ use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 /**
  * Class ManagerStartEvent
- * @package CrCms\Foundation\Swoole\Events
+ * @package CrCms\Foundation\Swoole\Server\Events
  */
 class ManagerStartEvent extends AbstractEvent implements EventContract
 {
     use ProcessNameTrait;
 
+    /**
+     * @param AbstractServer $server
+     */
     public function handle(AbstractServer $server): void
     {
         parent::handle($server);
-//        static::setProcessName($this->server->getConfig()['process_prefix'].'manage');
+        static::setProcessName(config('swoole.process_prefix') . 'manage');
     }
 }

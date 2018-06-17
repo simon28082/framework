@@ -7,8 +7,8 @@ use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 /**
- * Class WorkStartEvent
- * @package CrCms\Foundation\Swoole\Events
+ * Class WorkerStartEvent
+ * @package CrCms\Foundation\Swoole\Server\Events
  */
 class WorkerStartEvent extends AbstractEvent implements EventContract
 {
@@ -29,25 +29,28 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
     }
 
     /**
-     * @param Server $server
+     * @param AbstractServer $server
      */
     public function handle(AbstractServer $server): void
     {
         parent::handle($server);
 
-//        $this->setWorkOrTaskProcessName();
+        $this->setWorkOrTaskProcessName();
     }
 
     /**
-     * @return void
+     *
      */
     protected function setWorkOrTaskProcessName(): void
     {
-        $processPrefix = $this->server->getConfig()['process_prefix'];
-        if ($this->swooleServer->taskworker) {
-            static::setProcessName($processPrefix.'task');
-        } else {
-            static::setProcessName($processPrefix.'worker');
-        }
+        $processPrefix = config('swoole.process_prefix');
+
+        $processName = (
+            $this->server->taskworker ?
+                $processPrefix . 'task_' :
+                $processPrefix . 'worker_'
+            ) . strval($this->workId);
+
+        static::setProcessName($processName);
     }
 }
