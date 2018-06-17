@@ -144,7 +144,7 @@ class DirectoryMakeCommand extends Command
      */
     protected function createModules(): void
     {
-        return $this->autoCreateDirs([
+        $this->autoCreateDirs([
             base_path('modules'),
         ]);
     }
@@ -154,7 +154,7 @@ class DirectoryMakeCommand extends Command
      */
     protected function createExtensions(): void
     {
-        return $this->autoCreateDirs([
+        $this->autoCreateDirs([
             base_path('extensions'),
         ]);
     }
