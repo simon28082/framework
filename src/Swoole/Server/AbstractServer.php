@@ -171,6 +171,19 @@ abstract class AbstractServer implements StartActionContract
      * @param string $name
      * @return mixed
      */
+    public function __get(string $name)
+    {
+        if (isset($this->server->{$name})) {
+            return $this->server->{$name};
+        }
+
+        throw new InvalidArgumentException('The attributes is not exists');
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
     /*    public function __get(string $name)
         {
             if (in_array(
