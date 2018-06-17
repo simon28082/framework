@@ -9,118 +9,156 @@
 
 namespace CrCms\Foundation\Swoole\Server;
 
-
-use function CrCms\Foundation\App\Helpers\framework_config_path;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
+use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Support\Collection;
+use Swoole\Process;
+use UnexpectedValueException;
+use RuntimeException;
 use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
-use Swoole\Process\Pool;
+use function CrCms\Foundation\App\Helpers\framework_config_path;
 
+/**
+ * Class ServerManage
+ * @package CrCms\Foundation\Swoole\Server
+ */
 class ServerManage implements StartActionContract
 {
-//    protected $config;
-//
-//    public function __construct(Config $config)
-//    {
-//        $this->config = $config;
-//    }
+    use ProcessNameTrait;
 
+    /**
+     * @var Container
+     */
     protected $app;
 
     /**
      * @var array
      */
-    protected $servers;
-
-    protected $config;
-
+    protected $pids;
 
     /**
-     * @var Pool
+     * @var
      */
-    protected $pool;
+    protected $config;
 
+    /**
+     * ServerManage constructor.
+     * @param Container $app
+     */
     public function __construct(Container $app)
     {
         $this->app = $app;
-
-
-
         $this->loadConfiguration();
-
-//        $this->createServers();
-
-        $this->createPool();
     }
 
-
-    protected function createServers()
+    /**
+     * @return bool
+     */
+    public function start(): bool
     {
-        foreach ($this->config['servers'] as $server) {
-
-            $drive = $this->config['drives'][$server['drive']] ?? '';
-
-            if (!empty($drive) && class_exists($drive)) {
-                $this->servers[] = new $drive($this->app, $server);
-            }
+        if ($this->pidExists()) {
+            throw new UnexpectedValueException('Swoole server is running');
         }
-    }
 
-
-    protected function createPool()
-    {
-
-//        for ($i = 0; $i < count($this->servers); $i++)
-//        {
-//            $p = new \swoole_process(function () use ($i) {
-//                $this->servers[$i]->start();
-//            }, false, false);
-//            $p->start();
-//        }
-
-        $workerNum = 10;
-        $this->pool = new \Swoole\Process\Pool(count($this->config['servers']));
-$this->createServers();
-        $this->pool->on("WorkerStart", function ($pool, $workerId) {
-            $this->servers[$workerId]->start();
+        $pids = $this->servers()->map(function (ServerContract $server, int $key) {
+            $process = new Process(function () use ($server) {
+                // 经过测试放在 Process内外都可以
+                // 放内，在进程内再创建Server，合理一点
+                $server->createServer();
+                $server->start();
+            }, true, false);
+            $process->name('swoole_main_' . strval($key));
+            //file_put_contents(storage_path('abc'),$process->read());
+            return $process->start();
         });
-//
-//        $pool->on("WorkerStop", function ($pool, $workerId) {
-//            echo "Worker#{$workerId} is stopped\n";
-//        });
-//
-//        $pool->start();
 
-//        $this->pool = new Pool(count($this->servers));
-//        $this->pool->on('workerStart', [$this, 'onWorkStart']);
-//        $this->pool->on('workerStop', [$this, 'onWorkerStop']);
-        $this->pool->start();
+        return $this->storePid($pids);
     }
 
-
-    protected function onWorkStart(Pool $pool, int $workdId): void
+    /**
+     * @return bool
+     */
+    public function stop(): bool
     {
-        $this->servers[$workdId]->start();
+        if (!$this->pidExists()) {
+            throw new UnexpectedValueException('Swoole server is not running');
+        }
+
+        $this->currentPids()->map(function ($pid) {
+            if (!Process::kill($pid)) {
+                throw new RuntimeException("The process[pid:{$pid}] kill error");
+            }
+        });
+
+        return $this->deletePid();
     }
 
-
-    protected function onWorkerStop(Pool $pool, $workdId): void
+    /**
+     * @return bool
+     */
+    public function restart(): bool
     {
+        $this->stop();
 
+        sleep(3);
+
+        return $this->start();
     }
 
-    protected function createHttpServer()
+    /**
+     * @param int $pid
+     * @return int
+     */
+    protected function storePid(Collection $pids): int
     {
-
+        return file_put_contents($this->config['pid_file'], $pids->implode(','));
     }
 
-    protected function createWebSocketServer()
+    /**
+     * @return bool
+     */
+    protected function deletePid(): bool
     {
+        if (!$this->pidExists()) {
+            return true;
+        }
 
+        $result = @unlink($this->config['pid_file']);
+        if (!$result) {
+            throw new RuntimeException("Remove pid file : [{$this->config['pid_file']}] error");
+        }
+
+        return $result;
     }
 
+    /**
+     * @return bool
+     */
+    protected function pidExists(): bool
+    {
+        return file_exists($this->config['pid_file']) && filesize($this->config['pid_file']) > 0;
+    }
+
+    /**
+     * @return Collection
+     */
+    protected function currentPids(): Collection
+    {
+        if (!$this->pidExists()) {
+            return collect([]);
+        }
+
+        $pids = file_get_contents($this->config['pid_file']);
+        return collect(explode(',', $pids))->map(function ($pid) {
+            return intval($pid);
+        });
+    }
+
+    /**
+     *
+     */
     protected function loadConfiguration(): void
     {
         $config = require framework_config_path('swoole.php');
@@ -133,44 +171,18 @@ $this->createServers();
         $this->config = $config;
     }
 
-    protected function mergeConfig()
+    /**
+     * @return Collection
+     */
+    protected function servers(): Collection
     {
-        $config = $this->config['servers'][$key];
-        $config['settings'] = array_merge($this->config['public_settings'], $config['settings']);
-        $config['events'] = array_merge($this->config['public_events'], $config['events']);
-        return $config;
-    }
-
-    protected function p(array $servers)
-    {
-        $pool = new Pool(count($servers));
-
-        $pool->on('workerStart', function ($pool, $workerId) use ($servers) {
-            $servers[$workerId]->start();
+        return collect($this->config['servers'])->map(function ($server) {
+            $server['drive'] = $this->config['drives'][$server['drive']] ?? '';
+            return $server;
+        })->filter(function ($server) {
+            return !empty($server['drive']) && class_exists($server['drive']);
+        })->map(function ($server) {
+            return new $server['drive']($this->app, $server);
         });
-    }
-
-//
-//    protected function createRpcServer()
-//    {
-//
-//    }
-
-    public function start(): bool
-    {
-        return true;
-//        $this->pool->start();
-    }
-
-    public function stop(): bool
-    {
-        return true;
-        // TODO: Implement stop() method.
-    }
-
-    public function restart(): bool
-    {
-        return true;
-        // TODO: Implement restart() method.
     }
 }
