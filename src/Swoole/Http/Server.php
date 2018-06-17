@@ -11,16 +11,19 @@ namespace CrCms\Foundation\Swoole\Http;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Http\Events\RequestEvent;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Contracts\Http\Kernel;
 use Swoole\Http\Server as HttpServer;
-use Swoole\Server as SwooleServer;
 
 /**
  * Class Server
- * @package CrCms\Foundation\Swoole\Server\Http
+ * @package CrCms\Foundation\Swoole\Http
  */
-class Server extends AbstractServer
+class Server extends AbstractServer implements ServerContract
 {
+    /**
+     * @var array
+     */
     protected $events = [
         'request' => RequestEvent::class,
     ];
@@ -37,15 +40,17 @@ class Server extends AbstractServer
      * @param array $config
      * @return SwooleServer
      */
-    protected function createServer(array $config): SwooleServer
+    public function createServer(): void
     {
         $serverParams = [
-            $config['host'],
-            $config['port'],
-            $config['mode'] ?? SWOOLE_PROCESS,
-            $config['type'] ?? SWOOLE_SOCK_TCP,
+            $this->config['host'],
+            $this->config['port'],
+            $this->config['mode'] ?? SWOOLE_PROCESS,
+            $this->config['type'] ?? SWOOLE_SOCK_TCP,
         ];
 
-        return new HttpServer(...$serverParams);
+        $this->server = new HttpServer(...$serverParams);
+        $this->setSettings($this->config['settings'] ?? []);
+        $this->eventDispatcher($this->config['events'] ?? []);
     }
 }

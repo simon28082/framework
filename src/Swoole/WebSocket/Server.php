@@ -10,24 +10,39 @@
 namespace CrCms\Foundation\Swoole\WebSocket;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\WebSocket\Events\MessageEvent;
 use CrCms\Foundation\Swoole\WebSocket\Events\OpenEvent;
 use Swoole\Server as SwooleServer;
 use Swoole\WebSocket\Server as WebSocketServer;
 
-class Server extends AbstractServer
+/**
+ * Class Server
+ * @package CrCms\Foundation\Swoole\WebSocket
+ */
+class Server extends AbstractServer implements ServerContract
 {
+    /**
+     * @var array
+     */
     protected $events = [
         'open' => OpenEvent::class,
         'message' => MessageEvent::class,
     ];
 
+    /**
+     * @return void
+     */
     protected function bootstrap(): void
     {
         // TODO: bind Kernel bootstrap
     }
 
-    protected function createServer(array $config): SwooleServer
+    /**
+     * @param array $config
+     * @return void
+     */
+    public function createServer(array $config): void
     {
         $serverParams = [
             $config['host'],
@@ -36,6 +51,8 @@ class Server extends AbstractServer
             $config['type'] ?? SWOOLE_SOCK_TCP,
         ];
 
-        return new WebSocketServer(...$serverParams);
+        $this->server = new WebSocketServer(...$serverParams);
+        $this->setSettings($config['settings'] ?? []);
+        $this->eventDispatcher($config['events'] ?? []);
     }
 }

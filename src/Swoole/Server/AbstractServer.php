@@ -23,9 +23,14 @@ abstract class AbstractServer implements StartActionContract
     protected $app;
 
     /**
+     * @var array
+     */
+    protected $config;
+
+    /**
      * @var bool
      */
-    protected $hasBeenBootstrapped = false;
+//    protected $hasBeenBootstrapped = false;
 
     /**
      * @var array
@@ -67,18 +72,15 @@ abstract class AbstractServer implements StartActionContract
     protected $settings = [];
 
     /**
-     * Server constructor.
+     * AbstractServer constructor.
      * @param Container $app
+     * @param array $config
      */
     public function __construct(Container $app, array $config)//, \Swoole\Server $server = null)
     {
         $this->app = $app;
-
+        $this->config = $config;
         $this->bootstrap();
-
-        $this->server = $this->createServer($config);
-        $this->setSettings($config['settings'] ?? []);
-        $this->eventDispatcher($config['events'] ?? []);
     }
 
     /**
@@ -90,7 +92,7 @@ abstract class AbstractServer implements StartActionContract
      * @param array $config
      * @return SwooleServer
      */
-    abstract protected function createServer(array $config): SwooleServer;
+    //abstract protected function createServer(array $config): AbstractServer;
 
     /**
      * @param array $settings
