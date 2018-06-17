@@ -10,6 +10,10 @@ use Exception;
 use Swoole\Server as SwooleServer;
 use BadMethodCallException;
 
+/**
+ * Class AbstractServer
+ * @package CrCms\Foundation\Swoole\Server
+ */
 abstract class AbstractServer implements StartActionContract
 {
     /**
@@ -26,11 +30,6 @@ abstract class AbstractServer implements StartActionContract
      * @var array
      */
     protected $config;
-
-    /**
-     * @var bool
-     */
-//    protected $hasBeenBootstrapped = false;
 
     /**
      * @var array
@@ -84,15 +83,34 @@ abstract class AbstractServer implements StartActionContract
     }
 
     /**
+     * @return bool
+     */
+    public function start(): bool
+    {
+        return $this->server->start();
+    }
+
+    /**
+     * @return bool
+     */
+    public function stop(): bool
+    {
+        $this->server->stop();
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function restart(): bool
+    {
+        return $this->server->reload();
+    }
+
+    /**
      * @return void
      */
     abstract protected function bootstrap(): void;
-
-    /**
-     * @param array $config
-     * @return SwooleServer
-     */
-    //abstract protected function createServer(array $config): AbstractServer;
 
     /**
      * @param array $settings
@@ -182,22 +200,6 @@ abstract class AbstractServer implements StartActionContract
 
     /**
      * @param string $name
-     * @return mixed
-     */
-    /*    public function __get(string $name)
-        {
-            if (in_array(
-                Str::snake($name),
-                array_keys($this->config['events']), true
-            )) {
-                return $this->{Str::snake($name)};
-            }
-
-            throw new InvalidArgumentException('The attributes is not exists');
-        }*/
-
-    /**
-     * @param string $name
      * @param array $arguments
      * @return mixed
      */
@@ -209,22 +211,4 @@ abstract class AbstractServer implements StartActionContract
 
         throw new BadMethodCallException("The method:[{$name}] not exists");
     }
-
-    public function start(): bool
-    {
-        return $this->server->start();
-    }
-
-    public function stop(): bool
-    {
-        $this->server->stop();
-        return true;
-    }
-
-    public function restart(): bool
-    {
-        return $this->server->reload();
-    }
-
-
 }
