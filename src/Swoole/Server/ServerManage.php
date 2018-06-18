@@ -80,7 +80,7 @@ class ServerManage implements StartActionContract
             $processes->map(function (Process $process) {
                 swoole_event_add($process->pipe, function () use ($process) {
                     $result = $process->read();
-                    //swoole_async_write(storage_path('run.log'), $result);
+                    swoole_async_write(storage_path('run.log'), $result);
                 });
             });
 
