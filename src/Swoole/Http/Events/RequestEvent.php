@@ -68,7 +68,7 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-//        $this->requestLog();
+        $this->requestLog();
 
         $this->setResponse();
     }
@@ -196,8 +196,6 @@ class RequestEvent extends AbstractEvent implements EventContract
      */
     protected function requestLog()
     {
-        $file = sprintf($this->server->getConfig()['request_log'], Carbon::now()->toDateString());
-
         $params = http_build_query($this->illuminateRequest->all());
         $currentTime = Carbon::now()->toDateTimeString();
         $header = http_build_query($this->illuminateRequest->headers->all());
@@ -205,6 +203,6 @@ class RequestEvent extends AbstractEvent implements EventContract
         $requestTime = Carbon::createFromTimestamp($this->illuminateRequest->server('REQUEST_TIME'));
         $content = "RecordTime:{$currentTime} RequestTime:{$requestTime} METHOD:{$this->illuminateRequest->method()} IP:{$this->illuminateRequest->ip()} Params:{$params} Header:{$header}" . PHP_EOL;
 
-        Async::writeFile($file, $content, null, FILE_APPEND);
+        $this->server->getProcess()->write($content);
     }
 }
