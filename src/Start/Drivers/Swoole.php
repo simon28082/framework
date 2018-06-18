@@ -6,10 +6,14 @@ use Carbon\Carbon;
 use CrCms\Foundation\Swoole\INotify;
 use CrCms\Foundation\Swoole\Server;
 use CrCms\Foundation\StartContract;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Swoole\Async;
 use Swoole\Process;
 use Exception;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use UnexpectedValueException;
 use Illuminate\Contracts\Http\Kernel;
 
@@ -33,6 +37,8 @@ class Swoole implements StartContract
      * @var Container
      */
     protected $app;
+
+    protected $output;
 
     /**
      *
@@ -59,7 +65,14 @@ class Swoole implements StartContract
     {
         $this->app = $app;
 
+
+
         $action = $params[1] ?? 'start';
+        array_shift($params);
+        $this->output = new SymfonyStyle(
+            new ArgvInput($params),
+            new ConsoleOutput()
+        );
 
         $this->setServerManage();
 
@@ -67,11 +80,16 @@ class Swoole implements StartContract
             try {
                 $this->serverManage->{$action}();
 
-                echo "{$action} successfully" . PHP_EOL;
+                //echo "{$action} successfully" . PHP_EOL;
+                //$this->outputStyle->info("{$action} successfully");
+                echo 123;
+                $this->output->success("{$action} successfully");
 
             } catch (Exception $exception) {
                 //$this->log($exception->getMessage());
-                echo $exception->getMessage() . PHP_EOL;
+                //echo $exception->getMessage() . PHP_EOL;
+                $this->outputStyle->error($exception->getMessage());
+                $this->outputStyle->error(123);
             }
         } else {
             echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
