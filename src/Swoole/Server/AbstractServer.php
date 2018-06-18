@@ -7,6 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Exception;
+use Swoole\Process;
 use Swoole\Server as SwooleServer;
 use BadMethodCallException;
 
@@ -69,6 +70,27 @@ abstract class AbstractServer implements StartActionContract
      * @var array
      */
     protected $settings = [];
+
+    /**
+     * @var Process
+     */
+    protected $process;
+
+    /**
+     * @param Process $process
+     */
+    public function setProcess(Process $process)
+    {
+        $this->process = $process;
+    }
+
+    /**
+     * @return Process
+     */
+    public function getProcess(): Process
+    {
+        return $this->process;
+    }
 
     /**
      * AbstractServer constructor.
