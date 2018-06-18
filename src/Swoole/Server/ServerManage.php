@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
 use Swoole\Process;
 use UnexpectedValueException;
 use RuntimeException;
+use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
 use function CrCms\Foundation\App\Helpers\framework_config_path;
 
@@ -55,19 +56,15 @@ class ServerManage implements StartActionContract
      */
     public function start(): bool
     {
-        if ($this->pidExists()) {
+        if ($this->pidExists() && $this->processExists()) {
             throw new UnexpectedValueException('Swoole server is running');
         }
 
-        $pids = $this->servers()->map(function (ServerContract $server, int $key) {
-            $process = new Process(function () use ($server) {
-                // 经过测试放在 Process内外都可以
-                // 放内，在进程内再创建Server，合理一点
-                $server->createServer();
-                $server->start();
-            });//, true, false
-            $process->name('swoole_main_process_' . strval($key));
-            //file_put_contents(storage_path('abc'),$process->read());
+        $processes = $this->processes();
+
+        $this->addLogProcess($processes);
+
+        $pids = $processes->map(function (Process $process) {
             return $process->start();
         });
 
@@ -75,11 +72,55 @@ class ServerManage implements StartActionContract
     }
 
     /**
+     * @param Collection $processes
+     */
+    protected function addLogProcess(Collection $processes)
+    {
+        $logProcess = new Process(function (Process $mainProcess) use ($processes) {
+            $processes->map(function (Process $process) {
+                swoole_event_add($process->pipe, function () use ($process) {
+                    $result = $process->read();
+                    //swoole_async_write(storage_path('run.log'), $result);
+                });
+            });
+
+            /*swoole_event_add($mainProcess->pipe, function () use ($mainProcess) {
+                $result = $mainProcess->read();
+                swoole_async_write(storage_path('run.log'), $result);
+            });*/
+        }, false, true);
+        $logProcess->name('swoole_log');
+        $pid = $logProcess->start();
+        $this->storeLogPid($pid);
+    }
+
+    /**
+     * @return Collection
+     */
+    protected function processes(): Collection
+    {
+        return $this->servers()->map(function (ServerContract $server, int $key) {
+            $process = new Process(function (Process $process) use ($server) {
+                // 经过测试放在 Process内外都可以
+                // 放内，在进程内再创建Server，合理一点
+                $server->createServer();
+                $server->setProcess($process);
+                $server->start();
+
+            }, false, true);//, true, false
+
+            $process->name('swoole_main_process_' . strval($key));
+
+            return $process;
+        });
+    }
+
+    /**
      * @return bool
      */
     public function stop(): bool
     {
-        if (!$this->pidExists()) {
+        if (!$this->processExists()) {
             throw new UnexpectedValueException('Swoole server is not running');
         }
 
@@ -89,6 +130,9 @@ class ServerManage implements StartActionContract
             }
         });
 
+        Process::kill($this->currentLogPid());
+
+        $this->deleteLogPid();
         return $this->deletePid();
     }
 
@@ -114,6 +158,28 @@ class ServerManage implements StartActionContract
     }
 
     /**
+     * @param int $pid
+     * @return int
+     */
+    protected function storeLogPid(int $pid): int
+    {
+        return file_put_contents($this->config['log_pid_file'], $pid);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function deleteLogPid()
+    {
+        $result = @unlink($this->config['log_pid_file']);
+        if (!$result) {
+            throw new RuntimeException("Remove pid file : [{$this->config['log_pid_file']}] error");
+        }
+
+        return $result;
+    }
+
+    /**
      * @return bool
      */
     protected function deletePid(): bool
@@ -133,9 +199,28 @@ class ServerManage implements StartActionContract
     /**
      * @return bool
      */
+    protected function processExists(): bool
+    {
+        $pids = $this->currentPids();
+
+        return !$pids->map(function ($pid) {
+            return Process::kill($pid, 0);
+        })->filter(function ($exists) {
+            return $exists;
+        })->isEmpty();
+    }
+
+    /**
+     * @return bool
+     */
     protected function pidExists(): bool
     {
         return file_exists($this->config['pid_file']) && filesize($this->config['pid_file']) > 0;
+    }
+
+    protected function currentLogPid()
+    {
+        return file_get_contents($this->config['log_pid_file']);
     }
 
     /**
