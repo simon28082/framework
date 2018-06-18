@@ -28,6 +28,7 @@ class Server extends AbstractServer implements ServerContract
         'request' => RequestEvent::class,
     ];
 
+
     /**
      * @return void
      */
@@ -53,4 +54,6 @@ class Server extends AbstractServer implements ServerContract
         $this->setSettings($this->config['settings'] ?? []);
         $this->eventDispatcher($this->config['events'] ?? []);
     }
+
+
 }
