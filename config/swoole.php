@@ -12,7 +12,8 @@ return [
     ],
 
     'drives' => [
-        'http' => \CrCms\Foundation\Swoole\Http\Server::class
+        'http' => \CrCms\Foundation\Swoole\Http\Server::class,
+        'socket' => \CrCms\Foundation\Swoole\Socket\Server::class,
     ],
 
     'notify' => [
@@ -26,5 +27,6 @@ return [
     'error_log' => storage_path('logs/error_%s.log'),
     'process_prefix' => 'swoole_',
     'pid_file' => storage_path('swoole.pid'),
+    'log_pid_file' => storage_path('log.pid'),
     'request_log' => storage_path('logs/request-%s.log'),
 ];
