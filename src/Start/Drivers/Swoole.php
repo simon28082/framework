@@ -65,8 +65,6 @@ class Swoole implements StartContract
     {
         $this->app = $app;
 
-
-
         $action = $params[1] ?? 'start';
         array_shift($params);
         $this->output = new SymfonyStyle(
@@ -82,14 +80,12 @@ class Swoole implements StartContract
 
                 //echo "{$action} successfully" . PHP_EOL;
                 //$this->outputStyle->info("{$action} successfully");
-                echo 123;
                 $this->output->success("{$action} successfully");
 
             } catch (Exception $exception) {
                 //$this->log($exception->getMessage());
                 //echo $exception->getMessage() . PHP_EOL;
                 $this->outputStyle->error($exception->getMessage());
-                $this->outputStyle->error(123);
             }
         } else {
             echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
