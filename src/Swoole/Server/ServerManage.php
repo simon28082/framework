@@ -62,13 +62,13 @@ class ServerManage implements StartActionContract
 
         $processes = $this->processes();
 
-        $this->addLogProcess($processes);
-
         $pids = $processes->map(function (Process $process) {
             return $process->start();
         });
 
-        return $this->storePid($pids);
+        $this->addLogProcess($processes);
+
+        return $this->storePid(collect($pids));
     }
 
     /**
@@ -77,7 +77,7 @@ class ServerManage implements StartActionContract
     protected function addLogProcess(Collection $processes)
     {
         $logProcess = new Process(function (Process $mainProcess) use ($processes) {
-            $processes->map(function (Process $process) {
+            $processes->each(function (Process $process, $key) {
                 swoole_event_add($process->pipe, function () use ($process) {
                     $result = $process->read();
                     swoole_async_write(storage_path('run.log'), $result);
@@ -100,16 +100,15 @@ class ServerManage implements StartActionContract
     protected function processes(): Collection
     {
         return $this->servers()->map(function (ServerContract $server, int $key) {
-            $process = new Process(function (Process $process) use ($server) {
+            $process = new Process(function (Process $process) use ($server, $key) {
                 // 经过测试放在 Process内外都可以
                 // 放内，在进程内再创建Server，合理一点
                 $server->createServer();
                 $server->setProcess($process);
                 $server->start();
 
-            }, false, true);//, true, false
 
-            $process->name('swoole_main_process_' . strval($key));
+            }, false, true);//, true, false
 
             return $process;
         });
@@ -133,6 +132,9 @@ class ServerManage implements StartActionContract
         Process::kill($this->currentLogPid());
 
         $this->deleteLogPid();
+
+        Process::wait();
+
         return $this->deletePid();
     }
 
