@@ -9,6 +9,13 @@ return [
             'mode' => SWOOLE_PROCESS,
             'type' => SWOOLE_SOCK_TCP,
         ],
+        [
+            'drive' => 'socket',
+            'host' => '0.0.0.0',
+            'port' => 28999,
+            'mode' => SWOOLE_PROCESS,
+            'type' => SWOOLE_SOCK_TCP,
+        ],
     ],
 
     'drives' => [
