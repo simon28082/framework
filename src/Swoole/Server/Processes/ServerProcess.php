@@ -12,6 +12,7 @@ namespace CrCms\Foundation\Swoole\Server\Processes;
 
 use CrCms\Foundation\Swoole\Process\AbstractProcess;
 use CrCms\Foundation\Swoole\Process\Contracts\ProcessContract;
+use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Swoole\Process;
 
@@ -19,7 +20,7 @@ class ServerProcess extends AbstractProcess implements ProcessContract
 {
     protected $server;
 
-    public function __construct(ServerContract $server, bool $redirectStdinStdout = false, bool $createPipe = true)
+    public function __construct(AbstractServer $server, bool $redirectStdinStdout = false, bool $createPipe = true)
     {
         $this->server = $server;
         parent::__construct($redirectStdinStdout, $createPipe);
@@ -27,14 +28,11 @@ class ServerProcess extends AbstractProcess implements ProcessContract
 
     public function handle(Process $process): void
     {
-        echo '=========='.$process->pid.'===========';
-
         $this->server->createServer();
         $this->server->setProcess($process);
         $this->server->start();
 
         Process::signal(SIGTERM,function($signo){
-            echo 'stop-';
             $this->server->stop();
         });
     }
