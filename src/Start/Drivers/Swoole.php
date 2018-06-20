@@ -16,6 +16,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use UnexpectedValueException;
 use Illuminate\Contracts\Http\Kernel;
+use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
+use function CrCms\Foundation\App\Helpers\framework_config_path;
+use CrCms\Foundation\Swoole\Server\ProcessManage;
 
 /**
  * Class Swoole
@@ -40,15 +43,35 @@ class Swoole implements StartContract
 
     protected $output;
 
+    protected $config;
+
+    public function __construct()
+    {
+        $this->loadConfiguration();
+    }
+
+    protected function loadConfiguration(): void
+    {
+        $config = require framework_config_path('swoole.php');
+
+        $customConfigPath = config_path('swoole.php');
+        if (file_exists($customConfigPath) && is_file(file_exists($customConfigPath))) {
+            $config = array_merge_recursive_distinct($config, require $customConfigPath);
+        }
+
+        $this->config = $config;
+    }
+
     /**
      *
      */
     protected function setServerManage(): void
     {
-        if (!$this->serverManage instanceof Server\ServerManage) {
-            $this->serverManage = new Server\ServerManage($this->app);
-        }
-
+        $this->serverManage = new Server\ServerManage(
+            $this->app,
+            $this->config,
+            new ProcessManage($this->config['pid_file'])
+        );
     }
 
     /**
