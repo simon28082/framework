@@ -45,7 +45,10 @@ class Swoole implements StartContract
      */
     protected function setServerManage(): void
     {
-        $this->serverManage = new Server\ServerManage($this->app);
+        if (!$this->serverManage instanceof Server\ServerManage) {
+            $this->serverManage = new Server\ServerManage($this->app);
+        }
+
     }
 
     /**
@@ -85,7 +88,7 @@ class Swoole implements StartContract
             } catch (Exception $exception) {
                 //$this->log($exception->getMessage());
                 //echo $exception->getMessage() . PHP_EOL;
-                $this->outputStyle->error($exception->getMessage());
+                $this->output->error($exception->getMessage());
             }
         } else {
             echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
