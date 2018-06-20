@@ -117,8 +117,7 @@ abstract class AbstractServer implements StartActionContract
      */
     public function stop(): bool
     {
-        $this->server->shutdown();
-        return true;
+        return $this->server->shutdown();
     }
 
     /**
