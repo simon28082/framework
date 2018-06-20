@@ -21,6 +21,6 @@ class StartEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-        static::setProcessName(config('swoole.process_prefix') . 'main');
+        static::setProcessName(config('swoole.process_prefix') . 'master');
     }
 }
