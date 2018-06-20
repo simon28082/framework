@@ -26,7 +26,7 @@ class ProcessManage
     public function __construct(string $file)
     {
         $this->file = $file;
-        $this->pids = collect([]);
+        $this->pids = $this->all();
     }
 
     public function store(Collection $pids): bool
@@ -36,7 +36,11 @@ class ProcessManage
 
     public function exists(int $pid = -1): bool
     {
-        $pids = $pid > 0 ? $this->filter($pid) : $this->all();
+        $pids = $pid > 0 ? $this->filter($pid) : $this->pids;
+
+        if ($pids->isEmpty()) {
+            return false;
+        }
 
         return $pids->map(function ($pid) {
             return Process::kill(intval($pid), 0);
@@ -47,7 +51,7 @@ class ProcessManage
 
     public function kill(int $pid = -1): bool
     {
-        $pids = $pid > 0 ? $this->filter($pid) : $this->all();
+        $pids = $pid > 0 ? $this->filter($pid) : $this->pids;
         $pids->each(function ($pid) {
             return Process::kill(intval($pid), SIGTERM);
         });
@@ -67,15 +71,16 @@ class ProcessManage
 
     protected function all(): Collection
     {
-        if ($this->pids->isEmpty()) {
-            $this->pids = collect(explode(',', file_get_contents($this->file)));
+        if (file_exists($this->file)) {
+            return collect(explode(',', file_get_contents($this->file)));
+        } else {
+            return collect([]);
         }
-        return $this->pids;
     }
 
     protected function filter(int $pid): Collection
     {
-        $pids = $this->all()->filter(function ($item) use ($pid) {
+        $pids = $this->pids->filter(function ($item) use ($pid) {
             return $pid === intval($item);
         });
 
@@ -88,4 +93,8 @@ class ProcessManage
         return $pids;
     }
 
+    public function clean(): bool
+    {
+        return @unlink($this->file);
+    }
 }
