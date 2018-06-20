@@ -2,48 +2,90 @@
 
 /**
  * @author simon <crcms@crcms.cn>
- * @datetime 2018/6/18 18:09
+ * @datetime 2018/6/20 7:16
  * @link http://crcms.cn/
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
 namespace CrCms\Foundation\Swoole\Server;
 
-use CrCms\Foundation\Swoole\Server\Contracts\ProcessContract;
+
+use Illuminate\Support\Collection;
 use Swoole\Process;
 
-class ProcessManage implements ProcessContract
+class ProcessManage
 {
 
-    protected $process;
+    protected $file;
 
-    protected $callback;
+    /**
+     * @var Collection
+     */
+    protected $pids;
 
-    protected $name;
-
-    public function __construct(Process $process)
+    public function __construct(string $file)
     {
-        $this->process = $process;
+        $this->file = $file;
+        $this->pids = collect([]);
     }
 
-//    protected function createProcess()
-//    {
-//        $this->process = new Process($this->callback);
-//        $this->process->name($this->name);
-//    }
-
-    public function start(): bool
+    public function store(Collection $pids): bool
     {
-        return $this->process->start();
+        return (bool)file_put_contents($this->file, $pids->implode(','));
     }
 
-    public function exists(): bool
+    public function exists(int $pid = -1): bool
     {
-        return Process::kill($this->process->pid, 0);
+        $pids = $pid > 0 ? $this->filter($pid) : $this->all();
+
+        return $pids->map(function ($pid) {
+            return Process::kill(intval($pid), 0);
+        })->filter(function ($exists) {
+            return !$exists;
+        })->isEmpty();
     }
 
-    public function stop(): bool
+    public function kill(int $pid = -1): bool
     {
-        return Process::kill($this->process->pid);
+        $pids = $pid > 0 ? $this->filter($pid) : $this->all();
+        $pids->each(function ($pid) {
+            return Process::kill(intval($pid), SIGTERM);
+        });
+        return true;
     }
+
+    public function append($pid): bool
+    {
+        if ($pid instanceof Collection) {
+            $this->pids = $this->pids->merge($pid);
+        } else {
+            $this->pids->push($pid);
+        }
+
+        return $this->store($this->pids->unique());
+    }
+
+    protected function all(): Collection
+    {
+        if ($this->pids->isEmpty()) {
+            $this->pids = collect(explode(',', file_get_contents($this->file)));
+        }
+        return $this->pids;
+    }
+
+    protected function filter(int $pid): Collection
+    {
+        $pids = $this->all()->filter(function ($item) use ($pid) {
+            return $pid === intval($item);
+        });
+
+        if ($pids->isEmpty()) {
+            if (Process::kill(intval($pid), 0)) {
+                return collect([$pid]);
+            }
+        }
+
+        return $pids;
+    }
+
 }

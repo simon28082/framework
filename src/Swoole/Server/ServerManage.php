@@ -11,6 +11,8 @@ namespace CrCms\Foundation\Swoole\Server;
 
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
+use CrCms\Foundation\Swoole\Server\Processes\LogProcess;
+use CrCms\Foundation\Swoole\Server\Processes\ServerProcess;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Swoole\Process;
@@ -41,6 +43,10 @@ class ServerManage implements StartActionContract
      */
     protected $config;
 
+    protected $processes;
+
+    protected $processManage;
+
     /**
      * ServerManage constructor.
      * @param Container $app
@@ -49,6 +55,7 @@ class ServerManage implements StartActionContract
     {
         $this->app = $app;
         $this->loadConfiguration();
+        $this->processManage = new ProcessManage($this->config['pid_file']);
     }
 
     /**
@@ -56,19 +63,37 @@ class ServerManage implements StartActionContract
      */
     public function start(): bool
     {
-        if ($this->pidExists() && $this->processExists()) {
+        if ($this->processManage->exists()) {
             throw new UnexpectedValueException('Swoole server is running');
         }
+        /*if ($this->pidExists() && $this->processExists()) {
+            throw new UnexpectedValueException('Swoole server is running');
+        }*/
+
+        Process::signal(SIGCHLD, function ($sig) {
+            //必须为false，非阻塞模式
+            while ($ret = Process::wait(false)) {
+                echo "PID={$ret['pid']}\n";
+            }
+        });
+
+        Process::daemon();
 
         $processes = $this->processes();
 
-        $pids = $processes->map(function (Process $process) {
-            return $process->start();
-        });
 
         $this->addLogProcess($processes);
 
-        return $this->storePid(collect($pids));
+
+        $pids = $processes->map(function (ServerProcess $process) {
+            return $process->start();
+        });
+
+
+//
+        return $this->processManage->append($pids);
+
+        return $this->storePid(collect([]));
     }
 
     /**
@@ -76,22 +101,24 @@ class ServerManage implements StartActionContract
      */
     protected function addLogProcess(Collection $processes)
     {
-        $logProcess = new Process(function (Process $mainProcess) use ($processes) {
-            $processes->each(function (Process $process, $key) {
-                swoole_event_add($process->pipe, function () use ($process) {
-                    $result = $process->read();
-                    swoole_async_write(storage_path('run.log'), $result);
-                });
-            });
+        $logProcess = new LogProcess($processes, storage_path('run.log'));
+        /*        $logProcess = new Process(function (Process $mainProcess) use ($processes) {
+                    $processes->each(function (Process $process, $key) {
+                        swoole_event_add($process->pipe, function () use ($process) {
+                            $result = $process->read();
+                            swoole_async_write(storage_path('run.log'), $result);
+                        });
+                    });
 
-            /*swoole_event_add($mainProcess->pipe, function () use ($mainProcess) {
-                $result = $mainProcess->read();
-                swoole_async_write(storage_path('run.log'), $result);
-            });*/
-        }, false, true);
-        $logProcess->name('swoole_log');
+                    /*swoole_event_add($mainProcess->pipe, function () use ($mainProcess) {
+                        $result = $mainProcess->read();
+                        swoole_async_write(storage_path('run.log'), $result);
+                    });
+                }, false, true);
+                $logProcess->name('swoole_log');*/
         $pid = $logProcess->start();
-        $this->storeLogPid($pid);
+//        $this->storeLogPid($pid);
+        $this->processManage->append($pid);
     }
 
     /**
@@ -99,7 +126,10 @@ class ServerManage implements StartActionContract
      */
     protected function processes(): Collection
     {
-        return $this->servers()->map(function (ServerContract $server, int $key) {
+        return $this->servers()->map(function (ServerContract $server) {
+            return new ServerProcess($server);
+        });
+        /*return $this->servers()->map(function (ServerContract $server, int $key) {
             $process = new Process(function (Process $process) use ($server, $key) {
                 // 经过测试放在 Process内外都可以
                 // 放内，在进程内再创建Server，合理一点
@@ -111,7 +141,7 @@ class ServerManage implements StartActionContract
             }, false, true);//, true, false
 
             return $process;
-        });
+        });*/
     }
 
     /**
@@ -119,16 +149,28 @@ class ServerManage implements StartActionContract
      */
     public function stop(): bool
     {
-        if (!$this->processExists()) {
+
+        if (!$this->processManage->exists()) {
             throw new UnexpectedValueException('Swoole server is not running');
         }
 
-        $this->currentPids()->map(function ($pid) {
-            if (!Process::kill($pid)) {
-                throw new RuntimeException("The process[pid:{$pid}] kill error");
-            }
-        });
 
+        return $this->processManage->kill();
+
+//        if (!$this->processExists()) {
+//            throw new UnexpectedValueException('Swoole server is not running');
+//        }
+
+        //SIGUSR1
+        $this->currentPids()->map(function ($pid) {
+            Process::kill($pid, SIGTERM);
+            echo 'ssss==';
+            /*if (!Process::kill($pid)) {
+                throw new RuntimeException("The process[pid:{$pid}] kill error");
+            }*/
+        });
+//        exit();
+        return true;
         Process::kill($this->currentLogPid());
 
         $this->deleteLogPid();
