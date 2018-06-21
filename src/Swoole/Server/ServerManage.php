@@ -42,8 +42,14 @@ class ServerManage implements StartActionContract
      */
     protected $config;
 
+    /**
+     * @var
+     */
     protected $processes;
 
+    /**
+     * @var \CrCms\Foundation\Swoole\Server\ProcessManage
+     */
     protected $processManage;
 
     /**
@@ -74,17 +80,24 @@ class ServerManage implements StartActionContract
         });*/
 
         /* 这一块应该处理成类似中间件模块格式，暂时先这样 */
-        $processes = $this->processes();
+        $processes = $this->processes(
+            $this->servers()
+        );
 
         $pids = $this->startProcess($processes);
-        $this->processManage->store($pids);
 
         $logPid = $this->addLogProcess($processes);
-        $this->processManage->append($logPid);
 
-        return true;
+        return $this->processManage->store(collect([
+            'servers' => $pids->toArray(),
+            'log' => $logPid
+        ]));
     }
 
+    /**
+     * @param Collection $processes
+     * @return Collection
+     */
     protected function startProcess(Collection $processes): Collection
     {
         return $processes->map(function (ServerProcess $process) {
@@ -104,9 +117,9 @@ class ServerManage implements StartActionContract
     /**
      * @return Collection
      */
-    protected function processes(): Collection
+    protected function processes(Collection $servers): Collection
     {
-        return $this->servers()->map(function (ServerContract $server) {
+        return $servers->map(function (ServerContract $server) {
             return new ServerProcess($server);
         });
     }
@@ -121,34 +134,10 @@ class ServerManage implements StartActionContract
         }
 
         if ($this->processManage->kill()) {
-            $this->processManage->clean();
+            return $this->processManage->clean();
+        } else {
+            return false;
         }
-
-        return true;
-
-//        return $this->processManage->kill();
-
-//        if (!$this->processExists()) {
-//            throw new UnexpectedValueException('Swoole server is not running');
-//        }
-
-        //SIGUSR1
-        $this->currentPids()->map(function ($pid) {
-            Process::kill($pid, SIGTERM);
-            echo 'ssss==';
-            /*if (!Process::kill($pid)) {
-                throw new RuntimeException("The process[pid:{$pid}] kill error");
-            }*/
-        });
-//        exit();
-        return true;
-        Process::kill($this->currentLogPid());
-
-        $this->deleteLogPid();
-
-        Process::wait();
-
-        return $this->deletePid();
     }
 
     /**
@@ -156,116 +145,24 @@ class ServerManage implements StartActionContract
      */
     public function restart(): bool
     {
-        $this->stop();
-
-        sleep(3);
+        if ($this->processManage->exists()) {
+            $this->stop();
+            sleep(4);
+        }
 
         return $this->start();
     }
 
     /**
-     * @param int $pid
-     * @return int
-     */
-    protected function storePid(Collection $pids): int
-    {
-        return file_put_contents($this->config['pid_file'], $pids->implode(','));
-    }
-
-    /**
-     * @param int $pid
-     * @return int
-     */
-    protected function storeLogPid(int $pid): int
-    {
-        return file_put_contents($this->config['log_pid_file'], $pid);
-    }
-
-    /**
      * @return bool
      */
-    protected function deleteLogPid()
+    public function reload(): bool
     {
-        $result = @unlink($this->config['log_pid_file']);
-        if (!$result) {
-            throw new RuntimeException("Remove pid file : [{$this->config['log_pid_file']}] error");
+        if (!$this->processManage->exists()) {
+            throw new UnexpectedValueException('Swoole server is not running');
         }
 
-        return $result;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function deletePid(): bool
-    {
-        if (!$this->pidExists()) {
-            return true;
-        }
-
-        $result = @unlink($this->config['pid_file']);
-        if (!$result) {
-            throw new RuntimeException("Remove pid file : [{$this->config['pid_file']}] error");
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function processExists(): bool
-    {
-        $pids = $this->currentPids();
-
-        return !$pids->map(function ($pid) {
-            return Process::kill($pid, 0);
-        })->filter(function ($exists) {
-            return $exists;
-        })->isEmpty();
-    }
-
-    /**
-     * @return bool
-     */
-    protected function pidExists(): bool
-    {
-        return file_exists($this->config['pid_file']) && filesize($this->config['pid_file']) > 0;
-    }
-
-    protected function currentLogPid()
-    {
-        return file_get_contents($this->config['log_pid_file']);
-    }
-
-    /**
-     * @return Collection
-     */
-    protected function currentPids(): Collection
-    {
-        if (!$this->pidExists()) {
-            return collect([]);
-        }
-
-        $pids = file_get_contents($this->config['pid_file']);
-        return collect(explode(',', $pids))->map(function ($pid) {
-            return intval($pid);
-        });
-    }
-
-    /**
-     *
-     */
-    protected function loadConfiguration(): void
-    {
-        $config = require framework_config_path('swoole.php');
-
-        $customConfigPath = config_path('swoole.php');
-        if (file_exists($customConfigPath) && is_file(file_exists($customConfigPath))) {
-            $config = array_merge_recursive_distinct($config, require $customConfigPath);
-        }
-
-        $this->config = $config;
+        return $this->processManage->kill(SIGUSR1, 'servers');
     }
 
     /**

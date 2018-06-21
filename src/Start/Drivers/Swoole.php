@@ -41,37 +41,22 @@ class Swoole implements StartContract
      */
     protected $app;
 
+    /**
+     * @var SymfonyStyle
+     */
     protected $output;
 
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * Swoole constructor.
+     */
     public function __construct()
     {
         $this->loadConfiguration();
-    }
-
-    protected function loadConfiguration(): void
-    {
-        $config = require framework_config_path('swoole.php');
-
-        $customConfigPath = config_path('swoole.php');
-        if (file_exists($customConfigPath) && is_file(file_exists($customConfigPath))) {
-            $config = array_merge_recursive_distinct($config, require $customConfigPath);
-        }
-
-        $this->config = $config;
-    }
-
-    /**
-     *
-     */
-    protected function setServerManage(): void
-    {
-        $this->serverManage = new Server\ServerManage(
-            $this->app,
-            $this->config,
-            new ProcessManage($this->config['pid_file'])
-        );
     }
 
     /**
@@ -103,18 +88,40 @@ class Swoole implements StartContract
         if (in_array($action, $this->allows, true)) {
             try {
                 $this->serverManage->{$action}();
-
-                //echo "{$action} successfully" . PHP_EOL;
-                //$this->outputStyle->info("{$action} successfully");
                 $this->output->success("{$action} successfully");
-
             } catch (Exception $exception) {
-                //$this->log($exception->getMessage());
-                //echo $exception->getMessage() . PHP_EOL;
+                $this->log($exception->getMessage() . PHP_EOL);
                 $this->output->error($exception->getMessage());
             }
         } else {
-            echo "Allow only " . implode($this->allows, ' ') . "options" . PHP_EOL;
+            $this->output->error("Allow only " . implode($this->allows, ' ') . "options");
         }
+    }
+
+    /**
+     *
+     */
+    protected function loadConfiguration(): void
+    {
+        $config = require framework_config_path('swoole.php');
+
+        $customConfigPath = config_path('swoole.php');
+        if (file_exists($customConfigPath) && is_file(file_exists($customConfigPath))) {
+            $config = array_merge_recursive_distinct($config, require $customConfigPath);
+        }
+
+        $this->config = $config;
+    }
+
+    /**
+     *
+     */
+    protected function setServerManage(): void
+    {
+        $this->serverManage = new Server\ServerManage(
+            $this->app,
+            $this->config,
+            new ProcessManage($this->config['pid_file'])
+        );
     }
 }

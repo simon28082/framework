@@ -9,15 +9,24 @@
 
 namespace CrCms\Foundation\Swoole\Server\Contracts;
 
-
+/**
+ * Interface StartActionContract
+ * @package CrCms\Foundation\Swoole\Server\Contracts
+ */
 interface StartActionContract
 {
-
+    /**
+     * @return bool
+     */
     public function start(): bool;
 
-
+    /**
+     * @return bool
+     */
     public function stop(): bool;
 
-
+    /**
+     * @return bool
+     */
     public function restart(): bool;
 }

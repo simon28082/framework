@@ -35,6 +35,11 @@ class ServerProcess extends AbstractProcess implements ProcessContract
         Process::signal(SIGTERM,function($signo){
             $this->server->stop();
         });
+
+        Process::signal(SIGUSR1,function($signo){
+            dump('sssss');
+            $this->server->restart();
+        });
     }
 
     public function start(): int

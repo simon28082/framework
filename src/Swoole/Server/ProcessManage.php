@@ -9,34 +9,46 @@
 
 namespace CrCms\Foundation\Swoole\Server;
 
-
 use Illuminate\Support\Collection;
 use Swoole\Process;
+use RuntimeException;
 
+/**
+ * Class ProcessManage
+ * @package CrCms\Foundation\Swoole\Server
+ */
 class ProcessManage
 {
-
+    /**
+     * @var string
+     */
     protected $file;
 
     /**
-     * @var Collection
+     * ProcessManage constructor.
+     * @param string $file
      */
-    protected $pids;
-
     public function __construct(string $file)
     {
         $this->file = $file;
-        $this->pids = $this->all();
     }
 
+    /**
+     * @param Collection $pids
+     * @return bool
+     */
     public function store(Collection $pids): bool
     {
-        return (bool)file_put_contents($this->file, $pids->implode(','));
+        return (bool)file_put_contents($this->file, $pids->toJson());
     }
 
-    public function exists(int $pid = -1): bool
+    /**
+     * @param int|string $pid
+     * @return bool
+     */
+    public function exists($pid = -1): bool
     {
-        $pids = $pid > 0 ? $this->filter($pid) : $this->pids;
+        $pids = $this->handlePids($pid);
 
         if ($pids->isEmpty()) {
             return false;
@@ -49,39 +61,82 @@ class ProcessManage
         })->isEmpty();
     }
 
-    public function kill(int $pid = -1): bool
+    /**
+     * @param int $sign
+     * @param int|string $pid
+     * @return bool
+     */
+    public function kill(int $sign = SIGTERM, $pid = -1): bool
     {
-        $pids = $pid > 0 ? $this->filter($pid) : $this->pids;
-        $pids->each(function ($pid) {
-            return Process::kill(intval($pid), SIGTERM);
+        $this->handlePids($pid)->each(function ($pids) use ($sign) {
+            return collect((array)$pids)->each(function ($pid) use ($sign) {
+                return Process::kill(intval($pid), $sign);
+            });
         });
+
         return true;
     }
 
+
+    /**
+     * @param $pid
+     * @return bool
+     */
     public function append($pid): bool
     {
+        $pids = $this->all();
+
         if ($pid instanceof Collection) {
-            $this->pids = $this->pids->merge($pid);
+            $pids = $pids->merge($pid);
         } else {
-            $this->pids->push($pid);
+            $pids->push($pid);
         }
 
-        return $this->store($this->pids->unique());
+        return $this->store($pids->unique());
     }
 
+    /**
+     * @return bool
+     */
+    public function clean(): bool
+    {
+        $result = @unlink($this->file);
+        if (!$result) {
+            throw new RuntimeException("Remove pid file : [{$this->config['pid_file']}] error");
+        }
+        return $result;
+    }
+
+    /**
+     * @return Collection
+     */
     protected function all(): Collection
     {
-        if (file_exists($this->file)) {
-            return collect(explode(',', file_get_contents($this->file)));
+        if (file_exists($this->file) && filesize($this->file) > 0) {
+            $result = file_get_contents($this->file);
+            $result = json_decode($result, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('JSON unserialize error , message:' . json_last_error_msg());
+            }
+
+            return collect($result);
         } else {
             return collect([]);
         }
     }
 
-    protected function filter(int $pid): Collection
+    /**
+     * @param mixed $pid
+     * @return Collection
+     */
+    protected function filter($pid): Collection
     {
-        $pids = $this->pids->filter(function ($item) use ($pid) {
-            return $pid === intval($item);
+        $pids = $this->all()->filter(function ($item, $key) use ($pid) {
+            if (is_numeric($pid)) {
+                return in_array($pid, (array)$item);
+            } else {
+                return $key == $pid;
+            }
         });
 
         if ($pids->isEmpty()) {
@@ -93,8 +148,12 @@ class ProcessManage
         return $pids;
     }
 
-    public function clean(): bool
+    /**
+     * @param $pid
+     * @return Collection
+     */
+    protected function handlePids($pid): Collection
     {
-        return @unlink($this->file);
+        return $pid > 0 || !is_numeric($pid) ? $this->filter($pid) : $this->all();
     }
 }
