@@ -177,7 +177,7 @@ class ServerManage implements StartActionContract
      */
     public function reload(): bool
     {
-        if (!$this->processManage->exists()) {
+        if (!$this->processManage->exists('servers')) {
             throw new UnexpectedValueException('Swoole server is not running');
         }
 
