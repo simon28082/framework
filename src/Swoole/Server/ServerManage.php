@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Swoole\Server;
 
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
+use CrCms\Foundation\Swoole\Server\Processes\INotifyProcess;
 use CrCms\Foundation\Swoole\Server\Processes\LogProcess;
 use CrCms\Foundation\Swoole\Server\Processes\ServerProcess;
 use Illuminate\Container\Container;
@@ -79,6 +80,8 @@ class ServerManage implements StartActionContract
             }
         });*/
 
+
+
         /* 这一块应该处理成类似中间件模块格式，暂时先这样 */
         $processes = $this->processes(
             $this->servers()
@@ -88,10 +91,17 @@ class ServerManage implements StartActionContract
 
         $logPid = $this->addLogProcess($processes);
 
-        return $this->processManage->store(collect([
+        $allPid = collect([
             'servers' => $pids->toArray(),
             'log' => $logPid
-        ]));
+        ]);
+
+        if ($this->config['notify']['monitor']) {
+            $notifyPid = $this->addINotifyProcess();
+            $allPid = $allPid->merge(['inotify'=>$notifyPid]);
+        }
+
+        return $this->processManage->store($allPid);
     }
 
     /**
@@ -112,6 +122,15 @@ class ServerManage implements StartActionContract
     {
         $logProcess = new LogProcess($processes, storage_path('run.log'));
         return $logProcess->start();
+    }
+
+    /**
+     * @return int
+     */
+    protected function addINotifyProcess(): int
+    {
+        $notifyProcess = new INotifyProcess($this->processManage, $this->config);
+        return $notifyProcess->start();
     }
 
     /**
