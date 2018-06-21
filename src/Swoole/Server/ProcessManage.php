@@ -86,7 +86,7 @@ class ProcessManage
     {
         $pids = $this->all();
 
-        if ($pid instanceof Collection) {
+        if ($pid instanceof Collection || is_array($pid)) {
             $pids = $pids->merge($pid);
         } else {
             $pids->push($pid);
