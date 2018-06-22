@@ -82,7 +82,7 @@ class ServerManage implements StartActionContract
 
 
 
-        /* 这一块应该处理成类似中间件模块格式，暂时先这样 */
+        /* 这一块应该处理成类似中间件模块格式，装饰模式，暂时先这样 */
         $processes = $this->processes(
             $this->servers()
         );
