@@ -10,11 +10,13 @@
 namespace CrCms\Foundation\Swoole\Server\Processes;
 
 
+use Carbon\Carbon;
 use CrCms\Foundation\Swoole\INotify;
 use CrCms\Foundation\Swoole\Process\AbstractProcess;
 use CrCms\Foundation\Swoole\Process\Contracts\ProcessContract;
 use CrCms\Foundation\Swoole\Server\ProcessManage;
 use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
+use Swoole\Async;
 use Swoole\Process;
 
 /**
@@ -61,6 +63,8 @@ class INotifyProcess extends AbstractProcess implements ProcessContract
             if (!empty($events) && $this->processManage->exists('servers')) {
                 $this->processManage->kill(SIGUSR1, 'servers');
                 Async::writeFile($this->config['notify']['log_path'], 'The notify process is reload' . Carbon::now()->toDateTimeString() . PHP_EOL, null, FILE_APPEND);
+            } else {
+                Async::writeFile($this->config['notify']['log_path'], 'no');
             }
         });
     }
