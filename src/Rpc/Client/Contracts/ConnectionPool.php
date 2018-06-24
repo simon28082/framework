@@ -15,6 +15,6 @@ interface ConnectionPool
     public function nextConnection(): Connection;
 
 
-    public function deathConnection(Connection $connection);
+    public function deathConnection();
 
 }

@@ -38,11 +38,17 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
         return $this->selector->select($this->connections);
     }
 
-    public function deathConnection(Connection $connection)
+    public function deathConnection()
     {
-        $position = $connection->position();
+        foreach ($this->connections as $key=>$connection) {
+            if ($connection->isAlive() === false) {
+                $this->deathConnections[] = $connection;
+                unset($this->connections[$key]);
+            }
+        }
+        /*$position = $connection->position();
         $this->deathConnections[] = $this->connections[$position];
-        unset($this->connections[$position]);
+        unset($this->connections[$position]);*/
     }
 
 

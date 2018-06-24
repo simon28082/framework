@@ -19,6 +19,4 @@ interface Connection
 
     public function markDead(): bool;
 
-    public function position(): bool;
-
 }
