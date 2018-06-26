@@ -25,8 +25,6 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
 
     protected $deathConnections;
 
-    protected $position;
-
     public function __construct(array $connections, Selector $selector)
     {
         $this->selector = $selector;
@@ -40,15 +38,13 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
 
     public function deathConnection()
     {
-        foreach ($this->connections as $key=>$connection) {
+        foreach ($this->connections as $key => $connection) {
             if ($connection->isAlive() === false) {
+                $connection->disconnectTime(time());
                 $this->deathConnections[] = $connection;
                 unset($this->connections[$key]);
             }
         }
-        /*$position = $connection->position();
-        $this->deathConnections[] = $this->connections[$position];
-        unset($this->connections[$position]);*/
     }
 
 

@@ -2,17 +2,17 @@
 
 /**
  * @author simon <crcms@crcms.cn>
- * @datetime 2018/6/25 6:31
+ * @datetime 2018/6/26 6:25
  * @link http://crcms.cn/
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
 namespace CrCms\Foundation\Rpc\Client\Contracts;
 
-interface Selector
+
+interface Connector
 {
 
-    public function select(array $connections);
-
+    public function connect(array $config);
 
 }

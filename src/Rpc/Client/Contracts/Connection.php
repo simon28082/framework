@@ -15,8 +15,13 @@ interface Connection
 
     public function isAlive(): bool;
 
-    public function makeAlivie(): bool;
+    public function makeAlive(): Connection;
 
-    public function markDead(): bool;
+    public function markDead(): Connection;
 
+    public function send(string $data): bool;
+
+    public function recv(): string;
+
+    public function disconnectTime(int $timestamp);
 }

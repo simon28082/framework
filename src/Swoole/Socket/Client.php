@@ -9,12 +9,40 @@
 
 namespace CrCms\Foundation\Swoole\Socket;
 
+use BadMethodCallException;
+use Swoole\Client as SwooleClient;
 
+/**
+ * Class Client
+ * @package CrCms\Foundation\Swoole\Socket
+ */
 class Client
 {
+    /**
+     * @var \Swoole\Client
+     */
+    protected $client;
 
-    public function __construct()
+    /**
+     * Client constructor.
+     * @param SwooleClient $client
+     */
+    public function __construct(SwooleClient $client)
     {
+        $this->client = $client;
     }
 
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->client, $name)) {
+            return call_user_func_array([$this->client, $name], $arguments);
+        }
+
+        throw new BadMethodCallException("The method [{$name}] is not exists");
+    }
 }
