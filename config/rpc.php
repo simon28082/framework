@@ -9,7 +9,7 @@
 
 return [
 
-    'default' => ['socket'],
+    'default' => 'socket',
 
     'connections' => [
         'socket' => [
@@ -27,6 +27,7 @@ return [
             ],
 
         ]
-    ]
+    ],
 
+    'selector' => \CrCms\Foundation\Rpc\Client\Selectors\RandSelector::class
 ];

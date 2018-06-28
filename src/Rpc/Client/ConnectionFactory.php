@@ -9,40 +9,65 @@
 
 namespace CrCms\Foundation\Rpc\Client;
 
+use CrCms\Foundation\Rpc\Client\Connections\SocketConnection;
+use CrCms\Foundation\Rpc\Client\Connectors\SocketConnector;
+use CrCms\Foundation\Rpc\Client\Contracts\Connection;
+use CrCms\Foundation\Rpc\Client\Contracts\Connector;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
+/**
+ * Class ConnectionFactory
+ * @package CrCms\Foundation\Rpc\Client
+ */
 class ConnectionFactory
 {
-
+    /**
+     * ConnectionFactory constructor.
+     * @param Container $container
+     */
     public function __construct(Container $container)
     {
     }
 
-    public function make(string $name, array $config)
+    /**
+     * @param string $name
+     * @param array $config
+     * @return Connection
+     */
+    public function make(string $name, array $config): Connection
     {
-        $config = $this->parseConfig($name);
-
-        $this->createConnection($config);
+        return $this->createConnection($config);
     }
 
-    protected function parseConfig(string $name, array $connections)
-    {
-        return $connections[$name];
-    }
-
-    protected function createConnector(array $config)
+    /**
+     * @param array $config
+     * @return Connector
+     */
+    protected function createConnector(array $config): Connector
     {
         switch ($config['driver']) {
             case 'socket':
-                return new SocketConnector;
+                return new SocketConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
     }
 
-    protected function createConnection(array $config)
+    /**
+     * @param array $config
+     * @return Connection
+     */
+    protected function createConnection(array $config): Connection
     {
-        $this->createConnector($config)->connect($config);
+        $connect = $this->createConnector($config)->connect($config);
+
+        switch ($config['driver']) {
+            case 'socket':
+                return new SocketConnection($connect, $config);
+        }
+
+        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
     }
 }

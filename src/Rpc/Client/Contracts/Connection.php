@@ -23,5 +23,5 @@ interface Connection
 
     public function recv(): string;
 
-    public function disconnectTime(int $timestamp);
+    public function connectionFailure();
 }

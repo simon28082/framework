@@ -13,60 +13,149 @@ use CrCms\Foundation\Rpc\Client\Contracts\Connection;
 use CrCms\Foundation\Rpc\Client\Contracts\ConnectionPool as ConnectionPoolContract;
 use ArrayAccess;
 use CrCms\Foundation\Rpc\Client\Contracts\Selector;
+use Illuminate\Support\Arr;
+use BadMethodCallException;
 
+/**
+ * Class ConnectionPool
+ * @package CrCms\Foundation\Rpc\Client
+ */
 class ConnectionPool implements ConnectionPoolContract, ArrayAccess
 {
     /**
-     * @var array
+     * @var Selector
      */
-    protected $connections;
-
     protected $selector;
 
-    protected $deathConnections;
+    /**
+     * @var array
+     */
+    protected $deathConnectionGroups = [];
 
-    public function __construct(array $connections, Selector $selector)
+    /**
+     * @var array
+     */
+    protected $connectionGroups = [];
+
+    /**
+     * ConnectionPool constructor.
+     * @param Selector $selector
+     * @param null|string $group
+     * @param array $connections
+     */
+    public function __construct(Selector $selector, ?string $group = null, array $connections = [])
     {
         $this->selector = $selector;
-        $this->connections = $connections;
+
+        if (!empty($group) && !empty($connections)) {
+            $this->setConnections($group, $connections);
+        }
     }
 
-    public function nextConnection(): Connection
+    /**
+     * @param string $group
+     * @return Connection
+     */
+    public function nextConnection(string $group)
     {
-        return $this->selector->select($this->connections);
+        return $this->selector->select($this->connectionGroups[$group]);
     }
 
-    public function deathConnection()
+    /**
+     * @param string $group
+     * @return ConnectionPoolContract|void
+     */
+    public function deathConnection(string $group)
     {
-        foreach ($this->connections as $key => $connection) {
+        foreach ($this->connectionGroups[$group] as $key => $connection) {
             if ($connection->isAlive() === false) {
-                $connection->disconnectTime(time());
-                $this->deathConnections[] = $connection;
-                unset($this->connections[$key]);
+                $connection->connectionFailure();
+                $groupKey = "{$group}.{$key}";
+                $this->addDeathConnectionGroup($groupKey, $connection);
+                $this->offsetUnset($groupKey);
             }
         }
     }
 
+    /**
+     * @param string $group
+     * @param array $connections
+     * @return ConnectionPoolContract|void
+     */
+    public function setConnections(string $group, array $connections)
+    {
+        $this->connectionGroups[$group] = $connections;
+    }
 
+    /**
+     * @param string $group
+     * @param Connection $connection
+     * @return ConnectionPoolContract|void
+     */
+    public function addConnection(string $group, Connection $connection)
+    {
+        $this->connectionGroups[$group][] = $connection;
+    }
+
+    /**
+     * @param string $group
+     * @return bool
+     */
+    public function hasConnection(string $group): bool
+    {
+        return isset($this->connectionGroups[$group]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllConnections(): array
+    {
+        return $this->getAllConnections();
+    }
+
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
     public function offsetExists($offset)
     {
-        // TODO: Implement offsetExists() method.
+        return Arr::has($this->connectionGroups, $offset);
     }
 
+    /**
+     * @param mixed $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
-        // TODO: Implement offsetGet() method.
+        return Arr::get($this->connectionGroups, $offset);
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     * @return array|void
+     */
     public function offsetSet($offset, $value)
     {
-        // TODO: Implement offsetSet() method.
+        return Arr::set($this->connectionGroups, $offset, $value);
     }
 
+    /**
+     * @param mixed $offset
+     */
     public function offsetUnset($offset)
     {
-        // TODO: Implement offsetUnset() method.
+        Arr::forget($this->connectionGroups, $offset);
     }
 
-
+    /**
+     * @param string $group
+     * @param Connection $connection
+     */
+    protected function addDeathConnectionGroup(string $group, Connection $connection)
+    {
+        Arr::set($this->deathConnectionGroups, $group, $connection);
+    }
 }

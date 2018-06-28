@@ -15,18 +15,10 @@ use CrCms\Foundation\Rpc\Client\Contracts\Selector;
 class RandSelector implements Selector
 {
 
-    protected $position;
-
     public function select(array $connections): Connection
     {
         $key = array_rand($connections);
-        $this->position = $key;
         return $connections[$key];
-    }
-
-    public function position(): int
-    {
-        return $this->position;
     }
 
 
