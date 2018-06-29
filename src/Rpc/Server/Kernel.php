@@ -7,9 +7,9 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc;
+namespace CrCms\Foundation\Rpc\Server;
 
-use CrCms\Foundation\Rpc\Contracts\Kernel as KernelContract;
+use CrCms\Foundation\Rpc\Server\Contracts\Kernel as KernelContract;
 
 class Kernel implements KernelContract
 {

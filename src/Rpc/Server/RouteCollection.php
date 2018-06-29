@@ -7,7 +7,7 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc;
+namespace CrCms\Foundation\Rpc\Server;
 
 
 class RouteCollection
