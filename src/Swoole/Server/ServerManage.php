@@ -96,7 +96,7 @@ class ServerManage implements StartActionContract
             'log' => $logPid
         ]);
 
-        if ($this->config['notify']['monitor']) {
+        if ($this->config['notify']['monitor'] && function_exists('inotify_init')) {
             $notifyPid = $this->addINotifyProcess();
             $allPid = $allPid->merge(['inotify'=>$notifyPid]);
         }
