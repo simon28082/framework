@@ -7,18 +7,18 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client;
+namespace CrCms\Foundation\Client;
 
-use CrCms\Foundation\Rpc\Client\Contracts\Connection;
-use CrCms\Foundation\Rpc\Client\Contracts\ConnectionPool as ConnectionPoolContract;
+use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Contracts\ConnectionPool as ConnectionPoolContract;
 use ArrayAccess;
-use CrCms\Foundation\Rpc\Client\Contracts\Selector;
+use CrCms\Foundation\Client\Contracts\Selector;
 use Illuminate\Support\Arr;
 use BadMethodCallException;
 
 /**
  * Class ConnectionPool
- * @package CrCms\Foundation\Rpc\Client
+ * @package CrCms\Foundation\Client
  */
 class ConnectionPool implements ConnectionPoolContract, ArrayAccess
 {
@@ -56,16 +56,16 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      * @param string $group
      * @return Connection
      */
-    public function nextConnection(string $group)
+    public function nextConnection(string $group): Connection
     {
         return $this->selector->select($this->connectionGroups[$group]);
     }
 
     /**
      * @param string $group
-     * @return ConnectionPoolContract|void
+     * @return ConnectionPoolContract
      */
-    public function deathConnection(string $group)
+    public function deathConnection(string $group): ConnectionPoolContract
     {
         foreach ($this->connectionGroups[$group] as $key => $connection) {
             if ($connection->isAlive() === false) {
@@ -75,26 +75,30 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
                 $this->offsetUnset($groupKey);
             }
         }
+        
+        return $this;
     }
 
     /**
      * @param string $group
      * @param array $connections
-     * @return ConnectionPoolContract|void
+     * @return ConnectionPoolContract
      */
-    public function setConnections(string $group, array $connections)
+    public function setConnections(string $group, array $connections): ConnectionPoolContract
     {
         $this->connectionGroups[$group] = $connections;
+        return $this;
     }
 
     /**
      * @param string $group
      * @param Connection $connection
-     * @return ConnectionPoolContract|void
+     * @return ConnectionPoolContract
      */
-    public function addConnection(string $group, Connection $connection)
+    public function addConnection(string $group, Connection $connection): ConnectionPoolContract
     {
         $this->connectionGroups[$group][] = $connection;
+        return $this;
     }
 
     /**

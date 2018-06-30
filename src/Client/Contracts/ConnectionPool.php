@@ -7,11 +7,11 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client\Contracts;
+namespace CrCms\Foundation\Client\Contracts;
 
 /**
  * Interface ConnectionPool
- * @package CrCms\Foundation\Rpc\Client\Contracts
+ * @package CrCms\Foundation\Client\Contracts
  */
 interface ConnectionPool
 {
@@ -35,17 +35,17 @@ interface ConnectionPool
 
     /**
      * @param string $group
-     * @param $connections
+     * @param array $connections
      * @return ConnectionPool
      */
-    public function setConnections(string $group, $connections): ConnectionPool;
+    public function setConnections(string $group, array $connections): ConnectionPool;
 
     /**
      * @param string $group
-     * @param $connection
+     * @param Connection $connection
      * @return ConnectionPool
      */
-    public function addConnection(string $group, $connection): ConnectionPool;
+    public function addConnection(string $group, Connection $connection): ConnectionPool;
 
     /**
      * @return array

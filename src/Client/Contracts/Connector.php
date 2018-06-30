@@ -2,15 +2,17 @@
 
 /**
  * @author simon <crcms@crcms.cn>
- * @datetime 2018/6/23 7:20
+ * @datetime 2018/6/26 6:25
  * @link http://crcms.cn/
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Server;
+namespace CrCms\Foundation\Client\Contracts;
 
 
-class RouteCollection
+interface Connector
 {
+
+    public function connect(array $config);
 
 }

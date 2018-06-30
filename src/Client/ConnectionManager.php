@@ -1,22 +1,22 @@
 <?php
 
 /**
- * @author simon <434730525@qq.com>
- * @datetime 2018-06-28 10:36
- * @link http://www.koodpower.com/
- * @copyright Copyright &copy; 2018 Rights Reserved 快点动力
+ * @author simon <crcms@crcms.cn>
+ * @datetime 2018/6/25 6:25
+ * @link http://crcms.cn/
+ * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client;
+namespace CrCms\Foundation\Client;
 
-use CrCms\Foundation\Rpc\Client\Contracts\Connection;
-use CrCms\Foundation\Rpc\Client\Contracts\ConnectionPool;
+use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Contracts\ConnectionPool;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 
 /**
  * Class ConnectionManager
- * @package CrCms\Foundation\Rpc\Client
+ * @package CrCms\Foundation\Client
  */
 class ConnectionManager
 {
@@ -52,7 +52,7 @@ class ConnectionManager
      * @param null|string $name
      * @return Connection
      */
-    public function connction(?string $name = null): Connection
+    public function connection(?string $name = null): Connection
     {
         $name = $name ? $name : $this->defaultDriver();
 
@@ -63,6 +63,18 @@ class ConnectionManager
         return $this->pool->setConnections(
             $name, $this->makeConnections($name)
         )->nextConnection($name);
+
+        /*if (!empty($this->connections[$name])) {
+            return $this->connections[$name];
+        }
+
+        if ($this->pool->hasConnection($name)) {
+            $this->connection = $this->pool->nextConnection($name);
+        } else {
+            $this->connection = $this->pool->setConnections(
+                $name, $this->makeConnections($name)
+            )->nextConnection($name);
+        }*/
     }
 
     /**
@@ -81,7 +93,7 @@ class ConnectionManager
      */
     protected function defaultDriver(): string
     {
-        return $this->app->make('config')->get('rpc.default');
+        return $this->app->make('config')->get('client.default');
     }
 
     /**
@@ -90,12 +102,21 @@ class ConnectionManager
      */
     protected function configuration(string $name): array
     {
-        $connections = $this->app->make('config')->get('rpc.connections');
+        $connections = $this->app->make('config')->get('client.connections');
 
         if (!isset($connections[$name])) {
-            throw new InvalidArgumentException("rpc config[{$name}] not found");
+            throw new InvalidArgumentException("client config[{$name}] not found");
         }
 
         return $connections[$name];
     }
+
+    /*public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->connction(), $name)) {
+            return call_user_func_array([$this->connect, $name], $arguments);
+        }
+
+        throw new BadMethodCallException("The method[{$name}] is not exists");
+    }*/
 }

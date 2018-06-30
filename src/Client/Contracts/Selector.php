@@ -7,12 +7,13 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client\Contracts;
+namespace CrCms\Foundation\Client\Contracts;
 
 interface Selector
 {
-
-    public function select(array $connections);
-
-
+    /**
+     * @param array $connections
+     * @return Connection
+     */
+    public function select(array $connections): Connection;
 }

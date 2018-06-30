@@ -7,14 +7,14 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client;
+namespace CrCms\Foundation\Client;
 
 use CrCms\Foundation\Rpc\Client\Contracts\Connection as ConnectionContract;
 use Illuminate\Database\Connectors\Connector;
 
 /**
  * Class AbstractConnection
- * @package CrCms\Foundation\Rpc\Client
+ * @package CrCms\Foundation\Client
  */
 abstract class AbstractConnection implements ConnectionContract
 {
@@ -88,4 +88,6 @@ abstract class AbstractConnection implements ConnectionContract
         $this->connectionFailureNum += 1;
         $this->connectionFailureTime = time();
     }
+
+    
 }

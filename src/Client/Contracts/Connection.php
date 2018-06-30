@@ -7,7 +7,7 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client\Contracts;
+namespace CrCms\Foundation\Client\Contracts;
 
 
 interface Connection

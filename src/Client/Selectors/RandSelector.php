@@ -7,19 +7,20 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc\Client\Selectors;
+namespace CrCms\Foundation\Client\Selectors;
 
-use CrCms\Foundation\Rpc\Client\Connection;
-use CrCms\Foundation\Rpc\Client\Contracts\Selector;
+use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Contracts\Selector;
 
 class RandSelector implements Selector
 {
-
+    /**
+     * @param array $connections
+     * @return Connection
+     */
     public function select(array $connections): Connection
     {
         $key = array_rand($connections);
         return $connections[$key];
     }
-
-
 }
