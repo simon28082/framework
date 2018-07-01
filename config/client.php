@@ -9,36 +9,59 @@
 
 return [
 
-    'default' => 'socket',
+    /*
+    |--------------------------------------------------------------------------
+    | Default Connection Pool Connection Name
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'default' => 'http',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Connection Pool Connections
+    |--------------------------------------------------------------------------
+    |
+    | Connection pools are divided into different connection groups
+    | Each connection group can have multiple connections
+    | Determine which pool's connection is currently used by selecting a connection group
+    |
+    */
 
     'connections' => [
-        'socket' => [
-            /*[
-                'driver' => 'socket',
-                'host' => '127.0.0.1',
-                'port' => 22,
-                'settings' => [
-                    'timeout' => 10
-                ],
 
-            ],*/
+        'http' => [
             [
                 'driver' => 'http',
-                'host' => 'baidu.com',
-                'port' => 80,
+                'host' => '192.168.1.108',
+                'port' => 2222,
                 'settings' => [
                     'timeout' => 10
                 ],
             ],
+            [
+                'driver' => 'http',
+                'host' => '192.168.1.118',
+                'port' => 2222,
+                'settings' => [
+                    'timeout' => 0.5
+                ],
+            ]
+        ],
 
-        ]
     ],
 
-    'selector' => \CrCms\Foundation\Client\Selectors\RandSelector::class,
+    /*
+    |--------------------------------------------------------------------------
+    | Connection pool selector
+    |--------------------------------------------------------------------------
+    |
+    | Different selectors can be selected to select the connection in the connection pool
+    | RandSelector
+    | RingSelector
+    | ResidentSelector
+    */
 
-    /*'drivers' => [
-        'socket' => [
-            'settings' => [],
-        ]
-    ],*/
+    'selector' => CrCms\Foundation\Client\Selectors\RingSelector::class,
 ];
