@@ -9,27 +9,46 @@
 
 namespace CrCms\Foundation\Client;
 
+use BadMethodCallException;
+use CrCms\Foundation\Client\Contracts\Connection;
+
 /**
  * Class Client
  * @package CrCms\Foundation\Client
  */
 class Client
 {
+    /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
     protected $manager;
 
+    /**
+     * @var Connection
+     */
     protected $connection;
 
+    /**
+     * Client constructor.
+     */
     public function __construct()
     {
         $this->manager = $this->manager();
         $this->connection = $this->connection();
     }
 
+    /**
+     * @param null|string $name
+     * @return mixed
+     */
     public function connection(?string $name = null)
     {
         return $this->manager->connection($name);
     }
 
+    /**
+     * @return \Illuminate\Foundation\Application|mixed
+     */
     protected function manager()
     {
         return app('client.manager');
