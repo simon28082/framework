@@ -2,13 +2,20 @@
 
 /**
  * @author simon <crcms@crcms.cn>
- * @datetime 2018/7/2 6:32
+ * @datetime 2018/7/2 6:33
  * @link http://crcms.cn/
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-return [
+namespace CrCms\Foundation\Rpc;
 
-    'default' => 'http',
 
-];
+class Factory
+{
+
+    public function make()
+    {
+
+    }
+
+}

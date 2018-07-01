@@ -2,13 +2,17 @@
 
 /**
  * @author simon <crcms@crcms.cn>
- * @datetime 2018/7/2 6:32
+ * @datetime 2018/7/2 6:14
  * @link http://crcms.cn/
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-return [
+namespace CrCms\Foundation\Rpc\Contracts;
 
-    'default' => 'http',
 
-];
+interface Response
+{
+
+    public function parse(): Response;
+
+}

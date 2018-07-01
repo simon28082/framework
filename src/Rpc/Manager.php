@@ -7,8 +7,10 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-return [
+namespace CrCms\Foundation\Rpc;
 
-    'default' => 'http',
 
-];
+class Manager
+{
+
+}
