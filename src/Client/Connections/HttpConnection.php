@@ -77,9 +77,9 @@ class HttpConnection extends AbstractConnection implements Connection
     /**
      * @param string $path
      * @param array $data
-     * @return mixed|null
+     * @return Connection
      */
-    public function send(string $path = '', array $data = [])
+    public function send(string $path = '', array $data = []): Connection
     {
         $this->resolveSendPayload($path, $data);
 
@@ -97,7 +97,23 @@ class HttpConnection extends AbstractConnection implements Connection
             throw new RuntimeException('Connection failed');
         }
 
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContent()
+    {
         return $this->connector->body ?? null;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return $this->connector->statusCode;
     }
 
     /**

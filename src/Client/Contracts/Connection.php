@@ -34,9 +34,9 @@ interface Connection
     /**
      * @param string $path
      * @param array $data
-     * @return mixed
+     * @return Connection
      */
-    public function send(string $path = '', array $data = []);
+    public function send(string $path = '', array $data = []): Connection;
 
     /**
      * @return mixed
