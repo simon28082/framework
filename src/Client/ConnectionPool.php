@@ -15,6 +15,7 @@ use ArrayAccess;
 use CrCms\Foundation\Client\Contracts\Selector;
 use Illuminate\Support\Arr;
 use BadMethodCallException;
+use UnderflowException;
 
 /**
  * Class ConnectionPool
@@ -46,7 +47,6 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
     public function __construct(Selector $selector, ?string $group = null, array $connections = [])
     {
         $this->selector = $selector;
-
         if (!empty($group) && !empty($connections)) {
             $this->setConnections($group, $connections);
         }
@@ -58,24 +58,29 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      */
     public function nextConnection(string $group): Connection
     {
-        return $this->selector->select($this->connectionGroups[$group]);
+        $this->deathConnection($group);
+
+        if (empty($this->connectionGroups[$group])) {
+            throw new UnderflowException("Connection pool, no connection available");
+        }
+
+        return $this->selector->select($group, $this->connectionGroups[$group]);
     }
 
     /**
      * @param string $group
      * @return ConnectionPoolContract
      */
-    public function deathConnection(string $group): ConnectionPoolContract
+    protected function deathConnection(string $group): ConnectionPoolContract
     {
         foreach ($this->connectionGroups[$group] as $key => $connection) {
             if ($connection->isAlive() === false) {
-                $connection->connectionFailure();
                 $groupKey = "{$group}.{$key}";
                 $this->addDeathConnectionGroup($groupKey, $connection);
                 $this->offsetUnset($groupKey);
             }
         }
-        
+
         return $this;
     }
 
@@ -108,6 +113,15 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
     public function hasConnection(string $group): bool
     {
         return isset($this->connectionGroups[$group]);
+    }
+
+    /**
+     * @param string $group
+     * @param Connection $connection
+     */
+    protected function addDeathConnectionGroup(string $group, Connection $connection)
+    {
+        Arr::set($this->deathConnectionGroups, $group, $connection);
     }
 
     /**
@@ -152,14 +166,5 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
     public function offsetUnset($offset)
     {
         Arr::forget($this->connectionGroups, $offset);
-    }
-
-    /**
-     * @param string $group
-     * @param Connection $connection
-     */
-    protected function addDeathConnectionGroup(string $group, Connection $connection)
-    {
-        Arr::set($this->deathConnectionGroups, $group, $connection);
     }
 }

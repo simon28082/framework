@@ -29,12 +29,6 @@ interface ConnectionPool
 
     /**
      * @param string $group
-     * @return ConnectionPool
-     */
-    public function deathConnection(string $group): ConnectionPool;
-
-    /**
-     * @param string $group
      * @param array $connections
      * @return ConnectionPool
      */

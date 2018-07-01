@@ -9,10 +9,20 @@
 
 namespace CrCms\Foundation\Client\Contracts;
 
-
+/**
+ * Interface Connector
+ * @package CrCms\Foundation\Client\Contracts
+ */
 interface Connector
 {
+    /**
+     * @param array $config
+     * @return Connector
+     */
+    public function connect(array $config): Connector;
 
-    public function connect(array $config);
-
+    /**
+     * @return mixed
+     */
+    public function resource();
 }

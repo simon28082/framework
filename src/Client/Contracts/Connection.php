@@ -10,18 +10,36 @@
 namespace CrCms\Foundation\Client\Contracts;
 
 
+/**
+ * Interface Connection
+ * @package CrCms\Foundation\Client\Contracts
+ */
 interface Connection
 {
-
+    /**
+     * @return bool
+     */
     public function isAlive(): bool;
 
+    /**
+     * @return Connection
+     */
     public function makeAlive(): Connection;
 
+    /**
+     * @return Connection
+     */
     public function markDead(): Connection;
 
-    public function send(string $data): bool;
+    /**
+     * @param string $path
+     * @param array $data
+     * @return mixed
+     */
+    public function send(string $path = '', array $data = []);
 
-    public function recv(): string;
-
-    public function connectionFailure();
+    /**
+     * @return mixed
+     */
+//    public function recv(array $options = []);
 }

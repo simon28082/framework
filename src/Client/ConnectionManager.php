@@ -63,18 +63,6 @@ class ConnectionManager
         return $this->pool->setConnections(
             $name, $this->makeConnections($name)
         )->nextConnection($name);
-
-        /*if (!empty($this->connections[$name])) {
-            return $this->connections[$name];
-        }
-
-        if ($this->pool->hasConnection($name)) {
-            $this->connection = $this->pool->nextConnection($name);
-        } else {
-            $this->connection = $this->pool->setConnections(
-                $name, $this->makeConnections($name)
-            )->nextConnection($name);
-        }*/
     }
 
     /**
@@ -84,7 +72,7 @@ class ConnectionManager
     protected function makeConnections(string $name)
     {
         return array_map(function ($config) use ($name) {
-            return $this->factory->make($name, $config);
+            return $this->factory->make($config);
         }, $this->configuration($name));
     }
 

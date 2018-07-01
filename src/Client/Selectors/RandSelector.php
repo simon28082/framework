@@ -11,16 +11,17 @@ namespace CrCms\Foundation\Client\Selectors;
 
 use CrCms\Foundation\Client\Contracts\Connection;
 use CrCms\Foundation\Client\Contracts\Selector;
+use InvalidArgumentException;
 
 class RandSelector implements Selector
 {
     /**
+     * @param string $group
      * @param array $connections
      * @return Connection
      */
-    public function select(array $connections): Connection
+    public function select(string $group, array $connections): Connection
     {
-        $key = array_rand($connections);
-        return $connections[$key];
+        return $connections[array_rand($connections)];
     }
 }

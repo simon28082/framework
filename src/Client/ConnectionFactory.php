@@ -18,6 +18,7 @@ use CrCms\Foundation\Client\Contracts\Connector;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use CrCms\Foundation\Client\Contracts\ConnectionPool as ConnectionPoolContract;
 
 /**
  * Class ConnectionFactory
@@ -34,11 +35,10 @@ class ConnectionFactory
     }
 
     /**
-     * @param string $name
      * @param array $config
      * @return Connection
      */
-    public function make(string $name, array $config): Connection
+    public function make(array $config): Connection
     {
         return $this->createConnection($config);
     }
@@ -71,7 +71,7 @@ class ConnectionFactory
             case 'socket':
                 return new SocketConnection($connect, $config);
             case 'http':
-                return new HttpConnection($connect, $connect);
+                return new HttpConnection($connect, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");

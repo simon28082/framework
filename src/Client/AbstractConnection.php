@@ -9,8 +9,9 @@
 
 namespace CrCms\Foundation\Client;
 
-use CrCms\Foundation\Rpc\Client\Contracts\Connection as ConnectionContract;
-use Illuminate\Database\Connectors\Connector;
+use CrCms\Foundation\Client\Contracts\Connection as ConnectionContract;
+use CrCms\Foundation\Client\Contracts\Connector;
+use CrCms\Foundation\Client\Contracts\ConnectionPool as ConnectionPoolContract;
 
 /**
  * Class AbstractConnection
@@ -34,14 +35,19 @@ abstract class AbstractConnection implements ConnectionContract
     protected $config;
 
     /**
-     * @var
+     * @var int
      */
-    protected $connectionFailureTime;
+    protected $connectionFailureTime = 0;
 
     /**
      * @var int
      */
     protected $connectionFailureNum = 0;
+
+    /**
+     * @var mixed
+     */
+    protected $connctorResource;
 
     /**
      * AbstractConnection constructor.
@@ -51,6 +57,7 @@ abstract class AbstractConnection implements ConnectionContract
     public function __construct(Connector $connector, array $config = [])
     {
         $this->connector = $connector;
+        $this->connctorResource = $connector->resource();
         $this->config = $config;
     }
 
@@ -68,6 +75,9 @@ abstract class AbstractConnection implements ConnectionContract
     public function makeAlive(): ConnectionContract
     {
         $this->isAlive = true;
+        $this->connectionFailureNum = 0;
+        $this->connectionFailureTime = 0;
+
         return $this;
     }
 
@@ -77,17 +87,31 @@ abstract class AbstractConnection implements ConnectionContract
     public function markDead(): ConnectionContract
     {
         $this->isAlive = false;
+        $this->connectionFailureNum += 1;
+        $this->connectionFailureTime = time();
+
         return $this;
     }
 
     /**
-     *
+     * @return Connector
      */
-    public function connectionFailure()
+    public function getConnector(): Connector
     {
-        $this->connectionFailureNum += 1;
-        $this->connectionFailureTime = time();
+        return $this->connector;
     }
 
-    
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->connector, $name)) {
+            return call_user_func_array([$this->connector, $name], $arguments);
+        }
+
+        throw new BadMethodCallException("The method[{$name}] is not exists");
+    }
 }

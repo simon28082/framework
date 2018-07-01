@@ -18,13 +18,4 @@ use CrCms\Foundation\Client\Contracts\Connection;
  */
 class SocketConnection extends AbstractConnection implements Connection
 {
-    public function send(string $data): bool
-    {
-        return $this->connector->send('abc');
-    }
-
-    public function recv(): string
-    {
-        // TODO: Implement recv() method.
-    }
 }

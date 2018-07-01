@@ -9,50 +9,41 @@
 
 namespace CrCms\Foundation\Client\Connectors;
 
+use CrCms\Foundation\Client\AbstractConnector;
 use CrCms\Foundation\Client\Contracts\Connector;
 use Swoole\Coroutine\Http\Client;
-use BadMethodCallException;
 
 /**
  * Class HttpConnector
  * @package CrCms\Foundation\Client\Connectors
  */
-class HttpConnector implements Connector
+class HttpConnector extends AbstractConnector implements Connector
 {
     /**
      * @var array
      */
-    protected $defaultSettings = [
-        'timeout' => 1
+    protected $defaultHeaders = [
+        'Content-Type' => 'application/json',
     ];
 
     /**
-     * @var Client
-     */
-    protected $connect;
-
-    /**
      * @param array $config
-     * @return Client
+     * @return Connector
      */
-    public function connect(array $config)
+    public function connect(array $config): Connector
     {
         $this->connect = new Client($config['host'], $config['port']);
-        $this->connect->set(array_merge($this->defaultSettings, $config['settings'] ?? []));
-        return $this->connect;
+        $this->connect->set($this->mergeSettings($config['settings'] ?? []));
+        $this->connect->setHeaders($this->mergeHeaders([]));
+        return $this;
     }
 
     /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
+     * @param $headers
+     * @return array
      */
-    public function __call(string $name, array $arguments)
+    protected function mergeHeaders($headers): array
     {
-        if (method_exists($this->connect, $name)) {
-            return call_user_func_array([$this->connect, $name], $arguments);
-        }
-
-        throw new BadMethodCallException("The method[{$name}] is not exists");
+        return array_merge($this->defaultHeaders, $headers);
     }
 }

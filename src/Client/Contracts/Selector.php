@@ -12,8 +12,9 @@ namespace CrCms\Foundation\Client\Contracts;
 interface Selector
 {
     /**
+     * @param string $group
      * @param array $connections
      * @return Connection
      */
-    public function select(array $connections): Connection;
+    public function select(string $group, array $connections): Connection;
 }

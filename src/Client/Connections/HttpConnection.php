@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Client\Connections;
 
 use CrCms\Foundation\Client\AbstractConnection;
 use CrCms\Foundation\Client\Contracts\Connection;
+use RuntimeException;
 
 /**
  * Class HttpConnection
@@ -18,19 +19,123 @@ use CrCms\Foundation\Client\Contracts\Connection;
  */
 class HttpConnection extends AbstractConnection implements Connection
 {
-    public function send(string $data): bool
+    /**
+     * @var string
+     */
+    protected $method = 'post';
+
+    /**
+     * @var array
+     */
+    protected $payload = [];
+
+    /**
+     * @var string
+     */
+    protected $path;
+
+    /**
+     * @param array $headers
+     * @return $this
+     */
+    public function setHeaders(array $headers): self
     {
-        return $this->connector->send('abc');
+        $this->connector->setHeaders($headers);
+        return $this;
     }
 
-    public function recv(): string
+    /**
+     * @param string $method
+     * @return $this
+     */
+    public function setMethod(string $method): self
     {
-        // TODO: Implement recv() method.
+        $this->method = $method;
+        return $this;
     }
 
-    public function get()
+    /**
+     * @param array $payload
+     * @return $this
+     */
+    public function setPayload(array $payload): self
     {
-        return $this->connector->get('/');
+        $this->payload = $payload;
+        return $this;
     }
 
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function setPath(string $path): self
+    {
+        $this->path = $path;
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @param array $data
+     * @return mixed|null
+     */
+    public function send(string $path = '', array $data = [])
+    {
+        $this->resolveSendPayload($path, $data);
+
+        if (in_array($this->method, ['get', 'post'], true)) {
+            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path, json_encode($this->payload)]);
+        } else {
+            /* 这里需要详细测试，暂时此功能不可用 */
+            $this->connector->setMethod($this->method);
+            $this->connector->setData(json_encode($this->payload));
+            $execResult = call_user_func_array([$this->connector, 'execute'], [$this->path]);
+        }
+
+        //加入异常连接
+        if ($this->isAbnormalConnection(!$execResult)) {
+            throw new RuntimeException('Connection failed');
+        }
+
+        return $this->connector->body ?? null;
+    }
+
+    /**
+     * @param string $path
+     * @param array $data
+     */
+    protected function resolveSendPayload(string $path, array $data)
+    {
+        if (!empty($data['method'])) {
+            $this->setMethod($data['method']);
+        } elseif (empty($this->method)) {
+            $this->setMethod('post');
+        }
+
+        if (!empty($data['payload'])) {
+            $this->setPayload($data['payload']);
+        } elseif (empty($this->payload)) {
+            $this->setPayload([]);
+        }
+
+        if (!empty($path)) {
+            $this->setPath($path);
+        }
+
+        return;
+    }
+
+    /**
+     * @param bool $isDead
+     * @return bool
+     */
+    protected function isAbnormalConnection(bool $isDead = false): bool
+    {
+        if (in_array($this->connector->statusCode, [-1, -2], true) || $this->connector->errCode !== 0 || $isDead === true) {
+            $this->markDead();
+            return true;
+        }
+
+        return false;
+    }
 }
