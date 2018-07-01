@@ -80,5 +80,6 @@ class ClientServiceProvider extends ServiceProvider
             'client.pool',
             'client.manager'
         ];*/
+        return parent::provides();
     }
 }
