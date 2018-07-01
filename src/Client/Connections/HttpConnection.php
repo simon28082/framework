@@ -94,8 +94,11 @@ class HttpConnection extends AbstractConnection implements Connection
 
         //加入异常连接
         if ($this->isAbnormalConnection(!$execResult)) {
+            $this->connector->close();
             throw new RuntimeException('Connection failed');
         }
+
+        $this->connector->close();
 
         return $this;
     }
