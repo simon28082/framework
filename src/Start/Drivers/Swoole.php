@@ -18,7 +18,7 @@ use UnexpectedValueException;
 use Illuminate\Contracts\Http\Kernel;
 use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
 use function CrCms\Foundation\App\Helpers\framework_config_path;
-use CrCms\Foundation\Swoole\Server\ProcessManage;
+use CrCms\Foundation\Swoole\Server\ProcessManager;
 
 /**
  * Class Swoole
@@ -34,7 +34,7 @@ class Swoole implements StartContract
     /**
      * @var Server\ServerManager
      */
-    protected $ServerManager;
+    protected $serverManager;
 
     /**
      * @var Container
@@ -87,7 +87,7 @@ class Swoole implements StartContract
 
         if (in_array($action, $this->allows, true)) {
             try {
-                $this->ServerManager->{$action}();
+                $this->serverManager->{$action}();
                 $this->output->success("{$action} successfully");
             } catch (Exception $exception) {
                 $this->log($exception->getMessage() . PHP_EOL);
@@ -118,10 +118,10 @@ class Swoole implements StartContract
      */
     protected function setServerManager(): void
     {
-        $this->ServerManager = new Server\ServerManager(
+        $this->serverManager = new Server\ServerManager(
             $this->app,
             $this->config,
-            new ProcessManage($this->config['pid_file'])
+            new ProcessManager($this->config['pid_file'])
         );
     }
 }
