@@ -9,8 +9,7 @@
 
 namespace CrCms\Foundation\Rpc;
 
-
 class Manager
 {
-
+    //这里的Manager应该和Client里面的Manager一个思路，暂时只使用http，后期再次开发
 }

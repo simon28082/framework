@@ -9,22 +9,19 @@
 
 namespace CrCms\Foundation\Rpc;
 
-use CrCms\Foundation\Rpc\Contracts\Call as CallContract;
-use CrCms\Foundation\Rpc\Contracts\Request as RequestContract;
+use CrCms\Foundation\Rpc\Contracts\CallContract;
+use CrCms\Foundation\Rpc\Contracts\RequestContract;
+use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 
 class Rpc implements CallContract
 {
-    protected $request;
-
-    public function __construct(RequestContract $request)
+    /**
+     * @param string $name
+     * @param array $params
+     * @return ResponseContract
+     */
+    public function call(string $name, array $params = []): ResponseContract
     {
-        $this->request = $request;
+        return app(RequestContract::class)->sendPayload($name, $params = []);
     }
-
-    public function call(string $name, array $params = [])
-    {
-        return $this->request->sendPayload($name, $params = []);
-    }
-
-
 }

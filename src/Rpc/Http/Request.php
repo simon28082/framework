@@ -10,48 +10,78 @@
 namespace CrCms\Foundation\Rpc\Http;
 
 use CrCms\Foundation\Client\Client;
-use CrCms\Foundation\Rpc\Contracts\Request as RequestContract;
-use CrCms\Foundation\Rpc\Contracts\Response as ResponseContract;
+use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Rpc\Contracts\RequestContract;
+use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
+use CrCms\Foundation\Rpc\Contracts\ResponseContract;
+use RuntimeException;
+use Exception;
 
-class Request implements RequestContract
+/**
+ * Class Request
+ * @package CrCms\Foundation\Rpc\Http
+ */
+class Request implements RequestContract, HttpRequestContract
 {
-
+    /**
+     * @var array
+     */
     protected $headers = [
-        'User-Agent'=> 'JSON-RPC PHP Client <https://github.com/fguillot/JsonRPC>',
-        'Content-Type'=> 'application/json',
-        'Accept'=>' application/json',
-        'Connection'=>' close',
+        'User-Agent' => 'CRCMS-JSON-RPC PHP Client',
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
     ];
 
-    protected $path;
-
-    protected $data;
-
+    /**
+     * @var Client
+     */
     protected $client;
 
-    protected $response;
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
+    /**
+     * Request constructor.
+     * @param Client $client
+     */
     public function __construct(Client $client)
     {
         $this->client = $client;
-//        $this->response = $response;
     }
 
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return $this->connection->getStatusCode();
+    }
 
+    /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->connection->getContent();
+    }
+
+    /**
+     * @param string $name
+     * @param array $params
+     * @return ResponseContract
+     */
     public function sendPayload(string $name, array $params = []): ResponseContract
     {
         try {
-            $connection = $this->client->connection('http')->setHeaders($this->headers)
+            $this->connection = $this->client->connection('http')->setHeaders($this->headers)
                 ->setMethod('post')
-                ->send($name, ['payload'=>$params]);
-        } catch (\Exception $exception) {
-            throw new \Exception($exception->getMessage());
+                ->send($name, ['payload' => $params]);
+        } catch (Exception $exception) {
+            throw new RuntimeException($exception->getMessage());
         }
 
-
-        //$this->response->parse();
-        return new Response($connection->getStatusCode(),$connection->getContent());
+        return app(ResponseContract::class)->parse($this);
     }
-
-
 }
