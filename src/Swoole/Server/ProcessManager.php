@@ -14,10 +14,10 @@ use Swoole\Process;
 use RuntimeException;
 
 /**
- * Class ProcessManage
+ * Class ProcessManager
  * @package CrCms\Foundation\Swoole\Server
  */
-class ProcessManage
+class ProcessManager
 {
     /**
      * @var string

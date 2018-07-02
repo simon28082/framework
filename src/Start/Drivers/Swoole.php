@@ -32,9 +32,9 @@ class Swoole implements StartContract
     protected $allows = ['start', 'stop', 'restart', 'reload'];
 
     /**
-     * @var Server\ServerManage
+     * @var Server\ServerManager
      */
-    protected $serverManage;
+    protected $ServerManager;
 
     /**
      * @var Container
@@ -83,11 +83,11 @@ class Swoole implements StartContract
             new ConsoleOutput()
         );
 
-        $this->setServerManage();
+        $this->setServerManager();
 
         if (in_array($action, $this->allows, true)) {
             try {
-                $this->serverManage->{$action}();
+                $this->ServerManager->{$action}();
                 $this->output->success("{$action} successfully");
             } catch (Exception $exception) {
                 $this->log($exception->getMessage() . PHP_EOL);
@@ -116,9 +116,9 @@ class Swoole implements StartContract
     /**
      *
      */
-    protected function setServerManage(): void
+    protected function setServerManager(): void
     {
-        $this->serverManage = new Server\ServerManage(
+        $this->ServerManager = new Server\ServerManager(
             $this->app,
             $this->config,
             new ProcessManage($this->config['pid_file'])

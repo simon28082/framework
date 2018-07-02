@@ -4,7 +4,7 @@ namespace CrCms\Foundation\App\Actions;
 
 use Illuminate\Support\Collection;
 
-interface Contract
+interface ActionContract
 {
     /**
      * @param Collection $collects

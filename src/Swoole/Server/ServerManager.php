@@ -20,13 +20,13 @@ use Swoole\Process;
 use UnexpectedValueException;
 use RuntimeException;
 use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
-use CrCms\Foundation\Swoole\Server\ProcessManage;
+use CrCms\Foundation\Swoole\Server\processManager;
 
 /**
- * Class ServerManage
+ * Class ServerManager
  * @package CrCms\Foundation\Swoole\Server
  */
-class ServerManage implements StartActionContract
+class ServerManager implements StartActionContract
 {
     /**
      * @var Container
@@ -49,19 +49,19 @@ class ServerManage implements StartActionContract
     protected $processes;
 
     /**
-     * @var \CrCms\Foundation\Swoole\Server\ProcessManage
+     * @var \CrCms\Foundation\Swoole\Server\processManagerr
      */
-    protected $processManage;
+    protected $processManager;
 
     /**
      * ServerManage constructor.
      * @param Container $app
      */
-    public function __construct(Container $app, array $config, ProcessManage $processManage)
+    public function __construct(Container $app, array $config, processManager $processManager)
     {
         $this->app = $app;
         $this->config = $config;
-        $this->processManage = $processManage;
+        $this->processManager = $processManager;
     }
 
     /**
@@ -69,7 +69,7 @@ class ServerManage implements StartActionContract
      */
     public function start(): bool
     {
-        if ($this->processManage->exists()) {
+        if ($this->processManager->exists()) {
             throw new UnexpectedValueException('Swoole server is running');
         }
         /*Process::daemon();
@@ -101,7 +101,7 @@ class ServerManage implements StartActionContract
             $allPid = $allPid->merge(['inotify'=>$notifyPid]);
         }
 
-        return $this->processManage->store($allPid);
+        return $this->processManager->store($allPid);
     }
 
     /**
@@ -129,7 +129,7 @@ class ServerManage implements StartActionContract
      */
     protected function addINotifyProcess(): int
     {
-        $notifyProcess = new INotifyProcess($this->processManage, $this->config);
+        $notifyProcess = new INotifyProcess($this->processManager, $this->config);
         return $notifyProcess->start();
     }
 
@@ -148,12 +148,12 @@ class ServerManage implements StartActionContract
      */
     public function stop(): bool
     {
-        if (!$this->processManage->exists()) {
+        if (!$this->processManager->exists()) {
             throw new UnexpectedValueException('Swoole server is not running');
         }
 
-        if ($this->processManage->kill()) {
-            return $this->processManage->clean();
+        if ($this->processManager->kill()) {
+            return $this->processManager->clean();
         } else {
             return false;
         }
@@ -164,7 +164,7 @@ class ServerManage implements StartActionContract
      */
     public function restart(): bool
     {
-        if ($this->processManage->exists()) {
+        if ($this->processManager->exists()) {
             $this->stop();
             sleep(4);
         }
@@ -177,11 +177,11 @@ class ServerManage implements StartActionContract
      */
     public function reload(): bool
     {
-        if (!$this->processManage->exists('servers')) {
+        if (!$this->processManager->exists('servers')) {
             throw new UnexpectedValueException('Swoole server is not running');
         }
 
-        return $this->processManage->kill(SIGUSR1, 'servers');
+        return $this->processManager->kill(SIGUSR1, 'servers');
     }
 
     /**
