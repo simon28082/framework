@@ -15,8 +15,6 @@ use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
 use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
-use RuntimeException;
-use Exception;
 
 /**
  * Class Request
@@ -75,22 +73,26 @@ class Request implements RequestContract, HttpRequestContract
      */
     public function sendPayload(string $name, array $params = []): ResponseContract
     {
-        $this->whileGetConnection();
+        $this->connection = $this->whileGetConnection($name, $params);
 
         return app(ResponseContract::class)->parse($this);
     }
 
     /**
      * 循环获取连接，直到非异常连接
+     *
+     * @param string $name
+     * @param array $params
+     * @return Connection
      */
-    protected function whileGetConnection()
+    protected function whileGetConnection(string $name, array $params = [])
     {
         try {
-            $this->connection = $this->client->connection('http')->setHeaders($this->headers)
+            return $this->client->connection($this->client->getCurrentGroupName())->setHeaders($this->headers)
                 ->setMethod('post')
                 ->send($name, ['payload' => $params]);
         } catch (ConnectionException $exception) {
-            $this->execConnection();
+            $this->whileGetConnection($name, $params);
         }
     }
 }
