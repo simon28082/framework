@@ -51,7 +51,7 @@ class HttpConnection extends AbstractConnection implements Connection
      */
     public function setMethod(string $method): self
     {
-        $this->method = $method;
+        $this->method = strtolower($method);
         return $this;
     }
 
