@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Client\Connections;
 
 use CrCms\Foundation\Client\AbstractConnection;
 use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use RuntimeException;
 
 /**
@@ -95,7 +96,7 @@ class HttpConnection extends AbstractConnection implements Connection
         //加入异常连接
         if ($this->isAbnormalConnection(!$execResult)) {
             $this->connector->close();
-            throw new RuntimeException('Connection failed');
+            throw new ConnectionException($this);
         }
 
         $this->connector->close();
