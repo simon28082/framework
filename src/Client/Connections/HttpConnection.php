@@ -13,6 +13,7 @@ use CrCms\Foundation\Client\AbstractConnection;
 use CrCms\Foundation\Client\Contracts\Connection;
 use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use RuntimeException;
+use InvalidArgumentException;
 
 /**
  * Class HttpConnection
@@ -141,6 +142,13 @@ class HttpConnection extends AbstractConnection implements Connection
         if (!empty($path)) {
             $this->setPath($path);
         }
+
+        /*
+         奇葩，在这里判断如果为空则抛出异常无效，Swoole会挂掉
+         原因待查
+        if (empty($this->path)) {
+            throw new InvalidArgumentException('Invalid request path');
+        }*/
 
         return;
     }
