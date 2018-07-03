@@ -14,7 +14,8 @@ interface Selector
     /**
      * @param string $group
      * @param array $connections
+     * @param ConnectionPool $pool
      * @return Connection
      */
-    public function select(string $group, array $connections): Connection;
+    public function select(string $group, array $connections, ConnectionPool $pool): Connection;
 }

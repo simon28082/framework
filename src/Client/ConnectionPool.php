@@ -64,7 +64,7 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
             throw new UnderflowException("Connection pool, no connection available");
         }
 
-        return $this->selector->select($group, $this->connectionGroups[$group]);
+        return $this->selector->select($group, $this->connectionGroups[$group], $this);
     }
 
     /**

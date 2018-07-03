@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\Client\Selectors;
 
 use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Contracts\ConnectionPool;
 use CrCms\Foundation\Client\Contracts\Selector;
 
 /**
@@ -26,9 +27,10 @@ class RingSelector implements Selector
     /**
      * @param string $group
      * @param array $connections
+     * @param ConnectionPool $pool
      * @return Connection
      */
-    public function select(string $group, array $connections): Connection
+    public function select(string $group, array $connections, ConnectionPool $pool): Connection
     {
         $pointer = $this->groups[$group] ?? -1;
         $allNum = count($connections);
