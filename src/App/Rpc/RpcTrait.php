@@ -11,7 +11,7 @@ namespace CrCms\Foundation\App\Rpc;
 
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 
-class RpcTrait
+trait RpcTrait
 {
     /**
      * @var RpcContract
@@ -21,7 +21,7 @@ class RpcTrait
     /**
      * @return RpcContract
      */
-    public function instance(): RpcContract
+    public function rpc(): RpcContract
     {
         return app(RpcContract::class);
     }
