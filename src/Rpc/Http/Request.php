@@ -90,9 +90,18 @@ class Request implements RequestContract, HttpRequestContract
         try {
             return $this->client->connection($this->client->getCurrentGroupName())->setHeaders($this->headers)
                 ->setMethod('post')
-                ->send($name, ['payload' => $params]);
+                ->send($this->resolveName($name), ['payload' => $params]);
         } catch (ConnectionException $exception) {
             $this->whileGetConnection($name, $params);
         }
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    protected function resolveName(string $name): string
+    {
+        return str_replace('.', '/', $name);
     }
 }
