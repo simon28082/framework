@@ -71,7 +71,7 @@ class HttpConnection extends AbstractConnection implements Connection
      */
     public function setPath(string $path): self
     {
-        $this->path = $path;
+        $this->path = '/' . ltrim($path, '/');
         return $this;
     }
 
