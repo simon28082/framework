@@ -42,27 +42,12 @@ class Request implements RequestContract, HttpRequestContract
     protected $connection;
 
     /**
-     * @var string
-     */
-    protected $routePrefix;
-
-    /**
      * Request constructor.
      * @param Client $client
      */
     public function __construct(Client $client)
     {
         $this->client = $client;
-    }
-
-    /**
-     * @param string $prefix
-     * @return $this
-     */
-    public function setRoutePrefix(string $prefix)
-    {
-        $this->routePrefix = $prefix;
-        return $this;
     }
 
     /**
@@ -117,6 +102,6 @@ class Request implements RequestContract, HttpRequestContract
      */
     protected function resolveName(string $name): string
     {
-        return str_replace('.', '/', $this->routePrefix . '.' . $name);
+        return str_replace('.', '/', $name);
     }
 }
