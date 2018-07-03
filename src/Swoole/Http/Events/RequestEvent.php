@@ -121,7 +121,7 @@ class RequestEvent extends AbstractEvent implements EventContract
         if (strtoupper($this->request->server['request_method']) === 'POST') {
             $data = empty($this->request->post) ? [] : $this->request->post;
 
-            if (stripos($this->request->header['content-type'], 'application/json') !== false) {
+            if (isset($this->request->header['content-type']) && stripos($this->request->header['content-type'], 'application/json') !== false) {
                 $data = array_merge($data, json_decode($this->request->rawContent(), true));
             }
         }
