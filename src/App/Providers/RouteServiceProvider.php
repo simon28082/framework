@@ -18,6 +18,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
         $this->mapWebRoutes();
+        $this->mapRpcRoutes();
     }
 
     /**
@@ -43,6 +44,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes()
     {
         $routePath = base_path('routes/api.php');
+        file_exists($routePath) && require $routePath;
+    }
+
+    /**
+     * @return void
+     */
+    protected function mapRpcRoutes(): void
+    {
+        $routePath = base_path('routes/rpc.php');
         file_exists($routePath) && require $routePath;
     }
 
