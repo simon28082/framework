@@ -29,29 +29,55 @@ class Client
     protected $connection;
 
     /**
-     * Client constructor.
+     * @var string
      */
-    public function __construct()
+    protected $currentGroupName;
+
+    /**
+     * Client constructor.
+     * @param null|string $name
+     */
+    public function __construct(?string $name = null)
     {
-        $this->manager = $this->manager();
-        $this->connection = $this->connection();
+        $this->manager();
+        $this->connection($name);
     }
 
     /**
      * @param null|string $name
-     * @return mixed
+     * @return $this
      */
     public function connection(?string $name = null)
     {
-        return $this->manager->connection($name);
+        $this->setCurrentGroupName($name);
+        $this->connection = $this->manager->connection($name);
+        return $this;
     }
 
     /**
-     * @return \Illuminate\Foundation\Application|mixed
+     * @param null|string $name
+     * @return $this
+     */
+    protected function setCurrentGroupName(?string $name = null)
+    {
+        $this->currentGroupName = $name;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getCurrentGroupName(): ?string
+    {
+        return $this->currentGroupName;
+    }
+
+    /**
+     * @return void
      */
     protected function manager()
     {
-        return app('client.manager');
+        $this->manager = app('client.manager');
     }
 
     /**
