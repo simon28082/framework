@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Rpc\Http;
 
 use CrCms\Foundation\Client\Client;
 use CrCms\Foundation\Client\Contracts\Connection;
+use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
 use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
@@ -74,14 +75,22 @@ class Request implements RequestContract, HttpRequestContract
      */
     public function sendPayload(string $name, array $params = []): ResponseContract
     {
+        $this->whileGetConnection();
+
+        return app(ResponseContract::class)->parse($this);
+    }
+
+    /**
+     * 循环获取连接，直到非异常连接
+     */
+    protected function whileGetConnection()
+    {
         try {
             $this->connection = $this->client->connection('http')->setHeaders($this->headers)
                 ->setMethod('post')
                 ->send($name, ['payload' => $params]);
-        } catch (Exception $exception) {
-            throw new RuntimeException($exception->getMessage());
+        } catch (ConnectionException $exception) {
+            $this->execConnection();
         }
-
-        return app(ResponseContract::class)->parse($this);
     }
 }
