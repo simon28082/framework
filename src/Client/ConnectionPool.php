@@ -58,12 +58,6 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      */
     public function nextConnection(string $group): Connection
     {
-        $this->deathConnection($group);
-
-        if (empty($this->connectionGroups[$group])) {
-            throw new UnderflowException("Connection pool, no connection available");
-        }
-
         return $this->selector->select($group, $this->connectionGroups[$group], $this);
     }
 
@@ -73,6 +67,10 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      */
     protected function deathConnection(string $group): ConnectionPoolContract
     {
+        if (empty($this->connectionGroups[$group])) {
+            return $this;
+        }
+
         $isDeath = false;
 
         foreach ($this->connectionGroups[$group] as $key => $connection) {
@@ -130,7 +128,9 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      */
     public function hasConnection(string $group): bool
     {
-        return isset($this->connectionGroups[$group]);
+        $this->deathConnection($group);
+
+        return !empty($this->connectionGroups[$group]);
     }
 
     /**
