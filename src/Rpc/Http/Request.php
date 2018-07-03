@@ -100,14 +100,14 @@ class Request implements RequestContract, HttpRequestContract
      * @param array $params
      * @return Connection
      */
-    protected function whileGetConnection(string $name, array $params = [])
+    protected function whileGetConnection(string $name, array $params = []): Connection
     {
         try {
             return $this->client->connection($this->client->getCurrentGroupName())->setHeaders($this->headers)
                 ->setMethod('post')
                 ->send($this->resolveName($name), ['payload' => $params]);
         } catch (ConnectionException $exception) {
-            $this->whileGetConnection($name, $params);
+            return $this->whileGetConnection($name, $params);
         }
     }
 
