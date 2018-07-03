@@ -73,13 +73,31 @@ class ConnectionPool implements ConnectionPoolContract, ArrayAccess
      */
     protected function deathConnection(string $group): ConnectionPoolContract
     {
+        $isDeath = false;
+
         foreach ($this->connectionGroups[$group] as $key => $connection) {
             if ($connection->isAlive() === false) {
+                $isDeath = true;
                 $groupKey = "{$group}.{$key}";
                 $this->addDeathConnectionGroup($groupKey, $connection);
                 $this->offsetUnset($groupKey);
             }
         }
+
+        if ($isDeath) {
+            $this->resetConnectionGroups($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    protected function resetConnectionGroups(string $group)
+    {
+        $this->connectionGroups[$group] = array_values($this->connectionGroups[$group]);
 
         return $this;
     }
