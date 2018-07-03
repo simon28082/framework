@@ -9,6 +9,7 @@
 
 namespace CrCms\Foundation\Rpc\Http;
 
+use function CrCms\Foundation\App\Helpers\is_serialized;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
@@ -63,6 +64,8 @@ class Response implements ResponseContract
             $this->data = (object)$data;
         } else if ((bool)($newData = json_decode($data)) && json_last_error() === 0) {
             $this->data = $newData;
+        } else if (is_serialized($data)) {
+            $this->data = unserialize($data);
         } else {
             $this->data = $data;
         }
