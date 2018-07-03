@@ -34,7 +34,7 @@ class RingSelector implements Selector
         $allNum = count($connections);
 
         $pointer += 1;
-        if ($pointer > $allNum || $allNum === 1) {
+        if ($pointer >= $allNum || $allNum === 1) {
             $pointer = 0;
         }
 
