@@ -85,8 +85,10 @@ class HttpConnection extends AbstractConnection implements Connection
     {
         $this->resolveSendPayload($path, $data);
 
-        if (in_array($this->method, ['get', 'post'], true)) {
+        if ($this->method === 'post') {
             $execResult = call_user_func_array([$this->connector, $this->method], [$this->path, json_encode($this->payload)]);
+        } else if ($this->method === 'get') {
+            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path]);
         } else {
             /* 这里需要详细测试，暂时此功能不可用 */
             $this->connector->setMethod($this->method);
