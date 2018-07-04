@@ -40,7 +40,7 @@ class HttpConnection extends AbstractConnection implements Connection
      * @param array $headers
      * @return $this
      */
-    public function setHeaders(array $headers): self
+    public function setHeaders(array $headers)
     {
         $this->connector->setHeaders($headers);
         return $this;
@@ -50,7 +50,7 @@ class HttpConnection extends AbstractConnection implements Connection
      * @param string $method
      * @return $this
      */
-    public function setMethod(string $method): self
+    public function setMethod(string $method)
     {
         $this->method = strtolower($method);
         return $this;
@@ -60,7 +60,7 @@ class HttpConnection extends AbstractConnection implements Connection
      * @param array $payload
      * @return $this
      */
-    public function setPayload(array $payload): self
+    public function setPayload(array $payload)
     {
         $this->payload = $payload;
         return $this;
@@ -70,7 +70,7 @@ class HttpConnection extends AbstractConnection implements Connection
      * @param string $path
      * @return $this
      */
-    public function setPath(string $path): self
+    public function setPath(string $path)
     {
         $this->path = '/' . ltrim($path, '/');
         return $this;
