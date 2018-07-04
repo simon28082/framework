@@ -9,8 +9,10 @@
 
 namespace CrCms\Foundation\Client;
 
+use CrCms\Foundation\Client\Connections\GuzzleHttpConnection;
 use CrCms\Foundation\Client\Connections\HttpConnection;
 use CrCms\Foundation\Client\Connections\SocketConnection;
+use CrCms\Foundation\Client\Connectors\GuzzleHttpConnector;
 use CrCms\Foundation\Client\Connectors\HttpConnector;
 use CrCms\Foundation\Client\Connectors\SocketConnector;
 use CrCms\Foundation\Client\Contracts\Connection;
@@ -54,6 +56,8 @@ class ConnectionFactory
                 return new SocketConnector();
             case 'http':
                 return new HttpConnector();
+            case 'guzzle_http':
+                return new GuzzleHttpConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
@@ -72,6 +76,8 @@ class ConnectionFactory
                 return new SocketConnection($connect, $config);
             case 'http':
                 return new HttpConnection($connect, $config);
+            case 'guzzle_http':
+                return new GuzzleHttpConnection($connect, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
