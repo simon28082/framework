@@ -12,12 +12,12 @@ class Start
 {
     /**
      * @param Container $container
-     * @param string $drive
+     * @param string $driver
      * @param array $params
      * @return void
      */
-    public static function run(Container $container, string $drive, array $params): void
+    public static function run(Container $container, string $driver, array $params): void
     {
-        StartFactory::factory($container, $drive)->run($container, $params);
+        StartFactory::factory($container, $driver)->run($container, $params);
     }
 }
