@@ -31,7 +31,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "CrCms\\Tests\\": "tests/"
+            "CrCms\\Foundation\\Tests\\": "tests/"
         }
     },
     "config": {
