@@ -80,7 +80,7 @@ class DirectoryMakeCommand extends Command
      */
     protected function createConfig(): void
     {
-        $this->autoCreateDirs(config_path());
+        $this->autoCreateDirs([config_path()]);
     }
 
     /**
