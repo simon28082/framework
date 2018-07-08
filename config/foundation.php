@@ -29,4 +29,23 @@ return [
     'schedules' => [
 
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Version
+    |--------------------------------------------------------------------------
+    |
+    | Stored in the currently available version of the header X-CRCMS-Media-Version
+    |
+    */
+    'api_version' => env('API_VERSION', 'crcms.v1'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Type
+    |--------------------------------------------------------------------------
+    |
+    | Stored in the currently available version of the header X-CRCMS-Media-Type
+    */
+    'api_type' => env('API_TYPE', 'crcms.restful'),
 ];

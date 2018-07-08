@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
+            \CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
             \Barryvdh\Cors\HandleCors::class,
         ],
     ];
