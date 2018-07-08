@@ -28,11 +28,11 @@ class ApiResponseType
         $response = $next($request);
 
         if (!$response->headers->has('X-CRCMS-Media-Type')) {
-            $response->header('X-CRCMS-Media-Type: ', config('foundation.api_type'));
+            $response->header('X-CRCMS-Media-Type', config('foundation.api_type'));
         }
 
         if (!$response->headers->has('X-CRCMS-Media-Version')) {
-            $response->header('X-CRCMS-Media-Version: ', config('foundation.api_version'));
+            $response->header('X-CRCMS-Media-Version', config('foundation.api_version'));
         }
 
         return $response;
