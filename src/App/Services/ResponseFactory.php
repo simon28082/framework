@@ -8,7 +8,7 @@ use CrCms\Foundation\App\Http\Resources\Resource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use BadMethodCallException;
 use InvalidArgumentException;
