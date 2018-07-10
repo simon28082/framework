@@ -3,14 +3,9 @@
 namespace CrCms\Foundation\App\Providers;
 
 use CrCms\Foundation\App\WebSocket\WebSocketControllerDispatcher;
-use CrCms\Foundation\Routing\Router;
 use Illuminate\Routing\Contracts\ControllerDispatcher;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use CrCms\Foundation\Routing\Matching\UriValidator;
-use Illuminate\Routing\Matching\HostValidator;
-use Illuminate\Routing\Matching\MethodValidator;
-use Illuminate\Routing\Matching\SchemeValidator;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -66,15 +61,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-//        $this->app->singleton('router', function ($app) {
-//            return new Router($app['events'], $app);
-//        });
-//
-//        \Illuminate\Routing\Route::$validators = [
-//            new UriValidator, new MethodValidator,
-//            new SchemeValidator, new HostValidator,
-//        ];
-//        $this->app->alias('router',Router::class);
         parent::register();
 
 
