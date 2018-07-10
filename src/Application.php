@@ -3,10 +3,15 @@
 namespace CrCms\Foundation;
 
 use CrCms\Foundation\Foundation\PackageManifest;
+use CrCms\Foundation\Routing\Router;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as BaseApplication;
+use Illuminate\Log\LogServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use CrCms\Foundation\Routing\RoutingServiceProvider;
 
 /**
  * Class Application
@@ -65,6 +70,20 @@ class Application extends BaseApplication implements Container
         $this->instance(BasePackageManifest::class, new PackageManifest(
             new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
         ));
+    }
+
+    /**
+     * Register all of the base service providers.
+     *
+     * @return void
+     */
+    protected function registerBaseServiceProviders()
+    {
+        $this->register(new EventServiceProvider($this));
+
+        $this->register(new LogServiceProvider($this));
+
+        $this->register(new RoutingServiceProvider($this));
     }
 
     /**
@@ -222,5 +241,6 @@ class Application extends BaseApplication implements Container
     {
         parent::registerCoreContainerAliases();
         $this->alias('app', self::class);
+        $this->alias('router',Router::class);
     }
 }

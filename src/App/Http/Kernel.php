@@ -50,7 +50,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:60,1',
+//            'throttle:60,1',
             'bindings',
             \CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
             \Barryvdh\Cors\HandleCors::class,
@@ -70,7 +70,7 @@ class Kernel extends HttpKernel
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+//        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
     ];
