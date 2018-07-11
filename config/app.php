@@ -160,6 +160,8 @@ return [
         //App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         CrCms\Foundation\App\Providers\CrCmsServiceProvider::class,
+        CrCms\Foundation\Client\ClientServiceProvider::class,
+        CrCms\Foundation\Rpc\RpcServiceProvider::class
     ],
 
     /*
