@@ -44,7 +44,7 @@ class Request implements RequestContract, HttpRequestContract
     /**
      * @var string
      */
-    protected $routePrefix;
+    protected $routePrefix = '';
 
     /**
      * Request constructor.

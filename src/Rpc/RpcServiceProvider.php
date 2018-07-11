@@ -36,7 +36,7 @@ class RpcServiceProvider extends ServiceProvider
     {
         //暂时直接绑定http，后期扩展再次绑定其它
         $this->app->bind(RequestContract::class, function (Application $app) {
-            return (new Request(new Client()))->setRoutePrefix('rpc');
+            return (new Request(new Client()));
         });
 
         $this->app->bind(ResponseContract::class, Response::class);
