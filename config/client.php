@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'http',
+    'default' => 'user',
 
     /*
     |--------------------------------------------------------------------------
@@ -31,23 +31,23 @@ return [
 
     'connections' => [
 
-        'http' => [
+        'user' => [
             [
-                'driver' => 'http',
-                'host' => '192.168.1.108',
-                'port' => 2222,
+                'driver' => 'guzzle_http',
+                'host' => 'user.rpc.crcms.local',
+                'port' => 80,
                 'settings' => [
-                    'timeout' => 10
+                    'timeout' => 1
                 ],
             ],
-            [
+            /*[
                 'driver' => 'http',
                 'host' => '192.168.1.118',
                 'port' => 2222,
                 'settings' => [
                     'timeout' => 0.5
                 ],
-            ]
+            ]*/
         ],
 
     ],
