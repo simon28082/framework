@@ -14,9 +14,28 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use JsonSerializable;
 use Traversable;
+use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
+/**
+ * Class ResponseFactory
+ * @package CrCms\Foundation\App\Services
+ */
 class ResponseFactory
 {
+    /**
+     * @var FactoryContract
+     */
+    protected $factory;
+
+    /**
+     * ResponseFactory constructor.
+     * @param FactoryContract $factory
+     */
+    public function __construct(FactoryContract $factory)
+    {
+        $this->factory = $factory;
+    }
+
     /**
      * @param null $location
      * @param null $content
@@ -259,10 +278,10 @@ class ResponseFactory
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
-        if (Str::startsWith($method, 'with')) {
-            return call_user_func_array([$this, Str::camel(substr($method, 4))], $parameters);
+        if (method_exists($this->factory, $method)) {
+            return call_user_func_array([$this->factory, $method], $parameters);
         }
 
         throw new BadMethodCallException('Undefined method ' . get_class($this) . '::' . $method);
