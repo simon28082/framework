@@ -7,28 +7,45 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use InvalidArgumentException;
 
+/**
+ * Class Controller
+ * @package CrCms\Foundation\App\Http\Controllers
+ */
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    /**
+     * @var
+     */
     protected $repository;
 
-    public function __construct()
-    {
+    /**
+     * Controller constructor.
+     */
+    public function __construct() {}
 
-    }
-
+    /**
+     * @return ResponseFactory
+     */
     protected function response(): ResponseFactory
     {
         return app(ResponseFactory::class);
     }
 
-    public function __get($name)
+    /**
+     * @param string $name
+     * @return ResponseFactory
+     */
+    public function __get(string $name)
     {
         if ($name === 'response') {
             return $this->response();
         }
+
+        throw new InvalidArgumentException("Property not found [{$name}]");
     }
 }
 
