@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 interface ActionContract
 {
     /**
-     * @param Collection $collects
+     * @param array $data
      * @return mixed
      */
-    public function handle(Collection $collects);
+    public function handle(array $data = []);
 }
