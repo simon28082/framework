@@ -109,9 +109,9 @@ class ResponseFactory
      * @param $resource
      * @param string $collect
      * @param array $hide
-     * @return Response
+     * @return JsonResponse
      */
-    public function resource($resource, string $collect = '', array $hide = []): Response
+    public function resource($resource, string $collect = '', array $hide = []): JsonResponse
     {
         if (is_object($resource) && $resource instanceof Resource) {
             return $resource->hide($hide)->response();
