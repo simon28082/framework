@@ -9,25 +9,10 @@
 
 namespace CrCms\Foundation\App\Handlers;
 
-use Illuminate\Contracts\Container\Container;
-
 /**
  * Class AbstractHandler
  * @package CrCms\Foundation\App\Actions
  */
 abstract class AbstractHandler implements HandlerContract
 {
-    /**
-     * @var Container
-     */
-    protected $app;
-
-    /**
-     * AbstractHandler constructor.
-     * @param Container $app
-     */
-    public function __construct(Container $app)
-    {
-        $this->app = $app;
-    }
 }
