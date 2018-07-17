@@ -10,10 +10,10 @@
 namespace CrCms\Foundation\App\Actions;
 
 /**
- * Trait ActionTrait
+ * Trait HandlerTrait
  * @package CrCms\Foundation\App\Actions
  */
-trait ActionTrait
+trait HandlerTrait
 {
     /**
      * @var array
