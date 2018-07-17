@@ -7,10 +7,9 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Actions;
+namespace CrCms\Foundation\App\Handlers;
 
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 
 /**
  * Class AbstractHandler
@@ -18,8 +17,6 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
  */
 abstract class AbstractHandler implements HandlerContract
 {
-    use ValidatesRequests;
-
     /**
      * @var Container
      */
