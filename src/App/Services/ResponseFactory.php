@@ -84,9 +84,9 @@ class ResponseFactory
      * @param $collection
      * @param string $collect
      * @param array $hide
-     * @return Response
+     * @return JsonResponse
      */
-    public function collection($collection, string $collect = '', array $hide = []): Response
+    public function collection($collection, string $collect = '', array $hide = []): JsonResponse
     {
         if (is_object($collection) && $collection instanceof ResourceCollection) {
             return $collection->hide($hide)->response();
@@ -128,9 +128,9 @@ class ResponseFactory
      * @param $paginator
      * @param string $collect
      * @param array $hide
-     * @return Response
+     * @return JsonResponse
      */
-    public function paginator($paginator, string $collect = '', array $hide = []): Response
+    public function paginator($paginator, string $collect = '', array $hide = []): JsonResponse
     {
         if (is_object($paginator) && $paginator instanceof ResourceCollection) {
             return $paginator->hide($hide)->response();
