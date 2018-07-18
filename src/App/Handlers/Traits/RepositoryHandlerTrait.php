@@ -12,10 +12,10 @@ namespace CrCms\Foundation\App\Handlers\Traits;
 use CrCms\Foundation\App\Repositories\AbstractRepository;
 
 /**
- * Class RepositoryHandlerTrait
+ * Trait RepositoryHandlerTrait
  * @package CrCms\Foundation\App\Handlers\Traits
  */
-class RepositoryHandlerTrait
+trait RepositoryHandlerTrait
 {
     /**
      * @var AbstractRepository

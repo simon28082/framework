@@ -9,6 +9,8 @@
 
 namespace CrCms\Foundation\App\Handlers;
 
+use CrCms\Foundation\App\Handlers\Contracts\HandlerContract;
+
 /**
  * Class AbstractHandler
  * @package CrCms\Foundation\App\Actions

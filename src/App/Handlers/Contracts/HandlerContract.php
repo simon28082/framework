@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Handlers;
+namespace CrCms\Foundation\App\Handlers\Contracts;
 
 interface HandlerContract
 {
