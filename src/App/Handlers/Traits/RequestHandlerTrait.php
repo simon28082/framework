@@ -13,10 +13,10 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 
 /**
- * Trait HttpHandlerTrait
+ * Trait RequestHandlerTrait
  * @package CrCms\Foundation\App\Handlers
  */
-trait HttpHandlerTrait
+trait RequestHandlerTrait
 {
     use ValidatesRequests;
 
