@@ -8,7 +8,7 @@
         "php": "^7.1.3",
         "barryvdh/laravel-cors": "^0.11.0",
         "crcms/attribute-contract": "^1.0",
-        "crcms/repository": "2.0.x-dev",
+        "crcms/repository": "dev-master",
         "doctrine/dbal": "^2.8",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.6.*",
