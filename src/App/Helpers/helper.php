@@ -181,3 +181,10 @@ function module_factory()
 
     return $factory->of($arguments[0]);
 }
+
+function combination_url(string $url, array $params): string
+{
+    $params = http_build_query($params);
+    $joiner = strpos($url, '?') ? '&' : '?';
+    return $url . $joiner . $params;
+}
