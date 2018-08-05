@@ -46,6 +46,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Stored in the currently available version of the header X-CRCMS-Media-Type
+    |
     */
     'api_type' => env('API_TYPE', 'crcms.restful'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Passport authorize url
+    |--------------------------------------------------------------------------
+    |
+    */
+    'passport_url' => env('PASSPORT_URL', null),
 ];
