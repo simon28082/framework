@@ -50,7 +50,6 @@ class JWTPassportHandler extends AbstractHandler
         }
 
         return [
-            //fromUser 生成的token认证无效，真是奇怪
             'token' => Auth::guard()->setTTL($diff)->fromUser($user),
 //            'token' => Auth::guard()->setTTL($diff)->tokenById($user->id),
             'expire' => $diff,
