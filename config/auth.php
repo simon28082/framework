@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => \CrCms\User\Models\UserModel::class,
+            'model' => \CrCms\Passport\Models\UserModel::class,
         ],
 
         // 'users' => [
