@@ -57,11 +57,11 @@ abstract class AbstractDataProvider implements DataProviderContract, ArrayAccess
     }
 
     /**
-     * @param null $key
-     * @param null $default
+     * @param string $key
+     * @param mixed $default
      * @return mixed
      */
-    public function get($key = null, $default = null)
+    public function get(string $key, $default = null)
     {
         return data_get(
             $this->data, $key, $default
