@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use InvalidArgumentException;
 
 /**
+ * @property-read ResponseFactory $response
+ *
  * Class Controller
  * @package CrCms\Foundation\App\Http\Controllers
  */
