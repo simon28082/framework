@@ -2,8 +2,9 @@
 
 namespace CrCms\Foundation\App\Providers;
 
-use CrCms\Foundation\Console\Commands\AutoCreateStorageCommand;
 use CrCms\Foundation\Console\Commands\DirectoryMakeCommand;
+use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
+use CrCms\Foundation\Transporters\DataProvider;
 use Illuminate\Support\ServiceProvider;
 
 class CrCmsServiceProvider extends ServiceProvider
@@ -16,6 +17,9 @@ class CrCmsServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        $this->app->bind(DataProviderContract::class, function($app){
+            return new DataProvider($app['request']);
+        });
     }
 
     /**
