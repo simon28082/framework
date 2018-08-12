@@ -10,6 +10,11 @@ use Illuminate\Support\ServiceProvider;
 class CrCmsServiceProvider extends ServiceProvider
 {
     /**
+     * @var bool
+     */
+    protected $defer = true;
+
+    /**
      * Bootstrap any application services.
      *
      * @return void
@@ -17,9 +22,6 @@ class CrCmsServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        $this->app->bind(DataProviderContract::class, function($app){
-            return new DataProvider($app['request']);
-        });
     }
 
     /**
@@ -30,6 +32,10 @@ class CrCmsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerCommands();
+
+        $this->app->bind(DataProviderContract::class, function ($app) {
+            return new DataProvider($app['request']);
+        });
     }
 
     /**
@@ -49,5 +55,16 @@ class CrCmsServiceProvider extends ServiceProvider
         $this->app->singleton('command.crcms.make.directory', function ($app) {
             return new DirectoryMakeCommand($app['files']);
         });
+    }
+
+    /**
+     * @return array
+     */
+    public function provides(): array
+    {
+        return [
+            DataProviderContract::class,
+            'command.crcms.make.directory',
+        ];
     }
 }
