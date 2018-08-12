@@ -2,6 +2,7 @@
 
 namespace CrCms\Foundation\App\Http\Controllers;
 
+use CrCms\Foundation\App\Helpers\InstanceTrait;
 use CrCms\Foundation\App\Services\ResponseFactory;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
@@ -15,7 +16,9 @@ use InvalidArgumentException;
  */
 class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use InstanceTrait, AuthorizesRequests, DispatchesJobs, ValidatesRequests {
+        __get as __instanceGet;
+    }
 
     /**
      * @var
@@ -25,7 +28,9 @@ class Controller extends BaseController
     /**
      * Controller constructor.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * @return ResponseFactory
@@ -43,6 +48,10 @@ class Controller extends BaseController
     {
         if ($name === 'response') {
             return $this->response();
+        }
+
+        if ((bool)$instance = $this->__instanceGet($name)) {
+            return $instance;
         }
 
         throw new InvalidArgumentException("Property not found [{$name}]");
