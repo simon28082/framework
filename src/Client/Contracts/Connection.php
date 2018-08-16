@@ -41,5 +41,5 @@ interface Connection
     /**
      * @return mixed
      */
-//    public function recv(array $options = []);
+    public function getContent();
 }
