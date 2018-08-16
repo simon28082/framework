@@ -15,6 +15,7 @@ use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
 use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
+use Exception;
 
 /**
  * Class Request
@@ -53,6 +54,8 @@ class Request implements RequestContract, HttpRequestContract
     public function __construct(Client $client)
     {
         $this->client = $client;
+        //只做到这，这个有问题
+        $this->connection = $this->connection();
     }
 
     /**
@@ -102,14 +105,29 @@ class Request implements RequestContract, HttpRequestContract
      */
     protected function whileGetConnection(string $name, array $params = []): Connection
     {
+        // 这个方法还是有问题的
+        // 最好增加一个循环次数，因为connection如果全部丢掉还会自动创建
+        // 然后一直连不上再创建，就会陷入死循环
+        // 最好的方法是判断当前的connection还剩余多少个，超过这个次数就退出
+
         try {
             return $this->client->connection($this->client->getCurrentGroupName())->setHeaders($this->headers)
                 ->setMethod('post')
                 ->send($this->resolveName($name), ['payload' => $params]);
         } catch (ConnectionException $exception) {
-            return $this->whileGetConnection($name, $params);
+            if ($exception->getConnection()->getStatusCode() >= 500) {
+                return $this->whileGetConnection($name, $params);
+            }
+
+            throw $exception;
         }
     }
+
+    protected function connection(): Client
+    {
+        return $this->client->connection($this->client->getCurrentGroupName())->getConnection();
+    }
+
 
     /**
      * @param string $name
@@ -118,5 +136,19 @@ class Request implements RequestContract, HttpRequestContract
     protected function resolveName(string $name): string
     {
         return str_replace('.', '/', $this->routePrefix . '.' . $name);
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->connection, $name)) {
+            return call_user_func_array([$this->connection, $name], $arguments);
+        }
+
+        throw new BadMethodCallException("The method[{$name}] is not exists");
     }
 }

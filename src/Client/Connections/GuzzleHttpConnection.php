@@ -72,8 +72,13 @@ class GuzzleHttpConnection extends HttpConnection implements Connection
                 'headers' => (array)$this->headers,
             ]);
         } catch (RequestException | ClientException $exception) {
-            $this->markDead();
-            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
+            //400可能是请求方法或参数错误，不可视为超时或服务器error
+            if ($exception->getCode() >= 500) {
+                $this->markDead();
+                throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
+            }
+
+            throw $exception;
         }
 
         return $this;
