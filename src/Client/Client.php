@@ -19,7 +19,7 @@ use CrCms\Foundation\Client\Contracts\Connection;
 class Client
 {
     /**
-     * @var \Illuminate\Foundation\Application|mixed
+     * @var ConnectionManager
      */
     protected $manager;
 
@@ -52,6 +52,14 @@ class Client
         $this->setCurrentGroupName($name);
         $this->connection = $this->manager->connection($name);
         return $this;
+    }
+
+    /**
+     * @return Connection
+     */
+    public function getConnection(): Connection
+    {
+        return $this->connection;
     }
 
     /**
