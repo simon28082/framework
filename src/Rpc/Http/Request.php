@@ -54,8 +54,6 @@ class Request implements RequestContract, HttpRequestContract
     public function __construct(Client $client)
     {
         $this->client = $client;
-        //只做到这，这个有问题
-        $this->connection = $this->connection();
     }
 
     /**
@@ -91,7 +89,11 @@ class Request implements RequestContract, HttpRequestContract
      */
     public function sendPayload(string $name, array $params = []): ResponseContract
     {
-        $this->connection = $this->whileGetConnection($name, $params);
+        $group = strstr($name, '.', true);
+        $name = $this->resolveName(substr(strstr($name, '.'), 1));
+        $params = ['payload' => $params];
+
+        $this->connection = $this->whileGetConnection($group, $name, $params);
 
         return app(ResponseContract::class)->parse($this);
     }
@@ -103,7 +105,7 @@ class Request implements RequestContract, HttpRequestContract
      * @param array $params
      * @return Connection
      */
-    protected function whileGetConnection(string $name, array $params = []): Connection
+    protected function whileGetConnection(string $group, string $name, array $params = []): Connection
     {
         // 这个方法还是有问题的
         // 最好增加一个循环次数，因为connection如果全部丢掉还会自动创建
@@ -111,23 +113,29 @@ class Request implements RequestContract, HttpRequestContract
         // 最好的方法是判断当前的connection还剩余多少个，超过这个次数就退出
 
         try {
-            return $this->client->connection($this->client->getCurrentGroupName())->setHeaders($this->headers)
-                ->setMethod('post')
-                ->send($this->resolveName($name), ['payload' => $params]);
+            return $this->client->connection($group)->setHeaders($this->headers)
+                ->setMethod('get')
+                ->send($name, $params);
         } catch (ConnectionException $exception) {
-            if ($exception->getConnection()->getStatusCode() >= 500) {
-                return $this->whileGetConnection($name, $params);
+            $statusCode = $exception->getConnection()->getStatusCode();
+            if ($statusCode >= 500 || $statusCode <= 0) {
+                return $this->whileGetConnection($group, $name, $params);
             }
 
             throw $exception;
         }
     }
 
-    protected function connection(): Client
-    {
-        return $this->client->connection($this->client->getCurrentGroupName())->getConnection();
-    }
-
+    /**
+     * 每次调用都是一个新的connection连接
+     *
+     * @return Client
+     */
+//    protected function client(): Client
+//    {
+//        $this->client = $this->client->connection($group);
+//        return $this->client;
+//    }
 
     /**
      * @param string $name
@@ -143,12 +151,8 @@ class Request implements RequestContract, HttpRequestContract
      * @param array $arguments
      * @return mixed
      */
-    public function __call(string $name, array $arguments)
-    {
-        if (method_exists($this->connection, $name)) {
-            return call_user_func_array([$this->connection, $name], $arguments);
-        }
-
-        throw new BadMethodCallException("The method[{$name}] is not exists");
-    }
+//    public function __call(string $name, array $arguments)
+//    {
+//        return call_user_func_array([$this->client, $name], $arguments);
+//    }
 }

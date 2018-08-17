@@ -12,6 +12,7 @@ namespace CrCms\Foundation\Client\Connections;
 use CrCms\Foundation\Client\Contracts\Connection;
 use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 
@@ -46,7 +47,7 @@ class GuzzleHttpConnection extends HttpConnection implements Connection
      */
     public function getStatusCode(): int
     {
-        return $this->response->getStatusCode();
+        return $this->response ? $this->response->getStatusCode() : -1;
     }
 
     /**
@@ -54,7 +55,7 @@ class GuzzleHttpConnection extends HttpConnection implements Connection
      */
     public function getContent()
     {
-        return $this->response->getBody()->getContents();
+        return $this->response ? $this->response->getBody()->getContents() : null;
     }
 
     /**
@@ -71,14 +72,16 @@ class GuzzleHttpConnection extends HttpConnection implements Connection
                 'json' => $this->payload,
                 'headers' => (array)$this->headers,
             ]);
+        } catch (ConnectException $exception) {
+            $this->markDead();
+            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
         } catch (RequestException | ClientException $exception) {
             //400可能是请求方法或参数错误，不可视为超时或服务器error
-            if ($exception->getCode() >= 500) {
-                $this->markDead();
-                throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
-            }
+            //if ($exception->getCode() >= 500) {}
 
-            throw $exception;
+            $this->response = $exception->getResponse();
+
+            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
         }
 
         return $this;

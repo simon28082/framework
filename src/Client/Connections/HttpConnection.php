@@ -98,6 +98,7 @@ class HttpConnection extends AbstractConnection implements Connection
 
         //加入异常连接
         if ($this->isAbnormalConnection(!$execResult)) {
+            $this->markDead();
             $this->connector->close();
             throw new ConnectionException($this);
         }
@@ -162,7 +163,6 @@ class HttpConnection extends AbstractConnection implements Connection
     protected function isAbnormalConnection(bool $isDead = false): bool
     {
         if (in_array($this->connector->statusCode, [-1, -2], true) || $this->connector->errCode !== 0 || $isDead === true) {
-            $this->markDead();
             return true;
         }
 
