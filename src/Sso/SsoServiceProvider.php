@@ -9,6 +9,8 @@
 
 namespace CrCms\Foundation\Sso\Client;
 
+use CrCms\Foundation\Rpc\Rpc;
+use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -17,10 +19,26 @@ use Illuminate\Support\ServiceProvider;
  */
 class SsoServiceProvider extends ServiceProvider
 {
+    /**
+     * @var bool
+     */
+    public $defer = true;
 
+    /**
+     *
+     */
     public function register()
     {
-
+        $this->app->bind(InteractionContract::class, function ($app) {
+            return new DefaultInteractor(new Rpc());
+        });
     }
 
+    /**
+     * @return array
+     */
+    public function provides(): array
+    {
+        return [InteractionContract::class];
+    }
 }

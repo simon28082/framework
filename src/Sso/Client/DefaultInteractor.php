@@ -9,10 +9,12 @@
 
 namespace CrCms\Foundation\Sso\Client;
 
+use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use GuzzleHttp\Exception\ClientException;
+use Exception;
 
 /**
  * Class DefaultInteractor
@@ -20,28 +22,34 @@ use GuzzleHttp\Exception\ClientException;
  */
 class DefaultInteractor implements InteractionContract
 {
-    protected $request;
+    /**
+     * @var RpcContract
+     */
+    protected $rpc;
 
-    protected $client;
-
-    protected $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];
-
-    public function __construct(Client $client)
+    public function __construct(RpcContract $rpc)
     {
-        $this->client = $client;
+        $this->rpc = $rpc;
     }
 
-    public function refresh(): array
+    public function refresh(string $token): array
     {
-        // TODO: Implement refresh() method.
+        try {
+            $response = $this->rpc->call('passport.api.v1.refresh-token', ['token' => $token,'app_key'=>'2222222222','app_secret'=>'']);
+            dd($response);
+            return (array)$response->getData();
+        } catch (Exception $exception) {
+            dd($exception->getMessage());
+            throw $exception;
+        }
     }
 
-    public function token(): array
+    public function token(string $token): array
     {
         // TODO: Implement token() method.
     }
 
-    public function user(): array
+    public function user(string $token): array
     {
         // TODO: Implement user() method.
     }

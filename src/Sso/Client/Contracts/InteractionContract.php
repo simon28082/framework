@@ -16,21 +16,19 @@ namespace CrCms\Foundation\Sso\Client\Contracts;
 interface InteractionContract
 {
     /**
+     * @param string $token
      * @return array
      */
-    public function refresh(): array;
+    public function refresh(string $token): array;
 
     /**
+     * @param string $token
      * @return array
      */
-    public function token(): array;
+    public function user(string $token): array;
 
     /**
-     * @return array
-     */
-    public function user(): array;
-
-    /**
+     * @param string $token
      * @return bool
      */
     public function check(string $token): bool;
