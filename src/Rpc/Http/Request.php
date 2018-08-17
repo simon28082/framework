@@ -45,6 +45,11 @@ class Request implements RequestContract, HttpRequestContract
     /**
      * @var string
      */
+    protected $method = 'post';
+
+    /**
+     * @var string
+     */
     protected $routePrefix = '';
 
     /**
@@ -54,6 +59,26 @@ class Request implements RequestContract, HttpRequestContract
     public function __construct(Client $client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * @param array $headers
+     * @return $this
+     */
+    public function headers(array $headers)
+    {
+        $this->headers = $headers;
+        return $this;
+    }
+
+    /**
+     * @param string $method
+     * @return $this
+     */
+    public function method(string $method)
+    {
+        $this->method = $method;
+        return $this;
     }
 
     /**
@@ -105,37 +130,23 @@ class Request implements RequestContract, HttpRequestContract
      * @param array $params
      * @return Connection
      */
-    protected function whileGetConnection(string $group, string $name, array $params = []): Connection
+    protected function whileGetConnection(string $group, string $name, array $params = [], int $depth = 1): Connection
     {
-        // 这个方法还是有问题的
-        // 最好增加一个循环次数，因为connection如果全部丢掉还会自动创建
-        // 然后一直连不上再创建，就会陷入死循环
-        // 最好的方法是判断当前的connection还剩余多少个，超过这个次数就退出
-
         try {
-            return $this->client->connection($group)->setHeaders($this->headers)
-                ->setMethod('get')
+            return $this->client->connection($group)->setMethod($this->method)
+                ->setHeaders($this->headers)
                 ->send($name, $params);
         } catch (ConnectionException $exception) {
             $statusCode = $exception->getConnection()->getStatusCode();
-            if ($statusCode >= 500 || $statusCode <= 0) {
-                return $this->whileGetConnection($group, $name, $params);
+
+            /* @todo 暂时只用depth来进行限制，更好的就统计当前的组连接数 */
+            if ($depth > 3 || ($statusCode <= 500 && $statusCode > 0)) {
+                throw $exception;
             }
 
-            throw $exception;
+            return $this->whileGetConnection($group, $name, $params, $depth += 1);
         }
     }
-
-    /**
-     * 每次调用都是一个新的connection连接
-     *
-     * @return Client
-     */
-//    protected function client(): Client
-//    {
-//        $this->client = $this->client->connection($group);
-//        return $this->client;
-//    }
 
     /**
      * @param string $name
@@ -145,14 +156,4 @@ class Request implements RequestContract, HttpRequestContract
     {
         return str_replace('.', '/', $this->routePrefix . '.' . $name);
     }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-//    public function __call(string $name, array $arguments)
-//    {
-//        return call_user_func_array([$this->client, $name], $arguments);
-//    }
 }
