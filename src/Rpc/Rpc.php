@@ -14,6 +14,9 @@ use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 
 /**
+ * @property RequestContract method
+ * @property RequestContract headers
+ *
  * Class Rpc
  * @package CrCms\Foundation\Rpc
  */
@@ -39,7 +42,7 @@ class Rpc implements RpcContract
      */
     public function call(string $name, array $params = []): ResponseContract
     {
-        return $this->request->sendPayload($name, $params = []);
+        return $this->request->sendPayload($name, $params);
     }
 
     /**
