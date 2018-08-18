@@ -5,6 +5,7 @@ namespace CrCms\Foundation\App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -49,6 +50,10 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof UnauthorizedHttpException) {
+            return $this->unauthenticated($request, new AuthenticationException());
+        }
+
         return parent::render($request, $exception);
     }
 
@@ -61,8 +66,11 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
+        $scheme = config('foundation.passport.ssl') ? 'https://' : 'http://';
+        $url = $scheme . config('foundation.passport.routes.login');
+
         return $request->expectsJson()
-            ? response()->json(['message' => $exception->getMessage(), 'url' => config('foundation.passport.routes.login')], 401)
-            : redirect()->guest(config('foundation.passport.routes.login') . '?_redirect=' . rawurlencode($request->fullUrl()));
+            ? response()->json(['message' => $exception->getMessage(), 'url' => $url], 401)
+            : redirect()->guest($url . '?_redirect=' . rawurlencode($request->fullUrl()));
     }
 }
