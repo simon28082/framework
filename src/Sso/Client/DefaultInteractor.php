@@ -27,47 +27,43 @@ class DefaultInteractor implements InteractionContract
      */
     protected $rpc;
 
+    /**
+     * DefaultInteractor constructor.
+     * @param RpcContract $rpc
+     */
     public function __construct(RpcContract $rpc)
     {
         $this->rpc = $rpc;
     }
 
+    /**
+     * @param string $token
+     * @return array
+     */
     public function refresh(string $token): array
     {
-        try {
-            $response = $this->rpc->call('passport.api.v1.refresh-token', ['token' => $token,'app_key'=>'2222222222','app_secret'=>'']);
-            dd($response);
-            return (array)$response->getData();
-        } catch (Exception $exception) {
-            dd($exception->getMessage());
-            throw $exception;
-        }
+        $response = $this->rpc->call('passport.api.v1.refresh-token', $this->requestParams(['token' => $token]));
+        return (array)$response->getData();
     }
 
-    public function token(string $token): array
-    {
-        // TODO: Implement token() method.
-    }
-
+    /**
+     * @param string $token
+     * @return array
+     */
     public function user(string $token): array
     {
-        // TODO: Implement user() method.
+        $response = $this->rpc->call('passport.api.v1.refresh-token', $this->requestParams(['token' => $token]));
+        return (array)$response->getData();
     }
 
+    /**
+     * @param string $token
+     * @return bool
+     */
     public function check(string $token): bool
     {
-        $client = new \GuzzleHttp\Client(['base_uri' => 'http://passport.crcms.local/api/v1/', 'timeout' => 1]);
-        try {
-            $response = $this->client->get('check-login', [
-                'headers' => $this->headers,
-                'query' => $this->requestParams(['token' => $token])
-            ]);
-            $statusCode = $response->getStatusCode();
-        } catch (ClientException $exception) {
-            $statusCode = ($exception->getResponse()->getStatusCode());
-        }
-
-        return $statusCode === 403;
+        $response = $this->rpc->call('passport.api.v1.check-login', $this->requestParams(['token' => $token]));
+        return (array)$response->getData();
     }
 
     /**
@@ -76,6 +72,6 @@ class DefaultInteractor implements InteractionContract
      */
     protected function requestParams(array $params): array
     {
-        return array_merge(['app_key' => config('sso.client.app_key'), 'app_secret' => config('sso.client.app_secret')], $params);
+        return array_merge(['app_key' => config('foundation.passport_key'), 'app_secret' => config('foundation.passport_secret')], $params);
     }
 }
