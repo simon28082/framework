@@ -9,6 +9,8 @@
 
 namespace CrCms\Foundation\Sso\Client\Contracts;
 
+use CrCms\Foundation\Rpc\Contracts\ResponseContract;
+
 /**
  * Interface InteractionContract
  * @package CrCms\Foundation\Sso\Client\Contracts
@@ -17,15 +19,15 @@ interface InteractionContract
 {
     /**
      * @param string $token
-     * @return array
+     * @return ResponseContract
      */
-    public function refresh(string $token): array;
+    public function refresh(string $token): ResponseContract;
 
     /**
      * @param string $token
-     * @return array
+     * @return ResponseContract
      */
-    public function user(string $token): array;
+    public function user(string $token): ResponseContract;
 
     /**
      * @param string $token
