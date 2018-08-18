@@ -24,7 +24,7 @@ class Resource extends BaseResource
         $request = $request ?: Container::getInstance()->make('request');
 
         $data = $this->filterFields(
-            $this->mergeData($request)
+            $this->mergeIncludeData($request)
         );
 
         if (is_array($data)) {
@@ -42,7 +42,7 @@ class Resource extends BaseResource
      * @param Request $request
      * @return array
      */
-    protected function mergeData(Request $request): array
+    protected function mergeIncludeData(Request $request): array
     {
         return array_merge(
             $this->parseIncludes($request),
