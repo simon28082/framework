@@ -9,6 +9,7 @@
 
 namespace CrCms\Foundation\Sso\Client;
 
+use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
 use GuzzleHttp\Client;
@@ -38,22 +39,20 @@ class DefaultInteractor implements InteractionContract
 
     /**
      * @param string $token
-     * @return array
+     * @return ResponseContract
      */
-    public function refresh(string $token): array
+    public function refresh(string $token): ResponseContract
     {
-        $response = $this->rpc->call(config('foundation.passport.routes.refresh'), $this->requestParams(['token' => $token]));
-        return (array)$response->getData();
+        return $this->rpc->call(config('foundation.passport.routes.refresh'), $this->requestParams(['token' => $token]));
     }
 
     /**
      * @param string $token
-     * @return array
+     * @return ResponseContract
      */
-    public function user(string $token): array
+    public function user(string $token): ResponseContract
     {
-        $response = $this->rpc->call(config('foundation.passport.routes.user'), $this->requestParams(['token' => $token]));
-        return (array)$response->getData();
+        return $this->rpc->call(config('foundation.passport.routes.user'), $this->requestParams(['token' => $token]));
     }
 
     /**
