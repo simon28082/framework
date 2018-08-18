@@ -73,5 +73,7 @@ class Kernel extends HttpKernel
         //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'passport.user' => \CrCms\Foundation\App\Http\Middleware\Passport\UserMiddleware::class,
+        'passport.auth' => \CrCms\Foundation\App\Http\Middleware\Passport\AuthMiddleware::class,
     ];
 }
