@@ -63,7 +63,7 @@ class DefaultInteractor implements InteractionContract
     public function check(string $token): bool
     {
         $response = $this->rpc->call(config('foundation.passport.routes.check'), $this->requestParams(['token' => $token]));
-        return (array)$response->getData();
+        return $response->getStatusCode() === 204 || $response->getStatusCode() === 200;
     }
 
     /**

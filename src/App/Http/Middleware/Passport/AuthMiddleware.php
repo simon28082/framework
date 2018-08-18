@@ -10,9 +10,11 @@
 namespace CrCms\Foundation\App\Http\Middleware\Passport;
 
 use Closure;
+use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
 use Illuminate\Http\Request;
 use Exception;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * Class AuthMiddleware
@@ -41,16 +43,24 @@ class AuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->input('token', str_replace('Bearer ', $request->header('Authorization')));
+        $token = $request->input('token', str_replace('Bearer ', '', $request->header('Authorization')));
 
         try {
             $result = $this->passport->check($token);
-            dd($result);
         } catch (Exception $exception) {
-            dd($exception);
-            throw new UnauthorizedHttpException($exception);
+            $result = false;
+            if ($exception instanceof ConnectionException) {
+                $statusCode = $exception->getConnection()->getStatusCode();
+                $result = (bool)($statusCode >= 200 && $statusCode < 400);
+            } else {
+                throw $exception;
+            }
         }
 
-        return $next($request);
+        if ($result === true) {
+            return $next($request);
+        } else if (isset($statusCode) && $statusCode === 401) {
+            throw new UnauthorizedHttpException($token);
+        }
     }
 }

@@ -36,7 +36,8 @@ return [
                 'host' => env('PASSPORT_HOST', null),
                 'port' => 80,
                 'settings' => [
-                    'timeout' => 1
+                    'timeout' => 1,
+                    'ssl' => env('PASSPORT_SSL', true),
                 ],
             ],
         ],
