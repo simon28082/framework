@@ -12,6 +12,7 @@ namespace CrCms\Foundation\App\Http\Middleware\Passport;
 use Closure;
 use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
+use CrCms\Passport\Handlers\Traits\Token;
 use Illuminate\Http\Request;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -20,22 +21,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  * Class AuthMiddleware
  * @package CrCms\Foundation\App\Http\Middleware\Passport
  */
-class AuthMiddleware
+class AuthMiddleware extends AbstractPassportMiddleware
 {
-    /**
-     * @var InteractionContract
-     */
-    protected $passport;
-
-    /**
-     * CheckMiddleware constructor.
-     * @param InteractionContract $passport
-     */
-    public function __construct(InteractionContract $passport)
-    {
-        $this->passport = $passport;
-    }
-
     /**
      * @param Request $request
      * @param Closure $next
@@ -43,7 +30,7 @@ class AuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->input('token', str_replace('Bearer ', '', $request->header('Authorization')));
+        $token = $this->token($request);
 
         try {
             $result = $this->passport->check($token);
