@@ -32,4 +32,11 @@ interface ResponseContract
      * @return string|array|object
      */
     public function getContent();
+
+    /**
+     * @param string $key
+     * @param null $default
+     * @return mixed
+     */
+    public function data(string $key, $default = null);
 }

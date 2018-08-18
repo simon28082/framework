@@ -96,11 +96,15 @@ class Response implements ResponseContract
     }
 
     /**
-     * @return object
+     * @param string $key
+     * @param null $default
+     * @return null
      */
-    public function getData()
+    public function data(string $key, $default = null)
     {
-        return $this->data;
+        return data_get(
+            $this->data, $key, $default
+        );
     }
 
     /**
@@ -109,10 +113,12 @@ class Response implements ResponseContract
      */
     public function __get(string $name)
     {
-        if (isset($this->data->{$name})) {
+        return $this->data($name);
+        
+        /*if (isset($this->data->{$name})) {
             return $this->data->{$name};
         }
 
-        throw new InvalidArgumentException("The attribute[{$name}] is not exists");
+        throw new InvalidArgumentException("The attribute[{$name}] is not exists");*/
     }
 }
