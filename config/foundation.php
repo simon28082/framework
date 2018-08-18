@@ -56,21 +56,22 @@ return [
     |--------------------------------------------------------------------------
     |
     */
-    'passport_url' => env('PASSPORT_URL', null),
+    //'passport_url' => env('PASSPORT_URL', null),
 
     /*
     |--------------------------------------------------------------------------
-    | Passport authorize key
+    | Passport setting
     |--------------------------------------------------------------------------
     |
     */
-    'passport_key' => env('PASSPORT_KEY', null),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Passport authorize secret
-    |--------------------------------------------------------------------------
-    |
-    */
-    'passport_secret' => env('PASSPORT_SECRET', null),
+    'passport' => [
+        'key' => env('PASSPORT_KEY', null),
+        'secret' => env('PASSPORT_SECRET', null),
+        'routes' => [
+            'refresh' => 'passport.api.v1.refresh-token',
+            'user' => 'passport.api.v1.user',
+            'check' => 'passport.api.v1.check-login',
+            'logout' => 'passport.api.v1.logout',
+        ],
+    ],
 ];

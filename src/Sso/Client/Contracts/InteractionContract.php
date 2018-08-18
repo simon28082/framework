@@ -32,4 +32,10 @@ interface InteractionContract
      * @return bool
      */
     public function check(string $token): bool;
+
+    /**
+     * @param string $token
+     * @return bool
+     */
+    public function logout(string $token): bool;
 }

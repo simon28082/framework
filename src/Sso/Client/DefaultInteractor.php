@@ -42,7 +42,7 @@ class DefaultInteractor implements InteractionContract
      */
     public function refresh(string $token): array
     {
-        $response = $this->rpc->call('passport.api.v1.refresh-token', $this->requestParams(['token' => $token]));
+        $response = $this->rpc->call(config('foundation.passport.routes.refresh'), $this->requestParams(['token' => $token]));
         return (array)$response->getData();
     }
 
@@ -52,7 +52,7 @@ class DefaultInteractor implements InteractionContract
      */
     public function user(string $token): array
     {
-        $response = $this->rpc->call('passport.api.v1.refresh-token', $this->requestParams(['token' => $token]));
+        $response = $this->rpc->call(config('foundation.passport.routes.user'), $this->requestParams(['token' => $token]));
         return (array)$response->getData();
     }
 
@@ -62,7 +62,17 @@ class DefaultInteractor implements InteractionContract
      */
     public function check(string $token): bool
     {
-        $response = $this->rpc->call('passport.api.v1.check-login', $this->requestParams(['token' => $token]));
+        $response = $this->rpc->call(config('foundation.passport.routes.check'), $this->requestParams(['token' => $token]));
+        return (array)$response->getData();
+    }
+
+    /**
+     * @param string $token
+     * @return bool
+     */
+    public function logout(string $token): bool
+    {
+        $response = $this->rpc->method('get')->call(config('foundation.passport.routes.logout'), $this->requestParams(['token' => $token]));
         return (array)$response->getData();
     }
 
@@ -72,6 +82,6 @@ class DefaultInteractor implements InteractionContract
      */
     protected function requestParams(array $params): array
     {
-        return array_merge(['app_key' => config('foundation.passport_key'), 'app_secret' => config('foundation.passport_secret')], $params);
+        return array_merge(['app_key' => config('foundation.passport.key'), 'app_secret' => config('foundation.passport.secret')], $params);
     }
 }

@@ -30,7 +30,16 @@ return [
     */
 
     'connections' => [
-
+        'passport' => [
+            [
+                'driver' => 'guzzle_http',
+                'host' => env('PASSPORT_URL', null),
+                'port' => 80,
+                'settings' => [
+                    'timeout' => 1
+                ],
+            ],
+        ],
         'user' => [
             [
                 'driver' => 'guzzle_http',
