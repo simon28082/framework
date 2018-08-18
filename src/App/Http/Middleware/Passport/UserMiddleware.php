@@ -24,12 +24,16 @@ class UserMiddleware extends AbstractPassportMiddleware
     /**
      * @param Request $request
      * @param Closure $next
+     * @param null|string $user
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ?string $user = null)
     {
         $response = $this->passport->user($this->token($request));
 
-        $user = $this->config->get('foundation.passport.user');
+        if (is_null($user)) {
+            $user = $this->config->get('foundation.passport.user');
+        }
 
         $this->guard()->setUser(new $user((array)$response->data('data')));
 
