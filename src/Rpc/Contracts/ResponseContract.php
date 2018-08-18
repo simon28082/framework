@@ -9,11 +9,27 @@
 
 namespace CrCms\Foundation\Rpc\Contracts;
 
+use CrCms\Foundation\Client\Contracts\Connection;
+
+/**
+ * Interface ResponseContract
+ * @package CrCms\Foundation\Rpc\Contracts
+ */
 interface ResponseContract
 {
     /**
-     * @param RequestContract $request
+     * @param Connection $connection
      * @return ResponseContract
      */
-    public function parse(RequestContract $request): ResponseContract;
+    public function parse(Connection $connection): ResponseContract;
+
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int;
+
+    /**
+     * @return string|array|object
+     */
+    public function getContent();
 }

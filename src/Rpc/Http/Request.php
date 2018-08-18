@@ -13,7 +13,6 @@ use CrCms\Foundation\Client\Client;
 use CrCms\Foundation\Client\Contracts\Connection;
 use CrCms\Foundation\Client\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
-use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use Exception;
 
@@ -21,7 +20,7 @@ use Exception;
  * Class Request
  * @package CrCms\Foundation\Rpc\Http
  */
-class Request implements RequestContract, HttpRequestContract
+class Request implements RequestContract
 {
     /**
      * @var array
@@ -92,22 +91,6 @@ class Request implements RequestContract, HttpRequestContract
     }
 
     /**
-     * @return int
-     */
-    public function getStatusCode(): int
-    {
-        return $this->connection->getStatusCode();
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return $this->connection->getContent();
-    }
-
-    /**
      * @param string $name
      * @param array $params
      * @return ResponseContract
@@ -120,7 +103,7 @@ class Request implements RequestContract, HttpRequestContract
 
         $this->connection = $this->whileGetConnection($group, $name, $params);
 
-        return app(ResponseContract::class)->parse($this);
+        return app(ResponseContract::class)->parse($this->connection);
     }
 
     /**

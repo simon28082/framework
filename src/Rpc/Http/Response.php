@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\Rpc\Http;
 
 use function CrCms\Foundation\App\Helpers\is_serialized;
+use CrCms\Foundation\Client\Contracts\Connection;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\HttpRequestContract;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
@@ -29,24 +30,31 @@ class Response implements ResponseContract
     protected $data;
 
     /**
+     * @var Connection
+     */
+    protected $connection;
+
+    /**
      * @param RequestContract $request
      * @return ResponseContract
      */
-    public function parse(RequestContract $request): ResponseContract
+    public function parse(Connection $connection): ResponseContract
     {
-        $this->throwIfError($request);
+        $this->connection = $connection;
 
-        $this->resovleData($request);
+        $this->throwIfError();
+
+        $this->resovleData();
 
         return $this;
     }
 
     /**
-     * @param HttpRequestContract $request
+     *
      */
-    protected function throwIfError(HttpRequestContract $request)
+    protected function throwIfError()
     {
-        $statusCode = $request->getStatusCode();
+        $statusCode = $this->getStatusCode();
 
         if ($statusCode >= 300) {
             throw new RuntimeException("Request is redirected, status code:{$statusCode}");
@@ -54,11 +62,11 @@ class Response implements ResponseContract
     }
 
     /**
-     * @param HttpRequestContract $request
+     *
      */
-    protected function resovleData(HttpRequestContract $request)
+    protected function resovleData()
     {
-        $data = $request->getContent();
+        $data = $this->getContent();
 
         if (is_array($data)) {
             $this->data = (object)$data;
@@ -69,6 +77,22 @@ class Response implements ResponseContract
         } else {
             $this->data = $data;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return $this->connection->getStatusCode();
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->connection->getContent();
     }
 
     /**
