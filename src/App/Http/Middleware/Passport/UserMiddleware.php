@@ -27,9 +27,11 @@ class UserMiddleware extends AbstractPassportMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $this->guard()->setUser(
-            new User($this->passport->user($this->token($request)))
-        );
+        $response = $this->passport->user($this->token($request));
+
+        $user = $this->config->get('foundation.passport.user');
+
+        $this->guard()->setUser(new $user((array)$response->data('data')));
 
         return $next($request);
     }

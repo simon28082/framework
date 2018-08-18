@@ -68,5 +68,6 @@ return [
             'check' => 'passport.api.v1.check-login',
             'logout' => 'passport.api.v1.logout',
         ],
+        'user' => \CrCms\App\User::class,
     ],
 ];
