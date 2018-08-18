@@ -52,14 +52,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Passport authorize url
-    |--------------------------------------------------------------------------
-    |
-    */
-    //'passport_url' => env('PASSPORT_URL', null),
-
-    /*
-    |--------------------------------------------------------------------------
     | Passport setting
     |--------------------------------------------------------------------------
     |
@@ -68,6 +60,7 @@ return [
         'key' => env('PASSPORT_KEY', null),
         'secret' => env('PASSPORT_SECRET', null),
         'routes' => [
+            'login' => env('PASSPORT_HOST', null) . '/login',
             'refresh' => 'passport.api.v1.refresh-token',
             'user' => 'passport.api.v1.user',
             'check' => 'passport.api.v1.check-login',

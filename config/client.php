@@ -33,7 +33,7 @@ return [
         'passport' => [
             [
                 'driver' => 'guzzle_http',
-                'host' => env('PASSPORT_URL', null),
+                'host' => env('PASSPORT_HOST', null),
                 'port' => 80,
                 'settings' => [
                     'timeout' => 1

@@ -62,7 +62,7 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-            ? response()->json(['message' => $exception->getMessage(), 'url' => config('foundation.passport_url')], 401)
-            : redirect()->guest(config('foundation.passport_url') . '?_redirect=' . rawurlencode($request->fullUrl()));
+            ? response()->json(['message' => $exception->getMessage(), 'url' => config('foundation.passport.routes.login')], 401)
+            : redirect()->guest(config('foundation.passport.routes.login') . '?_redirect=' . rawurlencode($request->fullUrl()));
     }
 }
