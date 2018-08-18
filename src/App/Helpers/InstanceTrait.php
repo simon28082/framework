@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\App\Helpers;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -59,6 +60,15 @@ trait InstanceTrait
     public function auth(): AuthFactory
     {
         return $this->app->make(AuthFactory::class);
+    }
+
+    /**
+     * @param string $guard
+     * @return Guard
+     */
+    protected function guard(): Guard
+    {
+        return $this->auth->guard($this->config->get('auth.defaults.guard'));
     }
 
     /**
