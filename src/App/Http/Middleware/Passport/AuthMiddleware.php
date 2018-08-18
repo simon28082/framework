@@ -15,6 +15,7 @@ use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
 use CrCms\Passport\Handlers\Traits\Token;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
@@ -34,6 +35,21 @@ class AuthMiddleware extends AbstractPassportMiddleware
 
         try {
             $result = $this->passport->check($token);
+            if ($result === false) {
+                try {
+                    $rpcResponse = $this->passport->refresh($token);
+                    /* @var Response $response */
+                    $response = $next($request);
+                    return $response->header('Authorization', $rpcResponse->data('data.token'));
+                } catch (Exception $exception) {
+                    if ($exception instanceof ConnectionException) {
+                        $statusCode = $exception->getConnection()->getStatusCode();
+                        $result = (bool)($statusCode >= 200 && $statusCode < 400);
+                    } else {
+                        throw $exception;
+                    }
+                }
+            }
         } catch (Exception $exception) {
             $result = false;
             if ($exception instanceof ConnectionException) {
