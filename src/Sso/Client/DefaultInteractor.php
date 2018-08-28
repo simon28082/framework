@@ -72,7 +72,7 @@ class DefaultInteractor implements InteractionContract
     public function logout(string $token): bool
     {
         $response = $this->rpc->method('get')->call(config('foundation.passport.routes.logout'), $this->requestParams(['token' => $token]));
-        return (array)$response->getData();
+        return $response->getStatusCode() === 204 || $response->getStatusCode() === 200;
     }
 
     /**
