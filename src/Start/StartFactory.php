@@ -71,7 +71,8 @@ class StartFactory
         } elseif (stripos($type, self::TYPE_ARTISAN) !== false) {
             return self::TYPE_ARTISAN;
         } else {
-            throw new InvalidArgumentException('Run driver not found');
+            return self::TYPE_LARAVEL;
+            //throw new InvalidArgumentException('Run driver not found');
         }
     }
 }
