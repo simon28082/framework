@@ -2,11 +2,8 @@
 
 namespace CrCms\Foundation\Bootstrap;
 
-use function CrCms\Foundation\App\Helpers\array_merge_recursive_adv;
 use function CrCms\Foundation\App\Helpers\array_merge_recursive_distinct;
 use Exception;
-use SplFileInfo;
-use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;

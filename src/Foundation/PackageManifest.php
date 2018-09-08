@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\Foundation;
 
 use Exception;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 
 class PackageManifest extends BasePackageManifest
