@@ -133,7 +133,7 @@ class DirectoryMakeCommand extends Command
     protected function autoCreateDirs(array $dirs): void
     {
         foreach ($dirs as $dir) {
-            if (!$this->files->exists($dir)) {
+            if (!$this->files->exists($dir) && !empty($dir)) {
                 $this->files->makeDirectory($dir, 0755, true);
             }
         }
