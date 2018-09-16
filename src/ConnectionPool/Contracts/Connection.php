@@ -47,4 +47,6 @@ interface Connection
      * @return void
      */
     public function close();
+
+    public function reconnection();
 }
