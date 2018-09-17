@@ -3,13 +3,12 @@
 namespace CrCms\Foundation\Start\Drivers;
 
 use CrCms\Foundation\StartContract;
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Http\Request;
 
 /**
- * Class WebServer
+ * Class Laravel
  * @package CrCms\Foundation\Start\Drivers
  */
 class Laravel implements StartContract
