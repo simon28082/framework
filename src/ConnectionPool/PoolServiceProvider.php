@@ -41,7 +41,7 @@ class PoolServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('pool.manager', function ($app) {
-            return new ConnectionManager($app, $app->make('pool.factory'));
+            return new ConnectionManager($app);
         });
     }
 

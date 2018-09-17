@@ -24,7 +24,7 @@ return [
 
     'connections' => [
         'http' => [
-            'driver' => 'guzzle_http',
+            'factory' => \CrCms\Foundation\Client\Http\Guzzle\Factory::class,
 //                'host' => 'user.rpc.crcms.local',
 //                'port' => 80,
             'settings' => [

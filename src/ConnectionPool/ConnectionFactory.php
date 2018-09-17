@@ -21,26 +21,19 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool as ConnectionPoolContract;
+use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory as ConnectionFactoryContract;
 
 /**
  * Class ConnectionFactory
  * @package CrCms\Foundation\ConnectionPool
  */
-class ConnectionFactory
+class ConnectionFactory extends AbstractConnectionFactory implements ConnectionFactoryContract
 {
-    /**
-     * ConnectionFactory constructor.
-     * @param Container $container
-     */
-    public function __construct(Container $container)
-    {
-    }
-
     /**
      * @param array $config
      * @return Connection
      */
-    public function make(array $config, ConnectionPool $pool): Connection
+    public function make(array $config, ConnectionPoolContract $pool): Connection
     {
         return $this->createConnection($config, $pool);
     }

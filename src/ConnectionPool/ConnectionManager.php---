@@ -30,12 +30,11 @@ class ConnectionManager
     /**
      * @var array
      */
-    /*protected $services = [
-        'pools' => null,
+    protected $services = [
+        'pool' => null,
+        /* @var $services['factory'] */
         'factory' => null
-    ];*/
-
-    protected $pools = [];
+    ];
 
     /**
      * @var ConnectionPool

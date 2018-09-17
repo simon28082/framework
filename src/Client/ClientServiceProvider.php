@@ -28,6 +28,11 @@ class ClientServiceProvider extends ServiceProvider
      */
     protected $defer = false;
 
+    public function boot()
+    {
+//        $this->make('pool.manager')
+    }
+
     /**
      *
      */
