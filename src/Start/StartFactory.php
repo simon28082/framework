@@ -5,6 +5,7 @@ namespace CrCms\Foundation;
 use CrCms\Foundation\Start\Drivers\Artisan;
 use CrCms\Foundation\Start\Drivers\HTTP;
 use CrCms\Foundation\Start\Drivers\Laravel;
+use CrCms\Foundation\Start\Drivers\Rpc;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -28,6 +29,11 @@ class StartFactory
      * @var string
      */
     const TYPE_ARTISAN = 'ARTISAN';
+
+    /**
+     * @var string
+     */
+    const TYPE_RPC = 'RPC';
 
     /**
      * @param Container $app
@@ -55,6 +61,7 @@ class StartFactory
             self::TYPE_LARAVEL => Laravel::class,
             self::TYPE_HTTP => HTTP::class,
             self::TYPE_ARTISAN => Artisan::class,
+            self::TYPE_RPC => Rpc::class,
         ];
     }
 
@@ -70,6 +77,8 @@ class StartFactory
             return self::TYPE_HTTP;
         } elseif (stripos($type, self::TYPE_ARTISAN) !== false) {
             return self::TYPE_ARTISAN;
+        } elseif (stripos($type, self::TYPE_RPC) !== false) {
+            return self::TYPE_RPC;
         }
 
         throw new InvalidArgumentException('Run driver not found');
