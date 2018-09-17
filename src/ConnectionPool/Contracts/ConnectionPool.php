@@ -9,15 +9,35 @@
 
 namespace CrCms\Foundation\ConnectionPool\Contracts;
 
+/**
+ * Interface ConnectionPool
+ * @package CrCms\Foundation\ConnectionPool\Contracts
+ */
 interface ConnectionPool
 {
+    /**
+     * @return bool
+     */
     public function has(): bool;
 
+    /**
+     * @return Connection
+     */
     public function next(): Connection;
 
-    public function join(Connection $connection);
+    /**
+     * @param Connection $connection
+     * @return ConnectionPool
+     */
+    public function join(Connection $connection): ConnectionPool;
 
-    public function release(Connection $connection);
+    /**
+     * @param Connection $connection
+     */
+    public function release(Connection $connection): void;
 
+    /**
+     * @param Connection $connection
+     */
     public function close(Connection $connection): void;
 }

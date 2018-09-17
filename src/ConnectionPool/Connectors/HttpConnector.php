@@ -46,4 +46,11 @@ class HttpConnector extends AbstractConnector implements Connector
     {
         return array_merge($this->defaultHeaders, $headers);
     }
+
+    public function close(): void
+    {
+        // TODO: Implement close() method.
+    }
+
+
 }

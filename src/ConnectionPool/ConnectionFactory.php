@@ -40,9 +40,9 @@ class ConnectionFactory
      * @param array $config
      * @return Connection
      */
-    public function make(array $config): Connection
+    public function make(array $config, ConnectionPool $pool): Connection
     {
-        return $this->createConnection($config);
+        return $this->createConnection($config, $pool);
     }
 
     /**
@@ -67,17 +67,17 @@ class ConnectionFactory
      * @param array $config
      * @return Connection
      */
-    protected function createConnection(array $config): Connection
+    protected function createConnection(array $config, ConnectionPool $pool): Connection
     {
         $connect = $this->createConnector($config)->connect($config);
 
         switch ($config['driver']) {
             case 'socket':
-                return new SocketConnection($connect, $config);
+                return new SocketConnection($pool, $connect, $config);
             case 'http':
-                return new HttpConnection($connect, $config);
+                return new HttpConnection($pool, $connect, $config);
             case 'guzzle_http':
-                return new GuzzleHttpConnection($connect, $config);
+                return new GuzzleHttpConnection($pool, $connect, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");

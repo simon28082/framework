@@ -11,7 +11,8 @@ namespace CrCms\Foundation\ConnectionPool;
 
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
 use CrCms\Foundation\ConnectionPool\Contracts\Connector;
-use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool as ConnectionPoolContract;
+use BadMethodCallException;
+use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 
 /**
  * Class AbstractConnection
@@ -65,19 +66,18 @@ abstract class AbstractConnection implements ConnectionContract
     protected $connectionFailureTime = 0;
 
     /**
-     * 超时时间
-     * 
-     * @var int 
+     * @var ConnectionPool
      */
-    protected $timeout = 10;
+    protected $pool;
 
     /**
      * AbstractConnection constructor.
      * @param Connector $connector
      * @param array $config
      */
-    public function __construct(Connector $connector, array $config = [])
+    public function __construct(ConnectionPool $pool, Connector $connector, array $config = [])
     {
+        $this->pool;
         $this->connector = $connector;
         $this->config = $config;
     }
@@ -120,6 +120,26 @@ abstract class AbstractConnection implements ConnectionContract
     public function getConnector(): Connector
     {
         return $this->connector;
+    }
+
+    public function reconnection(): void
+    {
+        /* @todo 暂时 */
+        //$this->connector->connect($this->config);
+    }
+
+    public function close(): void
+    {
+        $this->connector->close();
+        $this->pool->close($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function id(): string
+    {
+        return spl_object_hash($this);
     }
 
     /**

@@ -28,9 +28,14 @@ class ConnectionManager
     protected $factory;
 
     /**
+     * @var array
+     */
+    protected $pools = [];
+
+    /**
      * @var ConnectionPool
      */
-    protected $pool;
+    protected $currentPool;
 
     /**
      * @var Application
@@ -53,10 +58,9 @@ class ConnectionManager
      * @param ConnectionFactory $factory
      * @param ConnectionPool $pool
      */
-    public function __construct(Application $app, ConnectionFactory $factory, ConnectionPool $pool)
+    public function __construct(Application $app, ConnectionFactory $factory)
     {
         $this->app = $app;
-        $this->pool = $pool;
         $this->factory = $factory;
     }
 
@@ -66,31 +70,52 @@ class ConnectionManager
      */
     public function connection(?string $name = null): ConnectionManager
     {
-        $this->group = $name = $name ? $name : $this->defaultDriver();
+        $name = $name ? $name : $this->defaultDriver();
 
-        if (!$this->pool->has($name)) {
-            throw new RangeException("The '{$name}' Exceeded the maximum connection limit");
+        $this->setCurrentPool($name);
+
+        if (!$this->currentPool->has()) {
+            $this->makeConnections($name);
         }
 
-        $this->connection = $this->pool->next($name);
+        $this->connection = $this->currentPool->next();
 
         return $this;
     }
 
-    public function close(): void
+    /**
+     * @return void
+     */
+    /*public function close(): void
     {
-        $this->pool->close($this->group, $this->connection);
+        $this->currentPool->close($this->connection);
+    }*/
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function makeConnections(string $name): void
+    {
+        $maxNumber = $this->currentPool->getConfig('max_idle_number');
+        while ($maxNumber) {
+            $this->currentPool->join(
+                $this->factory->make($this->configuration($name), $this->currentPool)
+            );
+            $maxNumber -= 1;
+        }
     }
 
     /**
      * @param string $name
-     * @return array
      */
-    public function makeConnections(string $name)
+    protected function setCurrentPool(string $name)
     {
-        return array_map(function ($config) use ($name) {
-            return $this->factory->make($config);
-        }, $this->configuration($name));
+        if (empty($this->pools[$name])) {
+            $this->pools[$name] = $this->app->make('pool.pool', $this->configuration($name)['settings']);
+        }
+
+        $this->pool = $this->pools[$name];
     }
 
     /**
@@ -98,7 +123,7 @@ class ConnectionManager
      */
     protected function defaultDriver(): string
     {
-        return $this->app->make('config')->get('client.default');
+        return $this->app->make('config')->get('pool.default');
     }
 
     /**
@@ -107,10 +132,10 @@ class ConnectionManager
      */
     protected function configuration(string $name): array
     {
-        $connections = $this->app->make('config')->get('client.connections');
+        $connections = $this->app->make('config')->get('pool.connections');
 
         if (!isset($connections[$name])) {
-            throw new InvalidArgumentException("client config[{$name}] not found");
+            throw new InvalidArgumentException("pool config[{$name}] not found");
         }
 
         return $connections[$name];

@@ -81,32 +81,43 @@ class HttpConnection extends AbstractConnection implements Connection
      * @param array $data
      * @return Connection
      */
-    public function send(string $path = '', array $data = []): Connection
+    public function send(array $data = []): Connection
     {
-        $this->resolveSendPayload($path, $data);
-
-        if ($this->method === 'post') {
-            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path, json_encode($this->payload)]);
-        } else if ($this->method === 'get') {
-            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path]);
-        } else {
-            /* 这里需要详细测试，暂时此功能不可用 */
-            $this->connector->setMethod($this->method);
-            $this->connector->setData(json_encode($this->payload));
-            $execResult = call_user_func_array([$this->connector, 'execute'], [$this->path]);
-        }
-
-        //加入异常连接
-        if ($this->isAbnormalConnection(!$execResult)) {
-            $this->markDead();
-            $this->connector->close();
-            throw new ConnectionException($this);
-        }
-
-        $this->connector->close();
+//        $this->resolveSendPayload($path, $data);
+//
+//        if ($this->method === 'post') {
+//            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path, json_encode($this->payload)]);
+//        } else if ($this->method === 'get') {
+//            $execResult = call_user_func_array([$this->connector, $this->method], [$this->path]);
+//        } else {
+//            /* 这里需要详细测试，暂时此功能不可用 */
+//            $this->connector->setMethod($this->method);
+//            $this->connector->setData(json_encode($this->payload));
+//            $execResult = call_user_func_array([$this->connector, 'execute'], [$this->path]);
+//        }
+//
+//        //加入异常连接
+//        if ($this->isAbnormalConnection(!$execResult)) {
+//            $this->markDead();
+//            $this->connector->close();
+//            throw new ConnectionException($this);
+//        }
+//
+//        $this->connector->close();
 
         return $this;
     }
+
+    public function content()
+    {
+        // TODO: Implement content() method.
+    }
+
+    public function close(): void
+    {
+        // TODO: Implement close() method.
+    }
+
 
     /**
      * @return mixed
