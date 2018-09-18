@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\ConnectionPool;
 
 use CrCms\Foundation\ConnectionPool\Contracts\Connection;
+use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool as ConnectionPoolContract;
 use SplQueue;
 use RangeException;
@@ -47,8 +48,9 @@ class ConnectionPool implements ConnectionPoolContract
      */
     protected $config = [
         'max_connection_number' => 10,
-        'max_idle_number' => 10,
-        'timeout' => 2000
+        'max_idle_number' => 20,
+        'min_idle_number' => 10,
+        'timeout' => 1
     ];
 
     /**
@@ -85,19 +87,15 @@ class ConnectionPool implements ConnectionPoolContract
     }
 
     /**
-     * @return int
+     * @param ConnectionFactory $factory
      */
-    public function getConnectionNumber(): int
+    public function create(ConnectionFactory $factory): void
     {
-        return $this->connectionNumber;
-    }
-
-    /**
-     * @return int
-     */
-    public function getConnectionTime(): int
-    {
-        return $this->connectionTime;
+        $maxNumber = $this->config['min_idle_number'];
+        while ($maxNumber) {
+            $this->join($factory->make($this));
+            $maxNumber -= 1;
+        }
     }
 
     /**
@@ -159,6 +157,22 @@ class ConnectionPool implements ConnectionPoolContract
         }
 
         return $this->config;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnectionNumber(): int
+    {
+        return $this->connectionNumber;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnectionTime(): int
+    {
+        return $this->connectionTime;
     }
 
     /**

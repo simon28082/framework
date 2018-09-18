@@ -9,13 +9,14 @@
 
 namespace CrCms\Foundation\ConnectionPool;
 
+use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use Illuminate\Contracts\Container\Container;
 
 /**
  * Class AbstractConnectionFactory
  * @package CrCms\Foundation\ConnectionPool
  */
-abstract class AbstractConnectionFactory
+abstract class AbstractConnectionFactory implements ConnectionFactory
 {
     /**
      * @var Container

@@ -9,7 +9,7 @@ return [
     |
     */
 
-    'default' => 'http',
+    'default' => 'client',
 
     /*
     |--------------------------------------------------------------------------
@@ -23,13 +23,8 @@ return [
     */
 
     'connections' => [
-        'http' => [
-            'factory' => \CrCms\Foundation\Client\Http\Guzzle\Factory::class,
-//                'host' => 'user.rpc.crcms.local',
-//                'port' => 80,
-            'settings' => [
-                'timeout' => 1
-            ],
+        'client' => [
+            'timeout' => 1
         ],
     ],
 ];

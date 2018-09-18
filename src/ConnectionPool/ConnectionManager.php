@@ -10,10 +10,10 @@
 namespace CrCms\Foundation\ConnectionPool;
 
 use CrCms\Foundation\ConnectionPool\Contracts\Connection;
+use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
-use RangeException;
 use BadMethodCallException;
 
 /**
@@ -23,45 +23,28 @@ use BadMethodCallException;
 class ConnectionManager
 {
     /**
-     * @var ConnectionFactory
-     */
-    protected $factory;
-
-    /**
-     * @var array
-     */
-    /*protected $services = [
-        'pools' => null,
-        'factory' => null
-    ];*/
-
-    protected $pools = [];
-
-    /**
-     * @var ConnectionPool
-     */
-    protected $currentPool;
-
-    /**
      * @var Application
      */
     protected $app;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $group;
+    protected $pools = [];
 
     /**
-     * @var
+     * @var ConnectionPool
+     */
+    protected $pool;
+
+    /**
+     * @var Connection
      */
     protected $connection;
 
     /**
      * ConnectionManager constructor.
      * @param Application $app
-     * @param ConnectionFactory $factory
-     * @param ConnectionPool $pool
      */
     public function __construct(Application $app)
     {
@@ -69,22 +52,39 @@ class ConnectionManager
     }
 
     /**
+     * @param ConnectionFactory $factory
      * @param null|string $name
      * @return ConnectionManager
      */
-    public function connection(?string $name = null): ConnectionManager
+    public function connection(ConnectionFactory $factory, ?string $name = null): ConnectionManager
     {
         $name = $name ? $name : $this->defaultDriver();
 
-        $this->setCurrentPool($name);
+        $this->setPool($name);
 
-        if (!$this->currentPool->has()) {
-            $this->makeConnections($name);
+        if (!$this->pool->has()) {
+            $this->pool->create($factory);
         }
 
-        $this->connection = $this->currentPool->next();
+        $this->connection = $this->pool->next();
 
         return $this;
+    }
+
+    /**
+     * @return Connection
+     */
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
+    /**
+     * @return ConnectionPool
+     */
+    public function getPool(): ConnectionPool
+    {
+        return $this->pool;
     }
 
     /**
@@ -92,31 +92,30 @@ class ConnectionManager
      */
     /*public function close(): void
     {
-        $this->currentPool->close($this->connection);
+        $this->pool->close($this->connection);
     }*/
+
+    /**
+     * @param ConnectionFactory $factory
+     * @return void
+     */
+//    public function makeConnections(ConnectionFactory $factory): void
+//    {
+//        $maxNumber = $this->pool->getConfig('max_idle_number');
+//        while ($maxNumber) {
+//            $this->pool->join($factory->make($this->pool));
+//            $maxNumber -= 1;
+//        }
+//    }
 
     /**
      * @param string $name
      * @return void
      */
-    public function makeConnections(string $name): void
-    {
-        $maxNumber = $this->currentPool->getConfig('max_idle_number');
-        while ($maxNumber) {
-            $this->currentPool->join(
-                $this->app->make($this->configuration($name)['factory'])->make($this->configuration($name), $this->currentPool)
-            );
-            $maxNumber -= 1;
-        }
-    }
-
-    /**
-     * @param string $name
-     */
-    protected function setCurrentPool(string $name)
+    protected function setPool(string $name): void
     {
         if (empty($this->pools[$name])) {
-            $this->pools[$name] = $this->app->make('pool.pool', $this->configuration($name)['settings']);
+            $this->pools[$name] = $this->app->make('pool.pool', $this->configuration($name));
         }
 
         $this->pool = $this->pools[$name];
@@ -139,7 +138,7 @@ class ConnectionManager
         $connections = $this->app->make('config')->get('pool.connections');
 
         if (!isset($connections[$name])) {
-            throw new InvalidArgumentException("pool config[{$name}] not found");
+            throw new InvalidArgumentException("Pool config[{$name}] not found");
         }
 
         return $connections[$name];
@@ -153,12 +152,15 @@ class ConnectionManager
     public function __call(string $name, array $arguments)
     {
         //需要在Manager中管理连接对象，每次都是通过Manager调用连接池，链接池有__call方法来调用
-        if (method_exists($this->connection, $name)) {
+        /*if (method_exists($this->pool, $name)) {
             $result = call_user_func_array([$this->connection, $name], $arguments);
             if (!$result instanceof $this->connection) {
                 return $result;
             }
             return $this;
+        }*/
+        if ($this->pool instanceof ConnectionPool) {
+            return call_user_func_array([$this->pool, $name], $arguments);
         }
 
         throw new BadMethodCallException("The method[{$name}] is not exists");

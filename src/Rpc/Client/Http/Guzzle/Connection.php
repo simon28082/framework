@@ -7,7 +7,7 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Client\Http\Guzzle;
+namespace CrCms\Foundation\Rpc\Client\Http\Guzzle;
 
 use CrCms\Foundation\ConnectionPool\AbstractConnection;
 use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;

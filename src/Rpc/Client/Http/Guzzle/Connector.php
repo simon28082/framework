@@ -7,23 +7,23 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Client\Connectors;
+namespace CrCms\Foundation\Rpc\Client\Http\Guzzle;
 
-use CrCms\Foundation\Client\AbstractConnector;
-use CrCms\Foundation\Client\Contracts\Connector;
-use GuzzleHttp\Client;
+use CrCms\Foundation\ConnectionPool\AbstractConnector;
+use CrCms\Foundation\ConnectionPool\Contracts\Connector as ConnectorContract;
+use GuzzleHttp\ConnectionPool;
 
 /**
  * Class GuzzleHttpConnector
- * @package CrCms\Foundation\Client\Connectors
+ * @package CrCms\Foundation\ConnectionPool\Connectors
  */
-class GuzzleHttpConnector extends AbstractConnector implements Connector
+class Connector extends AbstractConnector implements ConnectorContract
 {
     /**
      * @param array $config
      * @return Connector
      */
-    public function connect(array $config): Connector
+    public function connect(array $config): ConnectorContract
     {
         $settings = $this->mergeSettings($config['settings'] ?? []);
         $settings['base_uri'] = $this->baseUri($this->scheme($settings), $config);
@@ -31,6 +31,12 @@ class GuzzleHttpConnector extends AbstractConnector implements Connector
 
         return $this;
     }
+
+    public function close(): void
+    {
+        // TODO: Implement close() method.
+    }
+
 
     /**
      * @param array $settings

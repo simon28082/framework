@@ -10,13 +10,13 @@
 namespace CrCms\Foundation\Rpc;
 
 use CrCms\Foundation\Application;
-use CrCms\Foundation\Client\Client;
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use CrCms\Foundation\Rpc\Http\Request;
 use CrCms\Foundation\Rpc\Http\Response;
 use Illuminate\Support\ServiceProvider;
+use CrCms\Foundation\Rpc\Client\Factory;
 
 /**
  * Class RpcServiceProvider

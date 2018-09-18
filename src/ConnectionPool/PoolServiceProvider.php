@@ -36,10 +36,6 @@ class PoolServiceProvider extends ServiceProvider
     {
         $this->app->bind('pool.pool',ConnectionPool::class);
 
-        $this->app->singleton('pool.factory', function ($app) {
-            return new ConnectionFactory($app);
-        });
-
         $this->app->singleton('pool.manager', function ($app) {
             return new ConnectionManager($app);
         });
@@ -50,7 +46,6 @@ class PoolServiceProvider extends ServiceProvider
      */
     protected function registerAlias(): void
     {
-        $this->app->alias('pool.factory', ConnectionFactory::class);
         $this->app->alias('pool.pool', ConnectionPoolContract::class);
         $this->app->alias('pool.manager', ConnectionManager::class);
     }
@@ -61,7 +56,6 @@ class PoolServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [
-            'pool.factory',
             'pool.pool',
             'pool.manager'
         ];

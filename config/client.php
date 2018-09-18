@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'user',
+    'default' => 'http',
 
     /*
     |--------------------------------------------------------------------------
@@ -30,37 +30,27 @@ return [
     */
 
     'connections' => [
-        'passport' => [
-            [
-                'driver' => 'guzzle_http',
-                'host' => env('PASSPORT_HOST', null),
-                'port' => 80,
-                'settings' => [
-                    'timeout' => 1,
-                    'ssl' => env('PASSPORT_SSL', true),
-                ],
+        'http' => [
+            'driver' => 'http',
+            'host' => 'baidu.com',
+            'port' => 80,
+            'settings' => [
+                'timeout' => 1,
+                //'ssl' => env('PASSPORT_SSL', true),
             ],
         ],
-        'user' => [
-            [
-                'driver' => 'guzzle_http',
-                'host' => 'user.rpc.crcms.local',
-                'port' => 80,
-                'settings' => [
-                    'timeout' => 1
-                ],
+        'consul' => [
+            'driver' => 'http',
+            'host' => '127.0.0.1',
+            'port' => 80,
+            'settings' => [
+                'timeout' => 1,
+                //'ssl' => env('PASSPORT_SSL', true),
             ],
-            /*[
-                'driver' => 'http',
-                'host' => '192.168.1.118',
-                'port' => 2222,
-                'settings' => [
-                    'timeout' => 0.5
-                ],
-            ]*/
         ],
-
     ],
+
+    'pool' => 'client',
 
     /*
     |--------------------------------------------------------------------------
