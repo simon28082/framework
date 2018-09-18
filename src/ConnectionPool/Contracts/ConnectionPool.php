@@ -23,13 +23,7 @@ interface ConnectionPool
     /**
      * @return Connection
      */
-    public function next(): Connection;
-
-    /**
-     * @param ConnectionFactory $factory
-     * @return void
-     */
-    public function create(ConnectionFactory $factory): void;
+    public function connection(): Connection;
 
     /**
      * @param Connection $connection

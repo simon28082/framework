@@ -43,6 +43,10 @@ class ClientServiceProvider extends ServiceProvider
      */
     protected function registerConnectionServices()
     {
+        $this->app->singleton('client.manager',function(Application $app){
+           return new Manager($app);
+        });
+
         $this->app->singleton('client.factory', function (Application $app) {
             return new Factory($app);
         });
@@ -54,6 +58,7 @@ class ClientServiceProvider extends ServiceProvider
     protected function registerAlias()
     {
         $this->app->alias('client.factory', Factory::class);
+        $this->app->alias('client.manager', Manager::class);
     }
 
     /**
@@ -62,6 +67,7 @@ class ClientServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [
+            'client.manager',
             'client.factory',
         ];
     }

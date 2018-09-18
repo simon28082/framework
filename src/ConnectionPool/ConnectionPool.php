@@ -75,7 +75,7 @@ class ConnectionPool implements ConnectionPoolContract
     /**
      * @return Connection
      */
-    public function next(): Connection
+    public function connection(): Connection
     {
         /* @var Connection $connection */
         $connection = $this->effectiveConnection();
@@ -84,18 +84,6 @@ class ConnectionPool implements ConnectionPoolContract
         $this->connectionNumber += 1;
 
         return $connection;
-    }
-
-    /**
-     * @param ConnectionFactory $factory
-     */
-    public function create(ConnectionFactory $factory): void
-    {
-        $maxNumber = $this->config['min_idle_number'];
-        while ($maxNumber) {
-            $this->join($factory->make($this));
-            $maxNumber -= 1;
-        }
     }
 
     /**

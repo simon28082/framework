@@ -60,13 +60,13 @@ class ConnectionManager
     {
         $name = $name ? $name : $this->defaultDriver();
 
-        $this->setPool($name);
+        $this->setPool($name, $factory);
 
-        if (!$this->pool->has()) {
-            $this->pool->create($factory);
-        }
+        /*if (!$this->pool->has()) {
+            //$this->max
+        }*/
 
-        $this->connection = $this->pool->next();
+        $this->connection = $this->pool->connection();
 
         return $this;
     }
@@ -90,32 +90,33 @@ class ConnectionManager
     /**
      * @return void
      */
-    /*public function close(): void
+    public function close(): void
     {
-        $this->pool->close($this->connection);
-    }*/
+        $this->pool->release($this->connection);
+    }
 
     /**
      * @param ConnectionFactory $factory
      * @return void
      */
-//    public function makeConnections(ConnectionFactory $factory): void
-//    {
-//        $maxNumber = $this->pool->getConfig('max_idle_number');
-//        while ($maxNumber) {
-//            $this->pool->join($factory->make($this->pool));
-//            $maxNumber -= 1;
-//        }
-//    }
+    protected function makeConnections(ConnectionPool $pool, ConnectionFactory $factory): void
+    {
+        $maxNumber = $pool->getConfig('max_idle_number');
+        while ($maxNumber) {
+            $pool->join($factory->make($pool));
+            $maxNumber -= 1;
+        }
+    }
 
     /**
      * @param string $name
      * @return void
      */
-    protected function setPool(string $name): void
+    protected function setPool(string $name, ConnectionFactory $factory): void
     {
         if (empty($this->pools[$name])) {
             $this->pools[$name] = $this->app->make('pool.pool', $this->configuration($name));
+            $this->makeConnections($this->pools[$name],$factory);
         }
 
         $this->pool = $this->pools[$name];
@@ -159,8 +160,8 @@ class ConnectionManager
             }
             return $this;
         }*/
-        if ($this->pool instanceof ConnectionPool) {
-            return call_user_func_array([$this->pool, $name], $arguments);
+        if ($this->connection instanceof Connection) {
+            return call_user_func_array([$this->connection, $name], $arguments);
         }
 
         throw new BadMethodCallException("The method[{$name}] is not exists");

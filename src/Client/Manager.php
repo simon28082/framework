@@ -13,8 +13,11 @@ use CrCms\Foundation\Application;
 use CrCms\Foundation\ConnectionPool\ConnectionManager;
 use InvalidArgumentException;
 use BadMethodCallException;
+use Crcms\Foundation\ConnectionPool\Contracts\Connection;
 
 /**
+ *
+ *
  * Class Manager
  * @package CrCms\Foundation\Client
  */
@@ -26,9 +29,14 @@ class Manager
     protected $app;
 
     /**
-     * @var
+     * @var ConnectionManager
      */
-    protected $connectionPool;
+    protected $manager;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * Manager constructor.
@@ -49,9 +57,22 @@ class Manager
 
         $factory = $this->app->make('client.factory')->config($this->configuration($name));
 
-        $this->connectionPool = $this->app->make('pool.manager')->connection($factory, $this->poolName());
+        $this->manager = $this->app->make('pool.manager')->connection($factory, $this->poolName());
+
+//        ConnectionManager:: 应该为ConnectionPoolMnager，负责分发调度创建连接的操作，最后返回一个Connection即可
+//        ConnectionPool只用于存储，取出Connection，配置的验证逻辑应该在ConnectionPoolMnager里面
+//        Client通过获取ConnectionPoolMnager里面的Connection来执行操作，不应该操作ConnectionPoolMnager
+//        通过manager来吐出连接
 
         return $this;
+    }
+
+    /**
+     * @return ConnectionManager
+     */
+    public function getManager(): ConnectionManager
+    {
+        return $this->manager;
     }
 
     /**
@@ -93,8 +114,8 @@ class Manager
     public function __call(string $name, array $arguments)
     {
         //让渡控制权
-        if ($this->connectionPool instanceof ConnectionManager) {
-            return call_user_func_array([$this->connectionPool, $name], $arguments);
+        if ($this->manager instanceof ConnectionManager) {
+            return call_user_func_array([$this->manager, $name], $arguments);
         }
 
         throw new BadMethodCallException("The method[{$name}] is not exists");
