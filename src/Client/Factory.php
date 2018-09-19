@@ -13,8 +13,8 @@ use CrCms\Foundation\ConnectionPool\AbstractConnectionFactory;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool as ConnectionPoolContract;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory as ConnectionFactoryContract;
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
-use CrCms\Foundation\Rpc\Client\Http\Guzzle\Connection;
-use CrCms\Foundation\Rpc\Client\Http\Guzzle\Connector;
+use CrCms\Foundation\Client\Http\Guzzle\Connection;
+use CrCms\Foundation\Client\Http\Guzzle\Connector;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -51,7 +51,7 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
     {
         switch ($config['driver']) {
             case 'http':
-                return new Connection($pool, $this->createConnector($config), $config);
+                return new Connection($pool, $this->createConnector($config)->connect($config), $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");

@@ -57,7 +57,8 @@ class Manager
 
         $factory = $this->app->make('client.factory')->config($this->configuration($name));
 
-        $this->manager = $this->app->make('pool.manager')->connection($factory, $this->poolName());
+        $this->manager = $this->app->make('pool.manager');
+        $this->connection = $this->manager->connection($factory, $this->poolName());
 
 //        ConnectionManager:: 应该为ConnectionPoolMnager，负责分发调度创建连接的操作，最后返回一个Connection即可
 //        ConnectionPool只用于存储，取出Connection，配置的验证逻辑应该在ConnectionPoolMnager里面
@@ -73,6 +74,11 @@ class Manager
     public function getManager(): ConnectionManager
     {
         return $this->manager;
+    }
+
+    public function getConnection(): Connection
+    {
+        return $this->connection;
     }
 
     /**
@@ -114,8 +120,8 @@ class Manager
     public function __call(string $name, array $arguments)
     {
         //让渡控制权
-        if ($this->manager instanceof ConnectionManager) {
-            return call_user_func_array([$this->manager, $name], $arguments);
+        if ($this->connection instanceof Connection) {
+            return call_user_func_array([$this->connection, $name], $arguments);
         }
 
         throw new BadMethodCallException("The method[{$name}] is not exists");

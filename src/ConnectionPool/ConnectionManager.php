@@ -56,7 +56,7 @@ class ConnectionManager
      * @param null|string $name
      * @return ConnectionManager
      */
-    public function connection(ConnectionFactory $factory, ?string $name = null): ConnectionManager
+    public function connection(ConnectionFactory $factory, ?string $name = null)
     {
         $name = $name ? $name : $this->defaultDriver();
 
@@ -67,6 +67,8 @@ class ConnectionManager
         }*/
 
         $this->connection = $this->pool->connection();
+
+        return $this->connection;
 
         return $this;
     }

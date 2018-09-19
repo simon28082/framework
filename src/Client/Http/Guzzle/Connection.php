@@ -12,6 +12,9 @@ namespace CrCms\Foundation\Client\Http\Guzzle;
 use CrCms\Foundation\ConnectionPool\AbstractConnection;
 use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Class GuzzleHttpConnection
@@ -56,30 +59,30 @@ class Connection extends AbstractConnection implements ConnectionContract
     }
 
     /**
-     * @param string $path
+     * @param string $uri
      * @param array $data
-     * @return Connection
+     * @return ConnectionContract
      */
-    public function send(array $data = []): \CrCms\Foundation\ConnectionPool\Contracts\Connection
+    public function send(string $uri,array $data = []): \CrCms\Foundation\ConnectionPool\Contracts\Connection
     {
-//        $this->resolveSendPayload($path, $data);
-//
-//        try {
-//            $this->response = $this->connector->request($this->method, $this->path, [
-//                'json' => $this->payload,
-//                'headers' => (array)$this->headers,
-//            ]);
-//        } catch (ConnectException $exception) {
+//        $this->resolveSendPayload($uri, $data);
+
+        try {
+            $this->response = $this->connector->request('get', $uri, [
+                'json' => $data,
+                'headers' => (array)$this->headers,
+            ]);
+        } catch (ConnectException $exception) {
 //            $this->markDead();
-//            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
-//        } catch (RequestException | ClientException $exception) {
-//            //400+可能是请求方法或参数错误，不可视为超时或服务器error
-//            $this->response = $exception->getResponse();
-//
-//            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
-//        }
-//
-//        $this->connector->close();
+            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
+        } catch (RequestException | ClientException $exception) {
+            //400+可能是请求方法或参数错误，不可视为超时或服务器error
+            $this->response = $exception->getResponse();
+
+            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
+        }
+
+        $this->connector->close();
 
         return $this;
     }

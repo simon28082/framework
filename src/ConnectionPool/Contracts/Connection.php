@@ -8,6 +8,7 @@
  */
 
 namespace CrCms\Foundation\ConnectionPool\Contracts;
+
 use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
 
 /**
@@ -32,10 +33,11 @@ interface Connection
     public function markDead(): Connection;
 
     /**
+     * @param string $uri
      * @param array $data
      * @return Connection
      */
-    public function send(array $data): Connection;
+    public function send(string $uri, array $data = []): Connection;
 
     /**
      * @return mixed

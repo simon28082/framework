@@ -11,7 +11,7 @@ namespace CrCms\Foundation\Client\Http\Guzzle;
 
 use CrCms\Foundation\ConnectionPool\AbstractConnector;
 use CrCms\Foundation\ConnectionPool\Contracts\Connector as ConnectorContract;
-use GuzzleHttp\ConnectionPool;
+use GuzzleHttp\Client;
 
 /**
  * Class GuzzleHttpConnector
