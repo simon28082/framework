@@ -21,6 +21,11 @@ use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 abstract class AbstractConnection implements ConnectionContract
 {
     /**
+     * @var ConnectionPool
+     */
+    protected $pool;
+
+    /**
      * @var Connector
      */
     protected $connector;
@@ -38,18 +43,11 @@ abstract class AbstractConnection implements ConnectionContract
     protected $isAlive = true;
 
     /**
-     * 连接时间
-     *
-     * @var int
-     */
-    protected $connectionTime = 0;
-
-    /**
      * 连接次数
      *
      * @var int
      */
-    protected $connectionNumber = 0;
+    protected $connectionSuccessfulNumber = 0;
 
     /**
      * 连接失败次数
@@ -59,16 +57,11 @@ abstract class AbstractConnection implements ConnectionContract
     protected $connectionFailureNumber = 0;
 
     /**
-     * 连接失败时间
+     * 最后连接时间
      *
      * @var int
      */
-    protected $connectionFailureTime = 0;
-
-    /**
-     * @var ConnectionPool
-     */
-    protected $pool;
+    protected $connectionLastTime = 0;
 
     /**
      * AbstractConnection constructor.
@@ -77,9 +70,20 @@ abstract class AbstractConnection implements ConnectionContract
      */
     public function __construct(ConnectionPool $pool, Connector $connector, array $config = [])
     {
-        $this->pool;
+        $this->pool = $pool;
         $this->connector = $connector;
         $this->config = $config;
+        $this->updateConnectionTime();
+    }
+
+    public function updateConnectionTime(): void
+    {
+        $this->connectionLastTime = time();
+    }
+
+    public function getConnectionTime(): int
+    {
+        return $this->connectionLastTime;
     }
 
     /**
@@ -96,8 +100,6 @@ abstract class AbstractConnection implements ConnectionContract
     public function makeAlive(): ConnectionContract
     {
         $this->isAlive = true;
-        $this->connectionTime = time();
-        $this->connectionNumber += 1;
 
         return $this;
     }
@@ -108,10 +110,16 @@ abstract class AbstractConnection implements ConnectionContract
     public function markDead(): ConnectionContract
     {
         $this->isAlive = false;
-        $this->connectionFailureNumber += 1;
-        $this->connectionFailureTime = time();
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnectionLastTime(): int
+    {
+        return $this->connectionLastTime;
     }
 
     /**
@@ -131,7 +139,7 @@ abstract class AbstractConnection implements ConnectionContract
     public function close(): void
     {
         $this->connector->close();
-        $this->pool->close($this);
+        $this->pool->release($this);
     }
 
     /**

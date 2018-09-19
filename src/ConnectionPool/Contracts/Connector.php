@@ -22,11 +22,6 @@ interface Connector
     public function connect(array $config): Connector;
 
     /**
-     * @return mixed
-     */
-    public function resource();
-
-    /**
      * @return void
      */
     public function close(): void;

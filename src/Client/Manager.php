@@ -68,6 +68,11 @@ class Manager
         return $this;
     }
 
+    public function close()
+    {
+        $this->connection->close();
+    }
+
     /**
      * @return ConnectionManager
      */

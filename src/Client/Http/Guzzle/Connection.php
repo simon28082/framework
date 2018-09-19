@@ -63,10 +63,10 @@ class Connection extends AbstractConnection implements ConnectionContract
      * @param array $data
      * @return ConnectionContract
      */
-    public function send(string $uri,array $data = []): \CrCms\Foundation\ConnectionPool\Contracts\Connection
+    public function send(string $uri, array $data = []): \CrCms\Foundation\ConnectionPool\Contracts\Connection
     {
 //        $this->resolveSendPayload($uri, $data);
-
+        //
         try {
             $this->response = $this->connector->request('get', $uri, [
                 'json' => $data,

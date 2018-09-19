@@ -33,6 +33,11 @@ interface Connection
     public function markDead(): Connection;
 
     /**
+     * @return int
+     */
+    public function getConnectionLastTime(): int;
+
+    /**
      * @param string $uri
      * @param array $data
      * @return Connection

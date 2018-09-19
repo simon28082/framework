@@ -15,6 +15,9 @@ use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use BadMethodCallException;
+use RuntimeException;
+use OutOfBoundsException;
+use RangeException;
 
 /**
  * Class ConnectionManager
@@ -33,7 +36,7 @@ class ConnectionManager
     protected $pools = [];
 
     /**
-     * @var ConnectionPool
+     * @var \CrCms\Foundation\ConnectionPool\ConnectionPool
      */
     protected $pool;
 
@@ -41,6 +44,32 @@ class ConnectionManager
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var ConnectionFactory
+     */
+    protected $factory;
+
+    /**
+     * @var int
+     */
+    protected $connectionNumber = 0;
+
+    /**
+     * @var int
+     */
+    protected $connectionTime = 0;
+
+    /**
+     * @var array
+     */
+    protected $poolConfig = [
+        'max_idle_number' => 20,//最大空闲数
+        'min_idle_number' => 10,//最小空闲数
+        'max_connection_number' => 10,//最大连接数
+        'max_connection_time' => 3,//最大连接时间
+        //'timeout' => 1,//超时时间
+    ];
 
     /**
      * ConnectionManager constructor.
@@ -52,36 +81,6 @@ class ConnectionManager
     }
 
     /**
-     * @param ConnectionFactory $factory
-     * @param null|string $name
-     * @return ConnectionManager
-     */
-    public function connection(ConnectionFactory $factory, ?string $name = null)
-    {
-        $name = $name ? $name : $this->defaultDriver();
-
-        $this->setPool($name, $factory);
-
-        /*if (!$this->pool->has()) {
-            //$this->max
-        }*/
-
-        $this->connection = $this->pool->connection();
-
-        return $this->connection;
-
-        return $this;
-    }
-
-    /**
-     * @return Connection
-     */
-    public function getConnection(): Connection
-    {
-        return $this->connection;
-    }
-
-    /**
      * @return ConnectionPool
      */
     public function getPool(): ConnectionPool
@@ -90,38 +89,133 @@ class ConnectionManager
     }
 
     /**
+     * @param ConnectionFactory $factory
+     * @param null|string $name
+     * @return Connection
+     */
+    public function connection(ConnectionFactory $factory, ?string $name = null)
+    {
+        //连接准备
+        $this->connectionReady($name ? $name : $this->defaultDriver(), $factory);
+
+        //连接记录
+        $this->connectionRecord();
+
+        //连接回收，超时检测
+        $this->connectionRecycling();
+
+        return $this->effectiveConnection();
+    }
+
+    /**
+     * @return Connection
+     */
+    protected function effectiveConnection(): Connection
+    {
+        if ($this->pool->getTasksCount() > $this->poolConfig['max_connection_number']) {
+            throw new RuntimeException('More than the maximum number of connections');
+        }
+
+        if (!$this->pool->has()) {
+            $this->makeConnections($this->pool);
+        }
+
+        while ($this->pool->has()) {
+
+            $connection = $this->pool->get();
+
+            //断线重连机制
+            if (!$connection->isAlive()) {
+                $connection->reconnection();
+            }
+
+            //二次重连失败，直接销毁
+            if (!$connection->isAlive()) {
+                $this->pool->destroy($connection);
+                continue;
+            }
+
+            return $connection;
+        }
+
+        throw new RangeException("No valid connections found");
+    }
+
+    /**
+     * 连接准备
+     *
+     * @param string $name
+     * @param ConnectionFactory $factory
+     */
+    protected function connectionReady(string $name, ConnectionFactory $factory)
+    {
+        $this->factory = $factory;
+        $this->poolConfig = array_merge($this->poolConfig, $this->configuration($name));
+        $this->pool = $this->pool($name);
+    }
+
+    /**
+     * 任务连接回收
+     *
      * @return void
      */
-    public function close(): void
+    protected function connectionRecycling(): void
     {
-        $this->pool->release($this->connection);
+        // @todo 超过最大连接时间，自动结束掉此连接，放入空闲池
+        /* @var Connection $connection */
+        $currentTime = time();
+        foreach ($this->pool->getTasks() as $connection) {
+            if ($currentTime - $connection->getConnectionLastTime() > $this->poolConfig['max_connection_time']) {
+                $this->pool->release($connection);
+            }
+        }
     }
+
+    /**
+     * @return void
+     */
+    protected function connectionRecord(): void
+    {
+        $this->connectionTime = time();
+        $this->connectionNumber += 1;
+    }
+
 
     /**
      * @param ConnectionFactory $factory
      * @return void
      */
-    protected function makeConnections(ConnectionPool $pool, ConnectionFactory $factory): void
+    protected function makeConnections(ConnectionPool $pool): void
     {
-        $maxNumber = $pool->getConfig('max_idle_number');
-        while ($maxNumber) {
-            $pool->join($factory->make($pool));
-            $maxNumber -= 1;
+        $count = min(
+            $this->poolConfig['max_idle_number'],
+            $this->poolConfig['min_idle_number'] + $pool->getIdleQueuesCount()
+        );
+
+        while ($count) {
+            $pool->put($this->factory->make($pool));
+            $count -= 1;
         }
     }
 
     /**
      * @param string $name
-     * @return void
+     * @return ConnectionPool
      */
-    protected function setPool(string $name, ConnectionFactory $factory): void
+    protected function pool(string $name): ConnectionPool
     {
-        if (empty($this->pools[$name])) {
-            $this->pools[$name] = $this->app->make('pool.pool', $this->configuration($name));
-            $this->makeConnections($this->pools[$name],$factory);
-        }
+        return empty($this->pools[$name]) ? $this->initPool($name) : $this->pools[$name];
+    }
 
-        $this->pool = $this->pools[$name];
+    /**
+     * @param string $name
+     * @return ConnectionPool
+     */
+    protected function initPool(string $name): ConnectionPool
+    {
+        $this->pools[$name] = $this->app->make('pool.pool');
+        $this->makeConnections($this->pools[$name]);
+        return $this->pools[$name];
     }
 
     /**
@@ -145,27 +239,5 @@ class ConnectionManager
         }
 
         return $connections[$name];
-    }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return $this|mixed
-     */
-    public function __call(string $name, array $arguments)
-    {
-        //需要在Manager中管理连接对象，每次都是通过Manager调用连接池，链接池有__call方法来调用
-        /*if (method_exists($this->pool, $name)) {
-            $result = call_user_func_array([$this->connection, $name], $arguments);
-            if (!$result instanceof $this->connection) {
-                return $result;
-            }
-            return $this;
-        }*/
-        if ($this->connection instanceof Connection) {
-            return call_user_func_array([$this->connection, $name], $arguments);
-        }
-
-        throw new BadMethodCallException("The method[{$name}] is not exists");
     }
 }

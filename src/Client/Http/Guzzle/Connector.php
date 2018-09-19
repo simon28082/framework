@@ -25,6 +25,8 @@ class Connector extends AbstractConnector implements ConnectorContract
      */
     public function connect(array $config): ConnectorContract
     {
+        $this->
+
         $settings = $this->mergeSettings($config['settings'] ?? []);
         $settings['base_uri'] = $this->baseUri($this->scheme($settings), $config);
         $this->connect = new Client($settings);
@@ -34,9 +36,7 @@ class Connector extends AbstractConnector implements ConnectorContract
 
     public function close(): void
     {
-        // TODO: Implement close() method.
     }
-
 
     /**
      * @param array $settings

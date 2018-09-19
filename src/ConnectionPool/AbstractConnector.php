@@ -16,15 +16,19 @@ use InvalidArgumentException;
 abstract class AbstractConnector implements Connector
 {
     /**
-     * @var array
-     */
-    protected $defaultSettings = [
-    ];
-
-    /**
      * @var Connector
      */
     protected $connect;
+
+    /**
+     * @var array
+     */
+    protected $settings = [];
+
+    /**
+     * @var int
+     */
+    protected $connectTime = 0;
 
     /**
      * @param $settings
@@ -32,15 +36,23 @@ abstract class AbstractConnector implements Connector
      */
     protected function mergeSettings($settings): array
     {
-        return array_merge($this->defaultSettings, ['timeout'],$settings);
+        return array_merge($this->settings, $settings);
     }
 
     /**
      * @return mixed
      */
-    public function resource()
+    public function getConnect()
     {
         return $this->connect;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnectTime(): int
+    {
+        return $this->connectTime;
     }
 
     /**

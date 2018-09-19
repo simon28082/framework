@@ -23,21 +23,23 @@ interface ConnectionPool
     /**
      * @return Connection
      */
-    public function connection(): Connection;
+    public function get(): Connection;
 
     /**
      * @param Connection $connection
-     * @return ConnectionPool
+     * @return void
      */
-    public function join(Connection $connection): ConnectionPool;
+    public function put(Connection $connection): void;
 
     /**
      * @param Connection $connection
+     * @return void
+     */
+    public function destroy(Connection $connection): void;
+
+    /**
+     * @param Connection $connection
+     * @return void
      */
     public function release(Connection $connection): void;
-
-    /**
-     * @param Connection $connection
-     */
-    public function close(Connection $connection): void;
 }
