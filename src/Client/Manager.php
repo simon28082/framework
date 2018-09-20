@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Client;
 
 use CrCms\Foundation\Application;
 use CrCms\Foundation\ConnectionPool\ConnectionManager;
+use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
 use BadMethodCallException;
 use Crcms\Foundation\ConnectionPool\Contracts\Connection;
@@ -48,6 +49,7 @@ class Manager
     {
         $this->app = $app;
         $this->manager = $this->app->make('pool.manager');
+        $this->factory = $this->app->make('client.factory');
     }
 
     /**
@@ -58,10 +60,10 @@ class Manager
     {
         $name = $name ? $name : $this->defaultDriver();
 
-        $factory = $this->app->make('client.factory')->config($this->configuration($name));
-
-
-        $this->connection = $this->manager->connection($factory, $this->poolName());
+        $this->connection = $this->manager->connection(
+            $this->factory->config($this->configuration($name))
+            , $this->poolName()
+        );
 
 //        ConnectionManager:: 应该为ConnectionPoolMnager，负责分发调度创建连接的操作，最后返回一个Connection即可
 //        ConnectionPool只用于存储，取出Connection，配置的验证逻辑应该在ConnectionPoolMnager里面

@@ -177,7 +177,7 @@ class ConnectionManager
         foreach ($this->pool->getTasks() as $connection) {
             if (
                 $connection->isRelease() ||
-                $currentTime - $connection->getConnectionLastTime() > $this->poolConfig['max_connection_time']
+                $currentTime - $connection->getLaseActivityTime() > $this->poolConfig['max_connection_time']
             ) {
                 $this->pool->release($connection);
             }
