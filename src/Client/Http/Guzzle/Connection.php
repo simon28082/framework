@@ -15,6 +15,7 @@ use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use CrCms\Foundation\ConnectionPool\Exceptions\RequestException as ConnectionPoolRequestException;
 
 /**
  * Class GuzzleHttpConnection
@@ -58,34 +59,34 @@ class Connection extends AbstractConnection implements ConnectionContract
         return $this->response ? $this->response->getBody()->getContents() : null;
     }
 
+    public function response()
+    {
+        return $this->response;
+    }
+
     /**
      * @param string $uri
      * @param array $data
      * @return ConnectionContract
      */
-    public function send(string $uri, array $data = []): \CrCms\Foundation\ConnectionPool\Contracts\Connection
+    public function send(string $uri, array $data = []): AbstractConnection
     {
-//        $this->resolveSendPayload($uri, $data);
-        //
         try {
             $this->response = $this->connector->request('get', $uri, [
                 'json' => $data,
                 'headers' => (array)$this->headers,
             ]);
         } catch (ConnectException $exception) {
-//            $this->markDead();
+            $this->markDead();
             throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
         } catch (RequestException | ClientException $exception) {
             //400+可能是请求方法或参数错误，不可视为超时或服务器error
             $this->response = $exception->getResponse();
-
-            throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
+            throw new ConnectionPoolRequestException($this, 'Request failed: ' . $exception->getMessage());
+        } finally {
+            $this->connector->close();
         }
-
-        $this->connector->close();
 
         return $this;
     }
-
-
 }

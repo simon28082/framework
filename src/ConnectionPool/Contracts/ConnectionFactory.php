@@ -9,6 +9,12 @@ namespace CrCms\Foundation\ConnectionPool\Contracts;
 interface ConnectionFactory
 {
     /**
+     * @param array $config
+     * @return ConnectionFactory
+     */
+    public function config(array $config): ConnectionFactory;
+
+    /**
      * @param ConnectionPool $pool
      * @return Connection
      */

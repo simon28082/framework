@@ -12,7 +12,7 @@ namespace CrCms\Foundation\ConnectionPool;
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
 use CrCms\Foundation\ConnectionPool\Contracts\Connector;
 use BadMethodCallException;
-use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
+use Exception;
 
 /**
  * Class AbstractConnection
@@ -21,9 +21,9 @@ use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 abstract class AbstractConnection implements ConnectionContract
 {
     /**
-     * @var ConnectionPool
+     * @var mixed
      */
-    protected $pool;
+    protected $response;
 
     /**
      * @var Connector
@@ -43,47 +43,54 @@ abstract class AbstractConnection implements ConnectionContract
     protected $isAlive = true;
 
     /**
+     * 是否回收
+     *
+     * @var bool
+     */
+    protected $isRelease = false;
+
+    /**
+     * 最后活动时间
+     *
+     * @var int
+     */
+    protected $lastActivityTime = 0;
+
+    /**
      * 连接次数
      *
      * @var int
      */
-    protected $connectionSuccessfulNumber = 0;
-
-    /**
-     * 连接失败次数
-     *
-     * @var int
-     */
-    protected $connectionFailureNumber = 0;
-
-    /**
-     * 最后连接时间
-     *
-     * @var int
-     */
-    protected $connectionLastTime = 0;
+    protected $connectionNumber = 0;
 
     /**
      * AbstractConnection constructor.
-     * @param Connector $connector
      * @param array $config
      */
-    public function __construct(ConnectionPool $pool, Connector $connector, array $config = [])
+    public function __construct(Connector $connector, array $config = [])
     {
-        $this->pool = $pool;
         $this->connector = $connector;
         $this->config = $config;
-        $this->updateConnectionTime();
     }
 
-    public function updateConnectionTime(): void
+    protected function updateLaseActivityTime(): void
     {
-        $this->connectionLastTime = time();
+        $this->lastActivityTime = time();
     }
 
-    public function getConnectionTime(): int
+    protected function increaseConnectionNumber(): void
     {
-        return $this->connectionLastTime;
+        $this->connectionNumber += 1;
+    }
+
+    public function getLaseActivityTime(): int
+    {
+        return $this->lastActivityTime;
+    }
+
+    public function isRelease(): bool
+    {
+        return $this->isRelease;
     }
 
     /**
@@ -95,31 +102,19 @@ abstract class AbstractConnection implements ConnectionContract
     }
 
     /**
-     * @return ConnectionContract
+     * @return void
      */
-    public function makeAlive(): ConnectionContract
+    public function makeAlive(): void
     {
         $this->isAlive = true;
-
-        return $this;
     }
 
     /**
-     * @return ConnectionContract
+     * @return void
      */
-    public function markDead(): ConnectionContract
+    public function markDead(): void
     {
         $this->isAlive = false;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getConnectionLastTime(): int
-    {
-        return $this->connectionLastTime;
     }
 
     /**
@@ -138,8 +133,12 @@ abstract class AbstractConnection implements ConnectionContract
 
     public function close(): void
     {
-        $this->connector->close();
-        $this->pool->release($this);
+        $this->release();
+    }
+
+    public function release(): void
+    {
+        $this->isRelease = true;
     }
 
     /**
@@ -148,6 +147,36 @@ abstract class AbstractConnection implements ConnectionContract
     public function id(): string
     {
         return spl_object_hash($this);
+    }
+
+    public function request(string $uri, array $data = []): ConnectionContract
+    {
+        $this->updateLaseActivityTime();
+
+        try {
+            return $this->send($uri, $this->resolve($data));
+        } catch (Exception $exception) {
+            throw $exception;
+        } finally {
+            $this->connector->close();
+        }
+    }
+
+    protected function resolve(array $data): array
+    {
+        return $data;
+    }
+
+    abstract protected function send(string $url, array $data): AbstractConnection;
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function getConnectionNumber(): int
+    {
+        return $this->connectionNumber;
     }
 
     /**

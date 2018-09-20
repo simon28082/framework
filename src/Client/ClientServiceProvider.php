@@ -23,15 +23,10 @@ class ClientServiceProvider extends ServiceProvider
      */
     protected $defer = true;
 
-    public function boot()
-    {
-//        $this->make('pool.manager')
-    }
-
     /**
-     *
+     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->registerAlias();
 
@@ -39,12 +34,12 @@ class ClientServiceProvider extends ServiceProvider
     }
 
     /**
-     *
+     * @return void
      */
-    protected function registerConnectionServices()
+    protected function registerConnectionServices(): void
     {
-        $this->app->singleton('client.manager',function(Application $app){
-           return new Manager($app);
+        $this->app->singleton('client.manager', function (Application $app) {
+            return new Manager($app);
         });
 
         $this->app->singleton('client.factory', function (Application $app) {
@@ -53,9 +48,9 @@ class ClientServiceProvider extends ServiceProvider
     }
 
     /**
-     *
+     * @return void
      */
-    protected function registerAlias()
+    protected function registerAlias(): void
     {
         $this->app->alias('client.factory', Factory::class);
         $this->app->alias('client.manager', Manager::class);

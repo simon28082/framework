@@ -14,9 +14,7 @@ use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionPool;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
-use BadMethodCallException;
 use RuntimeException;
-use OutOfBoundsException;
 use RangeException;
 
 /**
@@ -36,7 +34,7 @@ class ConnectionManager
     protected $pools = [];
 
     /**
-     * @var \CrCms\Foundation\ConnectionPool\ConnectionPool
+     * @var ConnectionPool
      */
     protected $pool;
 
@@ -68,7 +66,6 @@ class ConnectionManager
         'min_idle_number' => 10,//最小空闲数
         'max_connection_number' => 10,//最大连接数
         'max_connection_time' => 3,//最大连接时间
-        //'timeout' => 1,//超时时间
     ];
 
     /**
@@ -105,6 +102,19 @@ class ConnectionManager
         $this->connectionRecycling();
 
         return $this->effectiveConnection();
+    }
+
+    /**
+     * @param Connection $connection
+     * @return void
+     */
+    public function close(Connection $connection): void
+    {
+        if ($connection->isRelease() || $connection->isAlive()) {
+            $this->pool->release($connection);
+        } else {
+            $this->pool->destroy($connection);
+        }
     }
 
     /**
@@ -161,12 +171,19 @@ class ConnectionManager
      */
     protected function connectionRecycling(): void
     {
-        // @todo 超过最大连接时间，自动结束掉此连接，放入空闲池
+        // 超过最大连接时间，自动结束掉此连接，放入空闲池
         /* @var Connection $connection */
         $currentTime = time();
         foreach ($this->pool->getTasks() as $connection) {
-            if ($currentTime - $connection->getConnectionLastTime() > $this->poolConfig['max_connection_time']) {
+            if (
+                $connection->isRelease() ||
+                $currentTime - $connection->getConnectionLastTime() > $this->poolConfig['max_connection_time']
+            ) {
                 $this->pool->release($connection);
+            }
+
+            if (!$connection->isAlive()) {
+                $this->pool->destroy($connection);
             }
         }
     }
@@ -179,7 +196,6 @@ class ConnectionManager
         $this->connectionTime = time();
         $this->connectionNumber += 1;
     }
-
 
     /**
      * @param ConnectionFactory $factory

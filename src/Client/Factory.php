@@ -24,12 +24,18 @@ use InvalidArgumentException;
  */
 class Factory extends AbstractConnectionFactory implements ConnectionFactoryContract
 {
-    protected $config;
+    /**
+     * @var array
+     */
+    protected $config = [];
 
-    public function config(array $config)
+    /**
+     * @param array $config
+     * @return ConnectionFactoryContract
+     */
+    public function config(array $config): ConnectionFactoryContract
     {
         $this->config = $config;
-
         return $this;
     }
 
@@ -51,7 +57,7 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
     {
         switch ($config['driver']) {
             case 'http':
-                return new Connection($pool, $this->createConnector($config)->connect($config), $config);
+                return new Connection($this->createConnector($config)->connect($config), $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
@@ -65,7 +71,7 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
     {
         switch ($config['driver']) {
             case 'http':
-                return new Connector();
+                return new Connector;
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");

@@ -38,6 +38,8 @@ class Manager
      */
     protected $connection;
 
+    protected $factory;
+
     /**
      * Manager constructor.
      * @param Application $app
@@ -45,6 +47,7 @@ class Manager
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->manager = $this->app->make('pool.manager');
     }
 
     /**
@@ -57,7 +60,7 @@ class Manager
 
         $factory = $this->app->make('client.factory')->config($this->configuration($name));
 
-        $this->manager = $this->app->make('pool.manager');
+
         $this->connection = $this->manager->connection($factory, $this->poolName());
 
 //        ConnectionManager:: 应该为ConnectionPoolMnager，负责分发调度创建连接的操作，最后返回一个Connection即可
@@ -68,9 +71,15 @@ class Manager
         return $this;
     }
 
+    public function getFactory()
+    {
+        return $this->factory;
+    }
+
     public function close()
     {
-        $this->connection->close();
+        $this->manager->close($this->connection);
+        $this->connection = null;
     }
 
     /**
@@ -124,9 +133,15 @@ class Manager
      */
     public function __call(string $name, array $arguments)
     {
-        //让渡控制权
+        //接手控制权
         if ($this->connection instanceof Connection) {
-            return call_user_func_array([$this->connection, $name], $arguments);
+            $result = call_user_func_array([$this->connection, $name], $arguments);
+            if ($result instanceof Connection) {
+                $this->connection = $result;
+                return $this;
+            }
+
+            return $result;
         }
 
         throw new BadMethodCallException("The method[{$name}] is not exists");

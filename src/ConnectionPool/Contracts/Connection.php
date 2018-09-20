@@ -9,8 +9,6 @@
 
 namespace CrCms\Foundation\ConnectionPool\Contracts;
 
-use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
-
 /**
  * Interface Connection
  * @package CrCms\Foundation\ConnectionPool\Contracts
@@ -18,36 +16,34 @@ use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
 interface Connection
 {
     /**
+     * @return string
+     */
+    public function id(): string;
+
+    /**
+     * @return bool
+     */
+    public function isRelease(): bool;
+
+    /**
+     * @return void
+     */
+    public function release(): void;
+
+    /**
      * @return bool
      */
     public function isAlive(): bool;
 
     /**
-     * @return Connection
+     * @return void
      */
-    public function makeAlive(): Connection;
+    public function makeAlive(): void;
 
     /**
-     * @return Connection
+     * @return void
      */
-    public function markDead(): Connection;
-
-    /**
-     * @return int
-     */
-    public function getConnectionLastTime(): int;
-
-    /**
-     * @param string $uri
-     * @param array $data
-     * @return Connection
-     */
-    public function send(string $uri, array $data = []): Connection;
-
-    /**
-     * @return mixed
-     */
-    public function getContent();
+    public function markDead(): void;
 
     /**
      * @return void
@@ -55,12 +51,24 @@ interface Connection
     public function reconnection(): void;
 
     /**
-     * @return void
+     * @param string $uri
+     * @param array $data
+     * @return Connection
      */
-    public function close(): void;
+    public function request(string $uri, array $data = []): Connection;
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function id(): string;
+    public function getResponse();
+
+    /**
+     * @return int
+     */
+    public function getLaseActivityTime(): int;
+
+    /**
+     * @return int
+     */
+    public function getConnectionNumber(): int;
 }
