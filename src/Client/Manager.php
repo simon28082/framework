@@ -10,7 +10,6 @@
 namespace CrCms\Foundation\Client;
 
 use CrCms\Foundation\Application;
-use CrCms\Foundation\ConnectionPool\AbstractConnection;
 use CrCms\Foundation\ConnectionPool\ConnectionManager;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use InvalidArgumentException;
@@ -28,7 +27,7 @@ use Crcms\Foundation\ConnectionPool\Contracts\Connection;
  * @method void reconnection()
  * @method Manager request(string $uri, array $data = []);
  * @method mixed getResponse()
- * @method array getContent()
+ * @method mixed getContent()
  * @method int getLaseActivityTime()
  * @method int getConnectionNumber()
  *
@@ -45,7 +44,7 @@ class Manager
     /**
      * @var ConnectionManager
      */
-    protected $manager;
+    protected $connectionPoolManager;
 
     /**
      * @var Connection
@@ -64,7 +63,7 @@ class Manager
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->manager = $this->app->make('pool.manager');
+        $this->connectionPoolManager = $this->app->make('pool.manager');
         $this->factory = $this->app->make('client.factory');
     }
 
@@ -81,7 +80,7 @@ class Manager
             $config = $this->configuration($name);
         }
 
-        $this->connection = $this->manager->connection(
+        $this->connection = $this->connectionPoolManager->connection(
             $this->factory->config($config)
             , $this->poolName()
         );
@@ -102,16 +101,16 @@ class Manager
      */
     public function close()
     {
-        $this->manager->close($this->connection);
+        $this->connectionPoolManager->close($this->connection);
         $this->connection = null;
     }
 
     /**
      * @return ConnectionManager
      */
-    public function getManager(): ConnectionManager
+    public function getConnectionPoolManager(): ConnectionManager
     {
-        return $this->manager;
+        return $this->connectionPoolManager;
     }
 
     /**
