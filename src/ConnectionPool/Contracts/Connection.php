@@ -68,9 +68,9 @@ interface Connection
     public function getResponse();
 
     /**
-     * @return array
+     * @return mixed
      */
-    public function getContent(): array;
+    public function getContent();
 
     /**
      * @return int

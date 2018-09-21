@@ -83,11 +83,11 @@ class Connection extends AbstractConnection implements ConnectionContract
     }
 
     /**
-     * @return array
+     * @return mixed
      */
-    public function getContent(): array
+    public function getContent()
     {
-        return $this->response ? json_decode($this->response->getBody()->getContents(), true) : [];
+        return $this->response ? $this->response->getBody()->getContents() : null;
     }
 
     /**
