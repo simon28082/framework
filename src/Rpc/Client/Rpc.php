@@ -7,32 +7,37 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Rpc;
+namespace CrCms\Foundation\Rpc\Client;
 
 use CrCms\Foundation\Rpc\Contracts\RequestContract;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
+use BadMethodCallException;
+use CrCms\Foundation\Rpc\Contracts\ServiceDiscoverContract;
 
 /**
- * @property RequestContract method
- * @property RequestContract headers
- *
  * Class Rpc
  * @package CrCms\Foundation\Rpc
  */
-class Rpc implements RpcContract
+class Rpc
 {
     /**
-     * @var RequestContract
+     * @var RpcContract
      */
-    protected $request;
+    protected $rpc;
+
+    /**
+     * @var ServiceDiscoverContract
+     */
+    protected $serviceDiscover;
 
     /**
      * Rpc constructor.
      */
-    public function __construct()
+    public function __construct(ServiceDiscoverContract $serviceDiscover, RpcContract $rpc)
     {
-        $this->request = app(RequestContract::class);
+        $this->serviceDiscover = $serviceDiscover;
+        $this->rpc = $rpc;
     }
 
     /**
@@ -40,9 +45,11 @@ class Rpc implements RpcContract
      * @param array $params
      * @return ResponseContract
      */
-    public function call(string $name, array $params = []): ResponseContract
+    public function call(string $name, ?string $uri, array $params = [])
     {
-        return $this->request->sendPayload($name, $params);
+        $service = $this->serviceDiscover->discover($name);
+        $client = $this->rpc->call($service, $uri, $params);
+        dd($client->getContent());
     }
 
     /**
@@ -61,8 +68,8 @@ class Rpc implements RpcContract
      */
     public function __call(string $name, array $arguments)
     {
-        if (method_exists($this->request, $name)) {
-            $result = call_user_func_array([$this->request, $name], $arguments);
+        if (method_exists($this->rpc, $name)) {
+            $result = call_user_func_array([$this->rpc, $name], $arguments);
             if ($result instanceof RequestContract) {
                 $this->request = $result;
                 return $this;

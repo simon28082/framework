@@ -26,7 +26,7 @@ return [
         'client' => [
             'max_idle_number' => 50,//最大空闲数
             'min_idle_number' => 15,//最小空闲数
-            'max_connection_number' => 2,//最大连接数
+            'max_connection_number' => 20,//最大连接数
             'max_connection_time' => 3,//最大连接时间(s)
         ],
     ],

@@ -9,14 +9,17 @@
 
 namespace CrCms\Foundation\Rpc\Contracts;
 
+use CrCms\Foundation\Client\Manager;
+
 interface RpcContract
 {
     /**
-     * @param string $name
+     * @param array $service
+     * @param string $uri
      * @param array $params
      * @return ResponseContract
      */
-    public function call(string $name, array $params = []): ResponseContract;
+    public function call(array $service, string $uri, array $params = []): Manager;
 
     /**
      * @param string $key

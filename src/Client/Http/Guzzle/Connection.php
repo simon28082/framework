@@ -24,14 +24,25 @@ use CrCms\Foundation\ConnectionPool\Exceptions\RequestException as ConnectionPoo
 class Connection extends AbstractConnection implements ConnectionContract
 {
     /**
-     * @var Response
+     * @var string
      */
-    protected $response;
+    protected $method = 'post';
 
     /**
      * @var array
      */
-    protected $headers;
+    protected $headers = [];
+
+    /**
+     * @param string $method
+     * @return $this
+     */
+    public function setMethod(string $method)
+    {
+        $this->method = strtolower($method);
+
+        return $this;
+    }
 
     /**
      * @param array $headers
@@ -40,7 +51,27 @@ class Connection extends AbstractConnection implements ConnectionContract
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;
+
         return $this;
+    }
+
+    /**
+     * @param string $path
+     * @param array $data
+     */
+    protected function resolve(array $data): array
+    {
+        if (!empty($data['method'])) {
+            $this->setMethod($data['method']);
+            unset($data['method']);
+        }
+
+        if (!empty($data['headers'])) {
+            $this->setHeaders($data['headers']);
+            unset($data['headers']);
+        }
+
+        return $data['payload'] ?? [];
     }
 
     /**
@@ -52,16 +83,11 @@ class Connection extends AbstractConnection implements ConnectionContract
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getContent()
+    public function getContent(): array
     {
-        return $this->response ? $this->response->getBody()->getContents() : null;
-    }
-
-    public function response()
-    {
-        return $this->response;
+        return $this->response ? json_decode($this->response->getBody()->getContents(), true) : [];
     }
 
     /**
@@ -72,12 +98,11 @@ class Connection extends AbstractConnection implements ConnectionContract
     public function send(string $uri, array $data = []): AbstractConnection
     {
         try {
-            $this->response = $this->connector->request('get', $uri, [
+            $this->response = $this->connector->request($this->method, $uri, [
                 'json' => $data,
                 'headers' => (array)$this->headers,
             ]);
         } catch (ConnectException $exception) {
-            $this->markDead();
             throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
         } catch (RequestException | ClientException $exception) {
             //400+可能是请求方法或参数错误，不可视为超时或服务器error

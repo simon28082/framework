@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\Client;
 
 use CrCms\Foundation\Application;
+use CrCms\Foundation\ConnectionPool\AbstractConnection;
 use CrCms\Foundation\ConnectionPool\ConnectionManager;
 use CrCms\Foundation\ConnectionPool\Contracts\ConnectionFactory;
 use InvalidArgumentException;
@@ -17,7 +18,19 @@ use BadMethodCallException;
 use Crcms\Foundation\ConnectionPool\Contracts\Connection;
 
 /**
- *
+ * @method string id()
+ * @method bool isRelease()
+ * @method void makeRelease()
+ * @method void makeRecycling()
+ * @method bool isAlive()
+ * @method void makeAlive()
+ * @method void markDead()
+ * @method void reconnection()
+ * @method Manager request(string $uri, array $data = []);
+ * @method mixed getResponse()
+ * @method array getContent()
+ * @method int getLaseActivityTime()
+ * @method int getConnectionNumber()
  *
  * Class Manager
  * @package CrCms\Foundation\Client
@@ -56,15 +69,20 @@ class Manager
     }
 
     /**
-     * @param null|string $name
+     * @param null|string|array $name
      * @return $this
      */
-    public function connection(?string $name = null)
+    public function connection($name = null)
     {
-        $name = $name ? $name : $this->defaultDriver();
+        if (is_array($name)) {
+            list($name, $config) = [$name['name'], $name];
+        } else {
+            $name = $name ? $name : $this->defaultDriver();
+            $config = $this->configuration($name);
+        }
 
         $this->connection = $this->manager->connection(
-            $this->factory->config($this->configuration($name))
+            $this->factory->config($config)
             , $this->poolName()
         );
 

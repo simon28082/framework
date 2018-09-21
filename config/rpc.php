@@ -2,38 +2,46 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Connection Pool Connection Name
-    |--------------------------------------------------------------------------
-    |
-    */
+    'default' => 'consul',
 
-    'default' => 'http',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Connection Pool Connections
-    |--------------------------------------------------------------------------
-    |
-    | Connection pools are divided into different connection groups
-    | Each connection group can have multiple connections
-    | Determine which pool's connection is currently used by selecting a connection group
-    |
-    */
+
 
     'connections' => [
-        'http' => [
-            'host' => 'baidu.com',
-            'port' => 80,
-            'settings' => [
-                'timeout' => 1
+        'consul' => [
+            'register' => [
+                'uri' => 'v1/agent/service/register',
+                'id' => 's10',
+                'name' => 'test_abc',
+                'tags' => [],
+                'enableTagOverride' => false,
+                'service' => [
+                    'address' => 'localhost',
+                    'port' => '8099',
+                ],
+                /*'check' => [
+                    'id' => '',
+                    'name' => '',
+                    'tcp' => 'localhost:8099',
+                    'interval' => 10,
+                    'timeout' => 1,
+                ],*/
+            ],
+            'discovery' => [
+                'uri' => 'v1/catalog/service',
+                'services' => ['user'],
+            ],
+            'driver' => [
+                'name' => 'http',
+                'headers' => [
+                    'User-Agent' => 'CRCMS-JSON-RPC PHP Client',
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ]
             ],
         ],
-
     ],
 
-    'pool' => 'rpc',
 
     /*
     |--------------------------------------------------------------------------
@@ -47,34 +55,5 @@ return [
     | PopSelector: Swoole coroutines are used, each time an independently generated connection
     */
 
-    'selector' => CrCms\Foundation\Client\Selectors\PopSelector::class,
-
-    'consul' => [
-        'address' => '127.0.0.1',
-        'port'    => 8500,
-        'register' => [
-            'id'                => '',
-            'name'              => '',
-            'tags'              => [],
-            'enableTagOverride' => false,
-            'service'           => [
-                'address' => 'localhost',
-                'port'   => '8099',
-            ],
-            'check'             => [
-                'id'       => '',
-                'name'     => '',
-                'tcp'      => 'localhost:8099',
-                'interval' => 10,
-                'timeout'  => 1,
-            ],
-        ],
-        /*'discovery' => [
-            'name' => 'user',
-            'dc' => 'dc',
-            'near' => '',
-            'tag' =>'',
-            'passing' => true
-        ]*/
-    ],
+    'selector' => \CrCms\Foundation\Rpc\Client\Selectors\RandSelector::class,
 ];

@@ -30,13 +30,13 @@ class ClientServiceProvider extends ServiceProvider
     {
         $this->registerAlias();
 
-        $this->registerConnectionServices();
+        $this->registerServices();
     }
 
     /**
      * @return void
      */
-    protected function registerConnectionServices(): void
+    protected function registerServices(): void
     {
         $this->app->singleton('client.manager', function (Application $app) {
             return new Manager($app);

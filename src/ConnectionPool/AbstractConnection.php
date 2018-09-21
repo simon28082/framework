@@ -12,6 +12,7 @@ namespace CrCms\Foundation\ConnectionPool;
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
 use CrCms\Foundation\ConnectionPool\Contracts\Connector;
 use BadMethodCallException;
+use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
 use Exception;
 
 /**
@@ -203,6 +204,9 @@ abstract class AbstractConnection implements ConnectionContract
 
         try {
             return $this->send($uri, $this->resolve($data));
+        } catch (ConnectionException $exception) {
+            $this->markDead();
+            throw $exception;
         } catch (Exception $exception) {
             throw $exception;
         } finally {

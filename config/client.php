@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'http',
+    'default' => 'consul',
 
     /*
     |--------------------------------------------------------------------------
@@ -41,8 +41,8 @@ return [
         ],
         'consul' => [
             'driver' => 'http',
-            'host' => '127.0.0.1',
-            'port' => 80,
+            'host' => '192.168.1.12',
+            'port' => 8500,
             'settings' => [
                 'timeout' => 1,
                 //'ssl' => env('PASSPORT_SSL', true),
@@ -51,18 +51,4 @@ return [
     ],
 
     'pool' => 'client',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Connection pool selector
-    |--------------------------------------------------------------------------
-    |
-    | Different selectors can be selected to select the connection in the connection pool
-    | RandSelector: Randomly select an available selector
-    | RingSelector: A ring selector to ensure scheduling equalization
-    | ResidentSelector: Always use the same available selector
-    | PopSelector: Swoole coroutines are used, each time an independently generated connection
-    */
-
-    'selector' => CrCms\Foundation\Client\Selectors\PopSelector::class,
 ];

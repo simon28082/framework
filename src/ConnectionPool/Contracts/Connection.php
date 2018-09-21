@@ -68,6 +68,11 @@ interface Connection
     public function getResponse();
 
     /**
+     * @return array
+     */
+    public function getContent(): array;
+
+    /**
      * @return int
      */
     public function getLaseActivityTime(): int;
