@@ -62,10 +62,10 @@ class ConnectionManager
      * @var array
      */
     protected $poolConfig = [
-        'max_idle_number' => 20,//最大空闲数
-        'min_idle_number' => 10,//最小空闲数
-        'max_connection_number' => 10,//最大连接数
-        'max_connection_time' => 3,//最大连接时间
+        'max_idle_number' => 500,//最大空闲数
+        'min_idle_number' => 50,//最小空闲数
+        'max_connection_number' => 400,//最大连接数
+        'max_connection_time' => 2,//最大连接时间
     ];
 
     /**
@@ -111,6 +111,7 @@ class ConnectionManager
     public function close(Connection $connection): void
     {
         if ($connection->isRelease() || $connection->isAlive()) {
+            $connection->makeRecycling();
             $this->pool->release($connection);
         } else {
             $this->pool->destroy($connection);
@@ -171,7 +172,6 @@ class ConnectionManager
      */
     protected function connectionRecycling(): void
     {
-        // 超过最大连接时间，自动结束掉此连接，放入空闲池
         /* @var Connection $connection */
         $currentTime = time();
         foreach ($this->pool->getTasks() as $connection) {
@@ -204,7 +204,7 @@ class ConnectionManager
     protected function makeConnections(ConnectionPool $pool): void
     {
         $count = min(
-            $this->poolConfig['max_idle_number'],
+            $this->poolConfig['max_idle_number'] - $pool->getIdleQueuesCount(),
             $this->poolConfig['min_idle_number'] + $pool->getIdleQueuesCount()
         );
 

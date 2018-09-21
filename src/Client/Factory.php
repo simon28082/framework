@@ -36,6 +36,7 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
     public function config(array $config): ConnectionFactoryContract
     {
         $this->config = $config;
+
         return $this;
     }
 
@@ -76,19 +77,4 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
     }
-
-    /**
-     * @param string $name
-     * @return array
-     */
-//    protected function configuration(string $name): array
-//    {
-//        $connections = $this->app->make('config')->get('client.connections');
-//
-//        if (!isset($connections[$name])) {
-//            throw new InvalidArgumentException("Client config[{$name}] not found");
-//        }
-//
-//        return $connections[$name];
-//    }
 }

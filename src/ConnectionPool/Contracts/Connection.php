@@ -28,7 +28,12 @@ interface Connection
     /**
      * @return void
      */
-    public function release(): void;
+    public function makeRelease(): void;
+
+    /**
+     * @return void
+     */
+    public function makeRecycling(): void;
 
     /**
      * @return bool

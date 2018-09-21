@@ -43,7 +43,7 @@ abstract class AbstractConnection implements ConnectionContract
     protected $isAlive = true;
 
     /**
-     * 是否回收
+     * 是否释放资源
      *
      * @var bool
      */
@@ -71,26 +71,31 @@ abstract class AbstractConnection implements ConnectionContract
     {
         $this->connector = $connector;
         $this->config = $config;
+        $this->updateLaseActivityTime();
     }
 
-    protected function updateLaseActivityTime(): void
+    /**
+     * @return string
+     */
+    public function id(): string
     {
-        $this->lastActivityTime = time();
+        return spl_object_hash($this);
     }
 
-    protected function increaseConnectionNumber(): void
-    {
-        $this->connectionNumber += 1;
-    }
-
+    /**
+     * @return int
+     */
     public function getLaseActivityTime(): int
     {
         return $this->lastActivityTime;
     }
 
-    public function isRelease(): bool
+    /**
+     * @return int
+     */
+    public function getConnectionNumber(): int
     {
-        return $this->isRelease;
+        return $this->connectionNumber;
     }
 
     /**
@@ -118,6 +123,50 @@ abstract class AbstractConnection implements ConnectionContract
     }
 
     /**
+     * @return bool
+     */
+    public function isRelease(): bool
+    {
+        return $this->isRelease;
+    }
+
+    /**
+     * 释放连接
+     *
+     * @return void
+     */
+    public function makeRelease(): void
+    {
+        $this->isRelease = true;
+    }
+
+    /**
+     * 回收连接
+     *
+     * @return void
+     */
+    public function makeRecycling(): void
+    {
+        $this->isRelease = false;
+    }
+
+    /**
+     * @return void
+     */
+    protected function updateLaseActivityTime(): void
+    {
+        $this->lastActivityTime = time();
+    }
+
+    /**
+     * @return void
+     */
+    protected function increaseConnectionNumber(): void
+    {
+        $this->connectionNumber += 1;
+    }
+
+    /**
      * @return Connector
      */
     public function getConnector(): Connector
@@ -125,33 +174,32 @@ abstract class AbstractConnection implements ConnectionContract
         return $this->connector;
     }
 
+    /**
+     * @return void
+     */
     public function reconnection(): void
     {
-        /* @todo 暂时 */
-        //$this->connector->connect($this->config);
-    }
-
-    public function close(): void
-    {
-        $this->release();
-    }
-
-    public function release(): void
-    {
-        $this->isRelease = true;
+        // @todo
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function id(): string
+    public function getResponse()
     {
-        return spl_object_hash($this);
+        return $this->response;
     }
 
+    /**
+     * @param string $uri
+     * @param array $data
+     * @return ConnectionContract
+     * @throws Exception
+     */
     public function request(string $uri, array $data = []): ConnectionContract
     {
         $this->updateLaseActivityTime();
+        $this->increaseConnectionNumber();
 
         try {
             return $this->send($uri, $this->resolve($data));
@@ -162,22 +210,21 @@ abstract class AbstractConnection implements ConnectionContract
         }
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     protected function resolve(array $data): array
     {
         return $data;
     }
 
+    /**
+     * @param string $url
+     * @param array $data
+     * @return AbstractConnection
+     */
     abstract protected function send(string $url, array $data): AbstractConnection;
-
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    public function getConnectionNumber(): int
-    {
-        return $this->connectionNumber;
-    }
 
     /**
      * @param string $name
