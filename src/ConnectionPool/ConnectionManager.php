@@ -87,13 +87,20 @@ class ConnectionManager
 
     /**
      * @param ConnectionFactory $factory
-     * @param null|string $name
+     * @param null|array|string $name
      * @return Connection
      */
-    public function connection(ConnectionFactory $factory, ?string $name = null)
+    public function connection(ConnectionFactory $factory, $name = null)
     {
+        if (is_array($name)) {
+            list($name, $configure) = [$name['name'], $name];
+        } else {
+            $name = $name ? $name : $this->defaultDriver();
+            $configure = $this->configuration($name);
+        }
+
         //连接准备
-        $this->connectionReady($name ? $name : $this->defaultDriver(), $factory);
+        $this->connectionReady($name ? $name : $this->defaultDriver(), $configure, $factory);
 
         //连接记录
         $this->connectionRecord();
@@ -156,12 +163,13 @@ class ConnectionManager
      * 连接准备
      *
      * @param string $name
+     * @param array $configure
      * @param ConnectionFactory $factory
      */
-    protected function connectionReady(string $name, ConnectionFactory $factory)
+    protected function connectionReady(string $name, array $configure, ConnectionFactory $factory)
     {
         $this->factory = $factory;
-        $this->poolConfig = array_merge($this->poolConfig, $this->configuration($name));
+        $this->poolConfig = array_merge($this->poolConfig, $configure);
         $this->pool = $this->pool($name);
     }
 
@@ -246,12 +254,13 @@ class ConnectionManager
      * @param string $name
      * @return array
      */
-    protected function configuration(string $name): array
+    protected function configuration($name): array
     {
         $connections = $this->app->make('config')->get('pool.connections');
 
         if (!isset($connections[$name])) {
-            throw new InvalidArgumentException("Pool config[{$name}] not found");
+            return $this->poolConfig;
+            //throw new InvalidArgumentException("Pool config[{$name}] not found");
         }
 
         return $connections[$name];
