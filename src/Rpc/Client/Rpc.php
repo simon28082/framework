@@ -9,8 +9,8 @@
 
 namespace CrCms\Foundation\Rpc\Client;
 
-use CrCms\Foundation\Rpc\Contracts\RequestContract;
-use CrCms\Foundation\Rpc\Contracts\ResponseContract;
+use CrCms\Foundation\Client\Manager;
+use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use BadMethodCallException;
 use CrCms\Foundation\Rpc\Contracts\ServiceDiscoverContract;
@@ -32,6 +32,18 @@ class Rpc
     protected $serviceDiscover;
 
     /**
+     * 重试次数
+     *
+     * @var int
+     */
+    protected $retry = 3;
+
+    /**
+     * @var Manager
+     */
+    protected $client;
+
+    /**
      * Rpc constructor.
      */
     public function __construct(ServiceDiscoverContract $serviceDiscover, RpcContract $rpc)
@@ -42,14 +54,35 @@ class Rpc
 
     /**
      * @param string $name
+     * @param null|string $uri
      * @param array $params
-     * @return ResponseContract
+     * @return Manager
      */
-    public function call(string $name, ?string $uri, array $params = [])
+    public function call(string $name, ?string $uri = null, array $params = []): Manager
     {
         $service = $this->serviceDiscover->discover($name);
-        $client = $this->rpc->call($service, $uri, $params);
-        dd($client->getContent());
+        return $this->whileGetConnection($service, $uri, $params);
+    }
+
+    /**
+     * 循环获取连接，直到非异常连接
+     *
+     * @param array $service
+     * @param string $uri
+     * @param array $params
+     * @param int $depth
+     * @return Manager
+     */
+    protected function whileGetConnection(array $service, string $uri, array $params = [], int $depth = 1): Manager
+    {
+        try {
+            return $this->rpc->call($service, $uri, $params);
+        } catch (ConnectionException $exception) {
+            if ($depth > $this->retry) {
+                throw $exception;
+            }
+            return $this->whileGetConnection($service, $uri, $params, $depth += 1);
+        }
     }
 
     /**
@@ -68,7 +101,7 @@ class Rpc
      */
     public function __call(string $name, array $arguments)
     {
-        if (method_exists($this->rpc, $name)) {
+        /*if (method_exists($this->rpc, $name)) {
             $result = call_user_func_array([$this->rpc, $name], $arguments);
             if ($result instanceof RequestContract) {
                 $this->request = $result;
@@ -76,7 +109,7 @@ class Rpc
             }
 
             return $result;
-        }
+        }*/
 
         throw new BadMethodCallException("The method[{$name}] is not exists");
     }

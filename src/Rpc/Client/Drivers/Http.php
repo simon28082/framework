@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\Rpc\Client\Drivers;
 
 use CrCms\Foundation\Client\Manager;
-use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 
 /**
@@ -68,7 +67,7 @@ class Http implements RpcContract
         ])->request($uri, ['method' => $this->method, 'payload' => $params]);
     }
 
-    public function authentication(string $key, string $passowrd = ''): RpcContract
+    public function authentication(string $key, string $password = ''): RpcContract
     {
         // TODO: Implement authentication() method.
     }

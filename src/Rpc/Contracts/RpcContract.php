@@ -17,7 +17,7 @@ interface RpcContract
      * @param array $service
      * @param string $uri
      * @param array $params
-     * @return ResponseContract
+     * @return Manager
      */
     public function call(array $service, string $uri, array $params = []): Manager;
 
