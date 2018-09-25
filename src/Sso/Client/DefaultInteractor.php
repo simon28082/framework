@@ -9,6 +9,7 @@
 
 namespace CrCms\Foundation\Sso\Client;
 
+use CrCms\Foundation\Rpc\Client\Rpc;
 use CrCms\Foundation\Rpc\Contracts\ResponseContract;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use CrCms\Foundation\Sso\Client\Contracts\InteractionContract;
@@ -32,27 +33,27 @@ class DefaultInteractor implements InteractionContract
      * DefaultInteractor constructor.
      * @param RpcContract $rpc
      */
-    public function __construct(RpcContract $rpc)
+    public function __construct(Rpc $rpc)
     {
         $this->rpc = $rpc;
     }
 
     /**
      * @param string $token
-     * @return ResponseContract
+     * @return object
      */
-    public function refresh(string $token): ResponseContract
+    public function refresh(string $token): object
     {
-        return $this->rpc->call(config('foundation.passport.routes.refresh'), $this->requestParams(['token' => $token]));
+        return $this->rpc->call('passport', config('foundation.passport.routes.refresh'), $this->requestParams(['token' => $token]));
     }
 
     /**
      * @param string $token
-     * @return ResponseContract
+     * @return object
      */
-    public function user(string $token): ResponseContract
+    public function user(string $token): object
     {
-        return $this->rpc->call(config('foundation.passport.routes.user'), $this->requestParams(['token' => $token]));
+        return $this->rpc->call('passport', config('foundation.passport.routes.user'), $this->requestParams(['token' => $token]));
     }
 
     /**
@@ -61,8 +62,8 @@ class DefaultInteractor implements InteractionContract
      */
     public function check(string $token): bool
     {
-        $response = $this->rpc->call(config('foundation.passport.routes.check'), $this->requestParams(['token' => $token]));
-        return $response->getStatusCode() === 204 || $response->getStatusCode() === 200;
+        $this->rpc->call(config('foundation.passport.routes.check'), $this->requestParams(['token' => $token]));
+        return $this->rpc->getClient()->getStatusCode() === 204 || $this->rpc->getClient()->getStatusCode() === 200;
     }
 
     /**
@@ -71,8 +72,8 @@ class DefaultInteractor implements InteractionContract
      */
     public function logout(string $token): bool
     {
-        $response = $this->rpc->method('get')->call(config('foundation.passport.routes.logout'), $this->requestParams(['token' => $token]));
-        return $response->getStatusCode() === 204 || $response->getStatusCode() === 200;
+        $this->rpc->method('get')->call(config('foundation.passport.routes.logout'), $this->requestParams(['token' => $token]));
+        return $this->rpc->getClient()->getStatusCode() === 204 || $this->rpc->getClient()->getStatusCode() === 200;
     }
 
     /**

@@ -19,15 +19,15 @@ interface InteractionContract
 {
     /**
      * @param string $token
-     * @return ResponseContract
+     * @return object
      */
-    public function refresh(string $token): ResponseContract;
+    public function refresh(string $token): object;
 
     /**
      * @param string $token
-     * @return ResponseContract
+     * @return object
      */
-    public function user(string $token): ResponseContract;
+    public function user(string $token): object;
 
     /**
      * @param string $token
