@@ -82,7 +82,7 @@ class Manager
 
         $this->connection = $this->connectionPoolManager->connection(
             $this->factory->config($config)
-            , $this->poolName()
+            , $name
         );
 
         return $this;
@@ -124,10 +124,10 @@ class Manager
     /**
      * @return string
      */
-    protected function poolName(): string
+    /*protected function poolName(): string
     {
         return $this->app->make('config')->get('client.pool');
-    }
+    }*/
 
     /**
      * @return string

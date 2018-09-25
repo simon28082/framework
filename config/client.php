@@ -11,11 +11,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Connection Pool Connection Name
+    | Default Client name
     |--------------------------------------------------------------------------
     |
     */
-
     'default' => 'consul',
 
     /*
@@ -49,7 +48,4 @@ return [
             ],
         ],
     ],
-
-    //连接池内的驱动名称 pool.connections.{$pool}
-    'pool' => 'client',
 ];

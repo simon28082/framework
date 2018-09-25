@@ -20,6 +20,11 @@ use GuzzleHttp\Client;
 class Connector extends AbstractConnector implements ConnectorContract
 {
     /**
+     * @var Client
+     */
+    protected $connect;
+
+    /**
      * @param array $config
      * @return Connector
      */
