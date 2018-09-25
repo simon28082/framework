@@ -29,7 +29,10 @@ return [
             ],
             'discovery' => [
                 'uri' => 'v1/catalog/service',
-                'services' => ['user'],
+                'services' => [
+                    'user',
+                    'passport'
+                ],
             ],
             'driver' => [
                 'name' => 'http',

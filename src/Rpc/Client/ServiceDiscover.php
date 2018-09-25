@@ -7,6 +7,7 @@ use CrCms\Foundation\Rpc\Contracts\Selector;
 use CrCms\Foundation\Rpc\Contracts\ServiceDiscoverContract;
 use Illuminate\Foundation\Application;
 use Exception;
+use UnexpectedValueException;
 
 /**
  * Class ServiceDiscovery
@@ -49,29 +50,39 @@ class ServiceDiscover implements ServiceDiscoverContract
 
     /**
      * @param string $service
+     * @param null|string $driver
      * @return array
      * @throws Exception
      */
-    public function discover(string $service): array
+    public function discover(string $service, ?string $driver = null): array
     {
-        if (empty($this->services[$service])) {
-            $this->services[$service] = $this->services($service);
+        $driver = $driver ? $driver : $this->defaultDriver();
+        $serviceKey = $this->serviceKey($service, $driver);
+
+        if (empty($this->services[$serviceKey])) {
+            $this->services[$serviceKey] = $this->services($service, $driver);
         }
 
-        return $this->selector->select($this->services[$service]);
+        return $this->selector->select($this->services[$serviceKey]);
     }
 
     /**
      * @param string $service
+     * @param string $driver
      * @return array
      * @throws Exception
      */
-    protected function services(string $service): array
+    protected function services(string $service, string $driver): array
     {
-        $config = $this->app->make('config')->get("rpc.connections.consul.discovery");
-        $this->client->connection('consul');
+        $config = $this->app->make('config')->get("rpc.connections.{$driver}.discovery");
+        $this->client->connection($driver);
         try {
             $content = $this->client->request($config['uri'] . '/' . $service, ['method' => 'get'])->getContent();
+            // @todo 这里还需要其它的判断，判断Client是否OK，JSON解析是否OK
+            $content = json_decode($content, true);
+            if (json_last_error() !== 0) {
+                throw new UnexpectedValueException("JSON parse error");
+            }
             return collect($content)->mapWithKeys(function ($item) {
                 return [$item['ServiceID'] => $item];
             })->toArray();
@@ -80,5 +91,23 @@ class ServiceDiscover implements ServiceDiscoverContract
         } finally {
             $this->client->close();
         }
+    }
+
+    /**
+     * @param string $service
+     * @param string $driver
+     * @return string
+     */
+    protected function serviceKey(string $service, string $driver): string
+    {
+        return $service . '_' . $driver;
+    }
+
+    /**
+     * @return string
+     */
+    protected function defaultDriver(): string
+    {
+        return $this->app->make('config')->get('rpc.default');
     }
 }

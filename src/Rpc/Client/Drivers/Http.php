@@ -30,7 +30,7 @@ class Http implements RpcContract
     {
         $this->client = $manager;
         $this->config = $config;
-        $this->addHeaders($config['header'] ?? []);
+        $this->addHeaders($config['headers'] ?? []);
     }
 
     public function setMethod(string $method)
@@ -54,17 +54,16 @@ class Http implements RpcContract
     {
         //@todo 这里就有问题了，新服务的配置怎么传入,并不是在client的配置文件里面的，而是动态加载的
         //@todo 解决上面的问题，暂时修改了Manage里面的connection,支持动态化数组传入
-
         return $this->client->connection([
-            'name' => 'rpc_' . $service['ServiceName'],
+            'name' => $service['ServiceName'],
             'driver' => 'http',
             'host' => $service['ServiceAddress'],
-            'port' => $service['ServicePort'],
+            'port' => 80,
             'settings' => [
                 'timeout' => 1,
                 //'ssl' => env('PASSPORT_SSL', true),
             ],
-        ])->request($uri, ['method' => $this->method, 'payload' => $params]);
+        ])->request($uri, ['headers' => $this->headers, 'method' => $this->method, 'payload' => $params]);
     }
 
     public function authentication(string $key, string $password = ''): RpcContract

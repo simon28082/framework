@@ -9,11 +9,14 @@
 
 namespace CrCms\Foundation\Rpc\Client;
 
+use function CrCms\Foundation\App\Helpers\is_serialized;
 use CrCms\Foundation\Client\Manager;
 use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
 use CrCms\Foundation\Rpc\Contracts\RpcContract;
 use BadMethodCallException;
 use CrCms\Foundation\Rpc\Contracts\ServiceDiscoverContract;
+use stdClass;
+use InvalidArgumentException;
 
 /**
  * Class Rpc
@@ -44,6 +47,11 @@ class Rpc
     protected $client;
 
     /**
+     * @var object
+     */
+    protected $data;
+
+    /**
      * Rpc constructor.
      */
     public function __construct(ServiceDiscoverContract $serviceDiscover, RpcContract $rpc)
@@ -56,12 +64,58 @@ class Rpc
      * @param string $name
      * @param null|string $uri
      * @param array $params
+     * @return object
+     */
+    public function call(string $name, ?string $uri = null, array $params = [])
+    {
+        $service = $this->serviceDiscover->discover($name, 'consul');
+        $this->client = $this->whileGetConnection($service, $uri, $params);
+
+        $this->resolveData($this->client->getContent());
+
+        return $this->getData();
+    }
+
+    /**
+     * @param mixed $data
+     */
+    protected function resolveData($data): void
+    {
+        if (is_array($data)) {
+            $this->data = (object)$data;
+        } else if ((bool)($newData = json_decode($data)) && json_last_error() === 0) {
+            $this->data = $newData;
+        } else if (is_serialized($data)) {
+            $this->data = unserialize($data);
+        } else {
+            $this->data = new stdClass();
+            $this->data->data = $data;
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param string $passowrd
+     * @return RpcContract
+     */
+    public function authentication(string $key, string $passowrd = ''): RpcContract
+    {
+    }
+
+    /**
+     * @return object
+     */
+    public function getData(): object
+    {
+        return $this->data;
+    }
+
+    /**
      * @return Manager
      */
-    public function call(string $name, ?string $uri = null, array $params = []): Manager
+    public function getClient(): Manager
     {
-        $service = $this->serviceDiscover->discover($name);
-        return $this->whileGetConnection($service, $uri, $params);
+        return $this->client;
     }
 
     /**
@@ -86,12 +140,16 @@ class Rpc
     }
 
     /**
-     * @param string $key
-     * @param string $passowrd
-     * @return RpcContract
+     * @param string $name
+     * @return mixed
      */
-    public function authentication(string $key, string $passowrd = ''): RpcContract
+    public function __get(string $name)
     {
+        if (isset($this->data->{$name})) {
+            return $this->data->{$name};
+        }
+
+        throw new InvalidArgumentException("The attribute[{$name}] is not exists");
     }
 
     /**
