@@ -81,7 +81,13 @@ class Rpc
      */
     protected function resolveData($data): void
     {
-        if (is_array($data)) {
+        if ((bool)($newData = json_decode($data)) && json_last_error() === 0) {
+            $this->data = $newData;
+        } else {
+            $this->data = null;
+        }
+
+        /*if (is_array($data)) {
             $this->data = (object)$data;
         } else if ((bool)($newData = json_decode($data)) && json_last_error() === 0) {
             $this->data = $newData;
@@ -90,7 +96,7 @@ class Rpc
         } else {
             $this->data = new stdClass();
             $this->data->data = $data;
-        }
+        }*/
     }
 
     /**
