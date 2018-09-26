@@ -14,7 +14,7 @@ use InvalidArgumentException;
  * @property-read ResponseFactory $response
  *
  * Class Controller
- * @package CrCms\Foundation\App\Http\Controllers
+ * @package CrCms\Foundation\App\MicroService\Controllers
  */
 class Controller extends BaseController
 {
