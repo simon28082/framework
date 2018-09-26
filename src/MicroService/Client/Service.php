@@ -12,7 +12,6 @@ namespace CrCms\Foundation\MicroService\Client;
 use function CrCms\Foundation\App\Helpers\is_serialized;
 use CrCms\Foundation\Client\Manager;
 use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
-use CrCms\Foundation\MicroService\Client\Contracts\RpcContract;
 use BadMethodCallException;
 use CrCms\Foundation\MicroService\Client\Contracts\ServiceContract;
 use CrCms\Foundation\MicroService\Client\Contracts\ServiceDiscoverContract;

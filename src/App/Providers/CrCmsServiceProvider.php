@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\App\Providers;
 
-use CrCms\Foundation\Console\Commands\DirectoryMakeCommand;
+use CrCms\Foundation\Artisan\Commands\DirectoryMakeCommand;
 use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
 use CrCms\Foundation\Transporters\DataProvider;
 use Illuminate\Support\ServiceProvider;
