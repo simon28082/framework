@@ -4,26 +4,20 @@ namespace CrCms\Foundation\Start\Drivers;
 
 use CrCms\Foundation\StartContract;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
+use CrCms\Foundation\MicroService\Server\Kernel as HttpKernelContract;
 use Illuminate\Http\Request;
 
 /**
- * Class Laravel
+ * Class MicroService
  * @package CrCms\Foundation\Start\Drivers
  */
-class Laravel implements StartContract
+class MicroService implements StartContract
 {
-    /**
-     * @param Container $app
-     * @return void
-     */
     /*public function register(Container $app): void
     {
-        $app->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
-            \CrCms\Foundation\App\Http\Kernel::class
-        );
+        // TODO: Implement register() method.
     }*/
+
 
     /**
      * @param Container $app

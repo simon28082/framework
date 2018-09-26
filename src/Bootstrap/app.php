@@ -12,7 +12,7 @@
 */
 
 $app = new \CrCms\Foundation\Application(
-    realpath(__DIR__.'/../../../../../')
+    realpath(__DIR__ . '/../../../../../')
 );
 
 /*
@@ -28,12 +28,17 @@ $app = new \CrCms\Foundation\Application(
 
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,
-    CrCms\Foundation\App\Http\Kernel::class
+    CrCms\Foundation\Http\Kernel::class
 );
 
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    CrCms\Foundation\App\Console\Kernel::class
+    CrCms\Foundation\Artisan\Kernel::class
+);
+
+$app->singleton(
+    CrCms\Foundation\MicroService\Server\Contracts\Kernel::class,
+    CrCms\Foundation\MicroService\Server\Kernel::class
 );
 
 $app->singleton(

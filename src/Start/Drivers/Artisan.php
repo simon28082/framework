@@ -16,6 +16,18 @@ class Artisan implements StartContract
 {
     /**
      * @param Container $app
+     * @return void
+     */
+    /*public function register(Container $app): void
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \CrCms\Foundation\App\Console\Kernel::class
+        );
+    }*/
+
+    /**
+     * @param Container $app
      */
     public function run(Container $app, array $params): void
     {
@@ -41,5 +53,4 @@ class Artisan implements StartContract
 
         exit($status);
     }
-
 }
