@@ -9,6 +9,7 @@
 
 namespace CrCms\Foundation\Client\Http\Guzzle;
 
+use CrCms\Foundation\Client\Http\Contracts\ResponseContract;
 use CrCms\Foundation\ConnectionPool\AbstractConnection;
 use CrCms\Foundation\ConnectionPool\Exceptions\ConnectionException;
 use CrCms\Foundation\ConnectionPool\Contracts\Connection as ConnectionContract;
@@ -21,7 +22,7 @@ use CrCms\Foundation\ConnectionPool\Exceptions\RequestException as ConnectionPoo
  * Class GuzzleHttpConnection
  * @package CrCms\Foundation\ConnectionPool\Connections
  */
-class Connection extends AbstractConnection implements ConnectionContract
+class Connection extends AbstractConnection implements ConnectionContract, ResponseContract
 {
     /**
      * @var string

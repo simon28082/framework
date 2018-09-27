@@ -38,12 +38,12 @@ class ClientServiceProvider extends ServiceProvider
      */
     protected function registerServices(): void
     {
-        $this->app->singleton('client.manager', function (Application $app) {
-            return new Manager($app);
-        });
-
         $this->app->singleton('client.factory', function (Application $app) {
             return new Factory($app);
+        });
+
+        $this->app->singleton('client.manager', function (Application $app) {
+            return new Manager($app, $app->make('client.factory'), $app->make('pool.manager'));
         });
     }
 

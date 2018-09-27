@@ -57,21 +57,27 @@ class Manager
     protected $factory;
 
     /**
+     * @var bool
+     */
+    protected $usePool;
+
+    /**
      * Manager constructor.
      * @param Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, ConnectionFactory $factory, ?ConnectionManager $poolManager = null)
     {
         $this->app = $app;
-        $this->connectionPoolManager = $this->app->make('pool.manager');
-        $this->factory = $this->app->make('client.factory');
+        $this->factory = $factory;
+        $this->connectionPoolManager = $poolManager;
     }
 
     /**
-     * @param null|string|array $name
+     * @param null $name
+     * @param bool $usePool
      * @return $this
      */
-    public function connection($name = null)
+    public function connection($name = null, $usePool = true)
     {
         if (is_array($name)) {
             list($name, $config) = [$name['name'], $name];
@@ -80,10 +86,12 @@ class Manager
             $config = $this->configuration($name);
         }
 
-        $this->connection = $this->connectionPoolManager->connection(
+        $this->usePool = $usePool;
+
+        $this->connection = $this->usePool ? $this->connectionPoolManager->connection(
             $this->factory->config($config)
             , $name
-        );
+        ) : $this->factory->config($config)->make();
 
         return $this;
     }
@@ -99,9 +107,12 @@ class Manager
     /**
      * @return void
      */
-    public function close()
+    public function close(): void
     {
-        $this->connectionPoolManager->close($this->connection);
+        if ($this->connectionPoolManager && $this->usePool) {
+            $this->connectionPoolManager->close($this->connection);
+        }
+
         $this->connection = null;
     }
 
