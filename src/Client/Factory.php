@@ -41,20 +41,18 @@ class Factory extends AbstractConnectionFactory implements ConnectionFactoryCont
     }
 
     /**
-     * @param array $config
      * @return ConnectionContract
      */
-    public function make(ConnectionPoolContract $pool): ConnectionContract
+    public function make(): ConnectionContract
     {
-        return $this->createConnection($this->config, $pool);
+        return $this->createConnection($this->config);
     }
 
     /**
      * @param string $driver
-     * @param ConnectionPoolContract $pool
      * @return Connection
      */
-    protected function createConnection(array $config, ConnectionPoolContract $pool): Connection
+    protected function createConnection(array $config): Connection
     {
         switch ($config['driver']) {
             case 'http':

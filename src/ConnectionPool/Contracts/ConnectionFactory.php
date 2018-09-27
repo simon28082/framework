@@ -15,8 +15,7 @@ interface ConnectionFactory
     public function config(array $config): ConnectionFactory;
 
     /**
-     * @param ConnectionPool $pool
      * @return Connection
      */
-    public function make(ConnectionPool $pool): Connection;
+    public function make(): Connection;
 }

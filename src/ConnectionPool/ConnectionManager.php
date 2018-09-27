@@ -217,7 +217,7 @@ class ConnectionManager
         );
 
         while ($count) {
-            $pool->put($this->factory->make($pool));
+            $pool->put($this->factory->make());
             $count -= 1;
         }
     }
