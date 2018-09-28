@@ -15,12 +15,14 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * @property-read Container $app
  * @property-read Config $config
  * @property-read Cache $cache
  * @property-read AuthFactory $auth
+ * @property-read Dispatcher $dispatcher
  *
  * Trait ComponentTrait
  * @package CrCms\Foundation\App\Helpers
@@ -63,10 +65,18 @@ trait InstanceTrait
     }
 
     /**
+     * @return Dispatcher
+     */
+    public function dispatcher(): Dispatcher
+    {
+        return app(Dispatcher::class);
+    }
+
+    /**
      * @param string $guard
      * @return Guard
      */
-    protected function guard(): Guard
+    public function guard(): Guard
     {
         return $this->auth->guard($this->config->get('auth.defaults.guard'));
     }
