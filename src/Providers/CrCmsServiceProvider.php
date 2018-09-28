@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Providers;
+namespace CrCms\Foundation\Providers;
 
 use CrCms\Foundation\Artisan\Commands\DirectoryMakeCommand;
 use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
