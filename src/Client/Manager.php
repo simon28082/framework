@@ -80,7 +80,7 @@ class Manager
     public function connection($name = null, $usePool = true)
     {
         if (is_array($name)) {
-            list($name, $config) = [$name['name'], $name];
+            list($name, $config) = [$name['name'] ?? '', $name];
         } else {
             $name = $name ? $name : $this->defaultDriver();
             $config = $this->configuration($name);
