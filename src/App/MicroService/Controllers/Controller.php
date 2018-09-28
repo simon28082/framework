@@ -4,7 +4,6 @@ namespace CrCms\Foundation\App\MicroService\Controllers;
 
 use CrCms\Foundation\App\Helpers\InstanceTrait;
 use CrCms\Foundation\App\Services\ResponseFactory;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -18,7 +17,7 @@ use InvalidArgumentException;
  */
 class Controller extends BaseController
 {
-    use InstanceTrait, AuthorizesRequests, DispatchesJobs, ValidatesRequests {
+    use InstanceTrait, AuthorizesRequests, ValidatesRequests {
         __get as __instanceGet;
     }
 
