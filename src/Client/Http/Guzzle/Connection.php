@@ -98,11 +98,21 @@ class Connection extends AbstractConnection implements ConnectionContract, Respo
      */
     public function send(string $uri, array $data = []): AbstractConnection
     {
+        $options = [];
+        $options['headers'] = $this->headers;
+
+        if (isset($this->headers['Content-Type']) && $this->headers['Content-Type'] === 'application/json') {
+            $options['json'] = $data;
+        } else if ($this->method === 'get') {
+            $options['query'] = $data;
+        } else if (isset($this->headers['Content-Type']) && $this->headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+            $options['form_params'] = $data;
+        } else {
+            $options['body'] = $data;
+        }
+
         try {
-            $this->response = $this->connector->request($this->method, $uri, [
-                'json' => $data,
-                'headers' => (array)$this->headers,
-            ]);
+            $this->response = $this->connector->request($this->method, $uri, $options);
         } catch (ConnectException $exception) {
             throw new ConnectionException($this, 'Connection failed: ' . $exception->getMessage());
         } catch (RequestException | ClientException $exception) {
