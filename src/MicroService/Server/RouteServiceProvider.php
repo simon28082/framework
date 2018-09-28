@@ -24,12 +24,4 @@ class RouteServiceProvider extends ServiceProvider
         $routePath = base_path('routes/service.php');
         file_exists($routePath) && require $routePath;
     }
-
-    /**
-     * @return void
-     */
-    public function register(): void
-    {
-        parent::register();
-    }
 }
