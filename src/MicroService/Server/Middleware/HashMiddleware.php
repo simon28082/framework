@@ -19,13 +19,10 @@ class HashMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (empty($request->hasHeader('Authorization'))) {
-            throw new UnauthorizedHttpException();
-        }
-
+        $token = $request->headers->get('Authorization');
         $hash = hash_hmac('ripemd256', serialize($request->all()), config('micro-service.secret'));
-        if ($request->headers->get('Authorization') !== $hash) {
-            throw new UnauthorizedHttpException();
+        if ($token !== $hash) {
+            throw new UnauthorizedHttpException($token);
         }
 
         return $next($request);
