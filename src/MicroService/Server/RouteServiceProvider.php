@@ -3,6 +3,7 @@
 namespace CrCms\Foundation\MicroService\Server;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapServiceRoutes(): void
     {
         $routePath = base_path('routes/service.php');
-        file_exists($routePath) && require $routePath;
+        if (file_exists($routePath)) {
+            Route::middleware('micro_service')
+                ->group($routePath);
+        }
     }
 }

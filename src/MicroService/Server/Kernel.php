@@ -66,7 +66,8 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middlewareGroups = [
-        'rpc' => [
+        'micro_service' => [
+            \CrCms\Foundation\MicroService\Server\Middleware\HashMiddleware::class,
 //            'throttle:60,1',
 //            'bindings',
             //\CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
