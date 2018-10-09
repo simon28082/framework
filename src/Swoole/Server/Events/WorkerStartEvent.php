@@ -43,7 +43,8 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
      */
     protected function setWorkOrTaskProcessName(): void
     {
-        $processPrefix = config('swoole.process_prefix');
+        $processPrefix = 'swoole_';
+//        $processPrefix = config('swoole.process_prefix');
 
         $processName = (
             $this->server->taskworker ?

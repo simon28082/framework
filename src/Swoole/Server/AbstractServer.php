@@ -101,7 +101,6 @@ abstract class AbstractServer implements StartActionContract
     {
         $this->app = $app;
         $this->config = $config;
-        $this->bootstrap();
     }
 
     /**
@@ -131,7 +130,7 @@ abstract class AbstractServer implements StartActionContract
     /**
      * @return void
      */
-    abstract protected function bootstrap(): void;
+    abstract public function bootstrap(): void;
 
     /**
      * @param array $settings

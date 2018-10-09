@@ -7,12 +7,12 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\Http;
+namespace CrCms\Foundation\Swoole\MicroService;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\Http\Events\RequestEvent;
+use CrCms\Foundation\Swoole\MicroService\Events\RequestEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
-use Illuminate\Contracts\Http\Kernel;
+use CrCms\Foundation\MicroService\Server\Contracts\Kernel;
 use Swoole\Http\Server as HttpServer;
 
 /**
@@ -27,6 +27,7 @@ class Server extends AbstractServer implements ServerContract
     protected $events = [
         'request' => RequestEvent::class,
     ];
+
 
     /**
      * @return void

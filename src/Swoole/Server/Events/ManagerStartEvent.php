@@ -27,6 +27,7 @@ class ManagerStartEvent extends AbstractEvent implements EventContract
     public function handle(AbstractServer $server): void
     {
         parent::handle($server);
-        static::setProcessName(config('swoole.process_prefix') . 'manage');
+        static::setProcessName('swoole_' . 'manage');
+//        static::setProcessName(config('swoole.process_prefix') . 'manage');
     }
 }
