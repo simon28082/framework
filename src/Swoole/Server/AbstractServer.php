@@ -77,6 +77,22 @@ abstract class AbstractServer implements StartActionContract
     protected $process;
 
     /**
+     * AbstractServer constructor.
+     * @param Container $app
+     * @param array $config
+     */
+    public function __construct(Container $app, array $config)//, \Swoole\Server $server = null)
+    {
+        $this->app = $app;
+        $this->config = $config;
+    }
+
+    /**
+     * @return void
+     */
+    abstract public function bootstrap(): void;
+
+    /**
      * @param Process $process
      */
     public function setProcess(Process $process)
@@ -90,17 +106,6 @@ abstract class AbstractServer implements StartActionContract
     public function getProcess(): Process
     {
         return $this->process;
-    }
-
-    /**
-     * AbstractServer constructor.
-     * @param Container $app
-     * @param array $config
-     */
-    public function __construct(Container $app, array $config)//, \Swoole\Server $server = null)
-    {
-        $this->app = $app;
-        $this->config = $config;
     }
 
     /**
@@ -128,9 +133,28 @@ abstract class AbstractServer implements StartActionContract
     }
 
     /**
-     * @return void
+     * @return SwooleServer
      */
-    abstract public function bootstrap(): void;
+    public function getServer(): SwooleServer
+    {
+        return $this->server;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * @return Container
+     */
+    public function getApp(): Container
+    {
+        return $this->app;
+    }
 
     /**
      * @param array $settings
@@ -195,14 +219,6 @@ abstract class AbstractServer implements StartActionContract
     protected function eventHandle(string $name): void
     {
         $this->server->{$name}->handle($this);
-    }
-
-    /**
-     * @return SwooleServer
-     */
-    public function getServer(): SwooleServer
-    {
-        return $this->server;
     }
 
     /**
