@@ -44,6 +44,7 @@ class ServerProcess extends AbstractProcess implements ProcessContract
     public function handle(Process $process): void
     {
         $this->server->createServer();
+        $this->server->bootstrap();
         $this->server->setProcess($process);
         $this->server->start();
 

@@ -41,7 +41,12 @@ class Kernel implements KernelContract
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-        //\Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+    ];
+
+    /**
+     * @var array
+     */
+    protected $deferredBootstrappers = [
         \CrCms\Foundation\MicroService\Server\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
@@ -174,6 +179,7 @@ class Kernel implements KernelContract
         Facade::clearResolvedInstance('request');
 
         $this->bootstrap();
+        $this->deferredBootstrap();
 
         return (new Pipeline($this->app))
             ->send($request)
@@ -190,6 +196,16 @@ class Kernel implements KernelContract
     {
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function deferredBootstrap()
+    {
+        if (! $this->app->hasBeenDeferredBootstrapped()) {
+            $this->app->deferredBootstrapWith($this->deferredBootstrappers);
         }
     }
 

@@ -5,6 +5,7 @@ namespace CrCms\Foundation;
 use CrCms\Foundation\Start\Drivers\Artisan;
 use CrCms\Foundation\Start\Drivers\HTTP;
 use CrCms\Foundation\Start\Drivers\Laravel;
+use CrCms\Foundation\Start\Drivers\Test;
 use CrCms\Foundation\Start\Drivers\MicroService;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
@@ -50,8 +51,6 @@ class StartFactory
         );
 
         return $app->make(StartContract::class);
-//        $bin->register($app);
-//        return $bin;
     }
 
     /**

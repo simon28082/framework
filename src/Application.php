@@ -40,6 +40,37 @@ class Application extends BaseApplication implements Container
     protected $frameworkResourcePath;
 
     /**
+     * @var bool
+     */
+    protected $hasBeenDeferredBootstrapped = false;
+
+    /**
+     * @param array $bootstrappers
+     */
+    public function deferredBootstrapWith(array $bootstrappers)
+    {
+        $this->hasBeenDeferredBootstrapped = true;
+
+        foreach ($bootstrappers as $bootstrapper) {
+            $this['events']->fire('bootstrapping: ' . $bootstrapper, [$this]);
+
+            $this->make($bootstrapper)->bootstrap($this);
+
+            $this['events']->fire('bootstrapped: ' . $bootstrapper, [$this]);
+        }
+    }
+
+    /**
+     * Determine if the application has been bootstrapped before.
+     *
+     * @return bool
+     */
+    public function hasBeenDeferredBootstrapped()
+    {
+        return $this->hasBeenDeferredBootstrapped;
+    }
+
+    /**
      * @return void
      */
     protected function bindPathsInContainer()
