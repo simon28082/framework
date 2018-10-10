@@ -11,6 +11,7 @@ namespace CrCms\Foundation\Swoole\Process;
 
 use CrCms\Foundation\Swoole\Process\Contracts\ProcessContract;
 use Swoole\Process;
+use BadMethodCallException;
 
 /**
  * Class AbstractProcess
@@ -24,6 +25,16 @@ abstract class AbstractProcess implements ProcessContract
     protected $process;
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var int
+     */
+    protected $pid;
+
+    /**
      * AbstractProcess constructor.
      * @param array $params
      * @param bool $redirectStdinStdout
@@ -32,6 +43,7 @@ abstract class AbstractProcess implements ProcessContract
     public function __construct(bool $redirectStdinStdout = false, bool $createPipe = true)
     {
         $this->process = new Process([$this, 'handle'], $redirectStdinStdout, $createPipe);
+        $this->process->name($this->name);
     }
 
     /**
@@ -39,7 +51,24 @@ abstract class AbstractProcess implements ProcessContract
      */
     public function start(): int
     {
-        return $this->process->start();
+        $this->pid = $this->process->start();
+        return $this->pid;
+    }
+
+    /**
+     * @return int
+     */
+    public function exit(): int
+    {
+        return $this->process->exit();
+    }
+
+    /**
+     * @return int
+     */
+    public function getPid(): int
+    {
+        return $this->pid;
     }
 
     /**
@@ -48,5 +77,19 @@ abstract class AbstractProcess implements ProcessContract
     public function getProcess(): Process
     {
         return $this->process;
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->process, $name)) {
+            return $this->process->{$name(...$arguments)};
+        }
+
+        throw new BadMethodCallException("The method[{$name}] not exists");
     }
 }

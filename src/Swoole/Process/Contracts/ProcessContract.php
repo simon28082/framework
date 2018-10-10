@@ -15,6 +15,7 @@ interface ProcessContract
 {
     /**
      * @param Process $process
+     * @return void
      */
     public function handle(Process $process): void;
 
@@ -22,4 +23,9 @@ interface ProcessContract
      * @return int
      */
     public function start(): int;
+
+    /**
+     * @return int
+     */
+    public function exit(): int;
 }

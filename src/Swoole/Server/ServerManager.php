@@ -9,6 +9,8 @@
 
 namespace CrCms\Foundation\Swoole\Server;
 
+use CrCms\Foundation\Start\Drivers\MicroService;
+use CrCms\Foundation\Swoole\MicroService\Server;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
 use CrCms\Foundation\Swoole\Server\Processes\INotifyProcess;
@@ -79,8 +81,19 @@ class ServerManager implements StartActionContract
                 echo "PID={$ret['pid']}\n";
             }
         });*/
+//dd($this->config);
 
+        $pid = \CrCms\Foundation\Swoole\Process\ProcessManager::instance()->start(
+            new ServerProcess(
+                 new Server($this->app, $this->config['servers']['micro-service'])
+            )
+        );
 
+        dump("=============pid {$pid}=============");
+
+        dump(\CrCms\Foundation\Swoole\Process\ProcessManager::instance()->list());
+
+        return true;
 
         /* 这一块应该处理成类似中间件模块格式，装饰模式，暂时先这样 */
         $processes = $this->processes(
@@ -139,7 +152,8 @@ class ServerManager implements StartActionContract
     protected function processes(Collection $servers): Collection
     {
         return $servers->map(function (ServerContract $server) {
-            return new ServerProcess($server);
+            //return new ServerProcess($server);
+
         });
     }
 
