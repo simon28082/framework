@@ -16,10 +16,10 @@ use function CrCms\Foundation\App\Helpers\framework_config_path;
 use CrCms\Foundation\Swoole\Server\ProcessManager;
 
 /**
- * Class HTTP
+ * Class Http
  * @package CrCms\Foundation\Start\Drivers
  */
-class HTTP implements StartContract
+class Http implements StartContract
 {
     /**
      * @var array
@@ -98,14 +98,7 @@ class HTTP implements StartContract
      */
     protected function loadConfiguration(): void
     {
-        $config = require framework_config_path('swoole.php');
-
-        $customConfigPath = config_path('swoole.php');
-        if (file_exists($customConfigPath) && is_file(file_exists($customConfigPath))) {
-            $config = array_merge_recursive_distinct($config, require $customConfigPath);
-        }
-
-        $this->config = $config;
+        $this->config = require config_path('swoole.php');
     }
 
     /**
