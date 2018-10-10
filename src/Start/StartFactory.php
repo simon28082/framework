@@ -50,8 +50,6 @@ class StartFactory
         );
 
         return $app->make(StartContract::class);
-//        $bin->register($app);
-//        return $bin;
     }
 
     /**
