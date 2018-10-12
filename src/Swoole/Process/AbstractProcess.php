@@ -25,42 +25,58 @@ abstract class AbstractProcess implements ProcessContract
     protected $process;
 
     /**
+     * 子进程名称
+     *
      * @var string
      */
     protected $name;
 
     /**
-     * @var int
-     */
-    protected $pid;
-
-    /**
      * AbstractProcess constructor.
-     * @param array $params
      * @param bool $redirectStdinStdout
-     * @param bool $createPipe
+     * @param int $createPipe
      */
-    public function __construct(bool $redirectStdinStdout = false, bool $createPipe = true)
+    public function __construct(bool $redirectStdinStdout = false, int $createPipe = 0)
     {
-        $this->process = new Process([$this, 'handle'], $redirectStdinStdout, $createPipe);
-        $this->process->name($this->name);
+        $this->process = new Process([$this, 'initChildProcess'], $redirectStdinStdout, $createPipe);
     }
 
     /**
-     * @return int
+     * @param Process $process
+     * @return mixed
      */
-    public function start(): int
+    public function initChildProcess(Process $process)
     {
-        $this->pid = $this->process->start();
-        return $this->pid;
+        if (!empty($this->name)) {
+            swoole_set_process_name($this->name);
+        }
+
+        return call_user_func([$this, 'childProcess'], $process);
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function exit(): int
+    public function start(): bool
     {
-        return $this->process->exit();
+        return (bool)$this->process->start();
+    }
+
+    /**
+     * @return bool
+     */
+    public function exit(): bool
+    {
+        $this->process->exit(0);
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name ?? '';
     }
 
     /**
@@ -68,7 +84,7 @@ abstract class AbstractProcess implements ProcessContract
      */
     public function getPid(): int
     {
-        return $this->pid;
+        return $this->process->pid;
     }
 
     /**

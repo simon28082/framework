@@ -32,7 +32,7 @@ class ServerProcess extends AbstractProcess implements ProcessContract
      * @param bool $redirectStdinStdout
      * @param bool $createPipe
      */
-    public function __construct(AbstractServer $server, bool $redirectStdinStdout = false, bool $createPipe = true)
+    public function __construct(AbstractServer $server, bool $redirectStdinStdout = false, int $createPipe = 0)
     {
         $this->server = $server;
         parent::__construct($redirectStdinStdout, $createPipe);
@@ -41,11 +41,11 @@ class ServerProcess extends AbstractProcess implements ProcessContract
     /**
      * @param Process $process
      */
-    public function handle(Process $process): void
+    public function childProcess(Process $process): void
     {
         $this->server->createServer();
         $this->server->bootstrap();
-        $this->server->setProcess($process);
+        $this->server->setProcess($this->process);
         $this->server->start();
 
         //这两个进程不加也行，默认swoole会自动监听

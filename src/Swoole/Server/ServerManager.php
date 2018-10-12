@@ -18,11 +18,8 @@ use CrCms\Foundation\Swoole\Server\Processes\LogProcess;
 use CrCms\Foundation\Swoole\Server\Processes\ServerProcess;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
-use Swoole\Process;
 use UnexpectedValueException;
-use RuntimeException;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
-use CrCms\Foundation\Swoole\Server\processManager;
+use CrCms\Foundation\Swoole\Process\ProcessManager;
 
 /**
  * Class ServerManager
@@ -36,11 +33,6 @@ class ServerManager implements StartActionContract
     protected $app;
 
     /**
-     * @var array
-     */
-    protected $pids;
-
-    /**
      * @var
      */
     protected $config;
@@ -51,19 +43,25 @@ class ServerManager implements StartActionContract
     protected $processes;
 
     /**
-     * @var \CrCms\Foundation\Swoole\Server\processManagerr
+     * @var ProcessManager
      */
     protected $processManager;
+
+    /**
+     * @var $server
+     */
+    protected $server;
 
     /**
      * ServerManage constructor.
      * @param Container $app
      */
-    public function __construct(Container $app, array $config, processManager $processManager)
+    public function __construct(Container $app, array $config, AbstractServer $server, ProcessManager $processManager)
     {
         $this->app = $app;
         $this->config = $config;
         $this->processManager = $processManager;
+        $this->server = $server;
     }
 
     /**
@@ -71,27 +69,36 @@ class ServerManager implements StartActionContract
      */
     public function start(): bool
     {
-        if ($this->processManager->exists()) {
-            throw new UnexpectedValueException('Swoole server is running');
-        }
-        /*Process::daemon();
-        Process::signal(SIGCHLD, function ($sig) {
-            //必须为false，非阻塞模式
-            while ($ret = Process::wait(false)) {
-                echo "PID={$ret['pid']}\n";
-            }
-        });*/
+//        if ($this->processManager->exists()) {
+//            throw new UnexpectedValueException('Swoole server is running');
+//        }
+//        Process::daemon();
+//        Process::signal(SIGCHLD, function ($sig) {
+//            //必须为false，非阻塞模式
+//            while ($ret = Process::wait(false)) {
+//                echo "PID={$ret['pid']}\n";
+//            }
+//        });
 //dd($this->config);
+//        swoole_set_process_name('--process -==== mmain--');
+//        sleep(10);
+//
+//        $pid = \CrCms\Foundation\Swoole\Process\ProcessManager::instance()->start(
+//
+//        );
 
-        $pid = \CrCms\Foundation\Swoole\Process\ProcessManager::instance()->start(
+        $this->processManager->start(
             new ServerProcess(
-                 new Server($this->app, $this->config['servers']['micro-service'])
-            )
+                $this->server
+            ),
+            'micro-service'
         );
 
-        dump("=============pid {$pid}=============");
+//        file_put_contents(storage_path('ss'),$pid);
+//
+//        dump("=============pid {$pid}=============");
 
-        dump(\CrCms\Foundation\Swoole\Process\ProcessManager::instance()->list());
+//        dump(\CrCms\Foundation\Swoole\Process\ProcessManager::instance()->list());
 
         return true;
 
@@ -111,7 +118,7 @@ class ServerManager implements StartActionContract
 
         if ($this->config['notify']['monitor'] && function_exists('inotify_init')) {
             $notifyPid = $this->addINotifyProcess();
-            $allPid = $allPid->merge(['inotify'=>$notifyPid]);
+            $allPid = $allPid->merge(['inotify' => $notifyPid]);
         }
 
         return $this->processManager->store($allPid);
@@ -162,6 +169,10 @@ class ServerManager implements StartActionContract
      */
     public function stop(): bool
     {
+        dump($this->processManager->kill('micro-service'));
+
+        return true;
+
         if (!$this->processManager->exists()) {
             throw new UnexpectedValueException('Swoole server is not running');
         }

@@ -17,15 +17,15 @@ interface ProcessContract
      * @param Process $process
      * @return void
      */
-    public function handle(Process $process): void;
+    public function childProcess(Process $process): void;
 
     /**
-     * @return int
+     * @return bool
      */
-    public function start(): int;
+    public function start(): bool;
 
     /**
-     * @return int
+     * @return bool
      */
-    public function exit(): int;
+    public function exit(): bool;
 }
