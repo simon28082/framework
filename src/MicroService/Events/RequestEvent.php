@@ -67,7 +67,7 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-        $this->requestLog();
+//        $this->requestLog();
 
         $this->setResponse();
     }
