@@ -180,7 +180,7 @@ class Kernel implements KernelContract
         Facade::clearResolvedInstance('request');
 
         $this->bootstrap();
-        $this->deferredBootstrap();
+        //$this->deferredBootstrap();
 
         return (new Pipeline($this->app))
             ->send($request)
@@ -205,9 +205,9 @@ class Kernel implements KernelContract
      */
     public function deferredBootstrap()
     {
-        if (! $this->app->hasBeenDeferredBootstrapped()) {
+        /*if (! $this->app->hasBeenDeferredBootstrapped()) {
             $this->app->deferredBootstrapWith($this->deferredBootstrappers);
-        }
+        }*/
     }
 
     /**
