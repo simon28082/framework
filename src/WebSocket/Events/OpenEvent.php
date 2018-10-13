@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\WebSocket\Events;
+namespace CrCms\Foundation\WebSocket\Events;
 
 use CrCms\Foundation\Swoole\Server;
 use Swoole\Http\Request as SwooleRequest;
@@ -13,7 +13,7 @@ use CrCms\Foundation\Swoole\Server\AbstractServer;
 
 /**
  * Class OpenEvent
- * @package CrCms\Foundation\Swoole\WebSocket\Events
+ * @package CrCms\Foundation\WebSocket\Events
  */
 class OpenEvent extends AbstractEvent implements EventContract
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Socket\Events;
+namespace CrCms\Foundation\Socket\Events;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;

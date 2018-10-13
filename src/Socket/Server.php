@@ -7,17 +7,17 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\Socket;
+namespace CrCms\Foundation\Socket;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
-use CrCms\Foundation\Swoole\Socket\Events\ReceiveEvent;
+use CrCms\Foundation\Socket\Events\ReceiveEvent;
 use Illuminate\Contracts\Http\Kernel;
 use Swoole\Server as SocketServer;
 
 /**
  * Class Server
- * @package CrCms\Foundation\Swoole\Socket
+ * @package CrCms\Foundation\Socket
  */
 class Server extends AbstractServer implements ServerContract
 {

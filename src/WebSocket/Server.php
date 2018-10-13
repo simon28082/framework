@@ -7,18 +7,17 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\WebSocket;
+namespace CrCms\Foundation\WebSocket;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
-use CrCms\Foundation\Swoole\WebSocket\Events\MessageEvent;
-use CrCms\Foundation\Swoole\WebSocket\Events\OpenEvent;
-use Swoole\Server as SwooleServer;
+use CrCms\Foundation\WebSocket\Events\MessageEvent;
+use CrCms\Foundation\WebSocket\Events\OpenEvent;
 use Swoole\WebSocket\Server as WebSocketServer;
 
 /**
  * Class Server
- * @package CrCms\Foundation\Swoole\WebSocket
+ * @package CrCms\Foundation\WebSocket
  */
 class Server extends AbstractServer implements ServerContract
 {

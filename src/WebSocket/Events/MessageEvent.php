@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\WebSocket\Events;
+namespace CrCms\Foundation\WebSocket\Events;
 
 use CrCms\Foundation\App\WebSocket\Kernel;
 use CrCms\Foundation\App\WebSocket\WebSocketControllerDispatcher;
@@ -15,7 +15,7 @@ use CrCms\Foundation\Swoole\Server\AbstractServer;
 
 /**
  * Class MessageEvent
- * @package CrCms\Foundation\Swoole\WebSocket\Events
+ * @package CrCms\Foundation\WebSocket\Events
  */
 class MessageEvent extends AbstractEvent implements EventContract
 {
