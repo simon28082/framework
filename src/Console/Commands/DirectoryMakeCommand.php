@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Artisan\Commands;
+namespace CrCms\Foundation\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

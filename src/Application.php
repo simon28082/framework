@@ -7,6 +7,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as BaseApplication;
+use CrCms\Foundation\ServerApplication as ServerApplicationContract;
+use CrCms\Foundation\Laravel\Application as LaravelApplication;
+use BadMethodCallException;
 
 /**
  * Class Application
@@ -43,6 +46,33 @@ class Application extends BaseApplication implements Container
      * @var bool
      */
     protected $hasBeenDeferredBootstrapped = false;
+
+    /**
+     * @var ServerApplicationContract
+     */
+    protected $serverApplication;
+
+    /**
+     * Application constructor.
+     * @param null|string $basePath
+     * @param ServerApplication|null $application
+     */
+    public function __construct(?string $basePath = null, ?ServerApplicationContract $application = null)
+    {
+        $this->initServiceApplication($application);
+        parent::__construct($basePath);
+    }
+
+    /**
+     * @param ServerApplication|null $application
+     */
+    public function initServiceApplication(?ServerApplicationContract $application = null)
+    {
+        $this->serverApplication = $application ? $application : $this->defaultServerApplication();
+        $this->serverApplication->setApp($this);
+        $this->instance('app.server', $this->serverApplication);
+        $this->instance(ServerApplicationContract::class, $this->serverApplication);
+    }
 
     /**
      * @param array $bootstrappers
@@ -82,20 +112,6 @@ class Application extends BaseApplication implements Container
         $this->useExtensionPath($this->extensionPath());
 
         parent::bindPathsInContainer();
-    }
-
-    /**
-     * Register the basic bindings into the container.
-     *
-     * @return void
-     */
-    protected function registerBaseBindings()
-    {
-        parent::registerBaseBindings();
-
-        $this->instance(BasePackageManifest::class, new PackageManifest(
-            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
-        ));
     }
 
     /**
@@ -204,9 +220,9 @@ class Application extends BaseApplication implements Container
      *
      * @return string
      */
-    public function getCachedServicesPath()
+    public function getCachedServicesPath(): string
     {
-        return $this->storagePath() . '/run-cache/services.php';
+        return $this->serverApplication->getCachedServicesPath();
     }
 
     /**
@@ -214,9 +230,9 @@ class Application extends BaseApplication implements Container
      *
      * @return string
      */
-    public function getCachedPackagesPath()
+    public function getCachedPackagesPath(): string
     {
-        return $this->storagePath() . '/run-cache/packages.php';
+        return $this->serverApplication->getCachedPackagesPath();
     }
 
     /**
@@ -224,34 +240,80 @@ class Application extends BaseApplication implements Container
      *
      * @return string
      */
-    public function getCachedConfigPath()
+    public function getCachedConfigPath(): string
     {
-        return $this->storagePath() . '/run-cache/config.php';
+        return $this->serverApplication->getCachedConfigPath();
     }
 
     /**
      * @return string
      */
-    public function getCachedRoutesPath()
+    public function getCachedRoutesPath(): string
     {
-        return $this->storagePath() . '/run-cache/routes.php';
+        return $this->serverApplication->getCachedRoutesPath();
     }
 
     /**
      * @param string $path
      * @return string
      */
-    public function bootstrapPath($path = '')
+    public function bootstrapPath($path = ''): string
     {
-        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src/Bootstrap' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
-     *
+     * @return void
      */
     public function registerCoreContainerAliases()
     {
         parent::registerCoreContainerAliases();
         $this->alias('app', self::class);
+        $this->alias('app.server', get_class($this->serverApplication));
+        $this->alias('app.server', ServerApplicationContract::class);
+    }
+
+    /**
+     * @return ServerApplication
+     */
+    public function defaultServerApplication(): ServerApplication
+    {
+        return new LaravelApplication;
+    }
+
+    /**
+     * @return ServerApplication
+     */
+    public function getServerApplication(): ServerApplicationContract
+    {
+        return $this->serverApplication;
+    }
+
+    /**
+     * Register the basic bindings into the container.
+     *
+     * @return void
+     */
+    protected function registerBaseBindings()
+    {
+        parent::registerBaseBindings();
+
+        $this->instance(BasePackageManifest::class, new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->serverApplication, $name)) {
+            return $this->serverApplication->$name(...$arguments);
+        }
+
+        throw new BadMethodCallException("The method[{$name}] is not exists");
     }
 }

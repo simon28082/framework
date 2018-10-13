@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Artisan;
+namespace CrCms\Foundation\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\RegisterProviders as BaseRegisterProviders;
@@ -17,10 +17,12 @@ class RegisterProviders extends BaseRegisterProviders
     {
         parent::bootstrap($app);
 
-        $providers = Collection::make($app->make('config')->get('http.providers'));
+        $app->make('app.server')->registerConfiguredProviders();
+
+        /*$providers = Collection::make($app->make('config')->get('http.providers'));
         $microServiceProviders = Collection::make($app->make('config')->get('micro-service.providers'));
 
         (new ProviderRepository($app, new Filesystem, $app->getCachedServicesPath()))
-            ->load($providers->merge($microServiceProviders)->toArray());
+            ->load($providers->merge($microServiceProviders)->toArray());*/
     }
 }

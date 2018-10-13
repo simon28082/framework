@@ -63,7 +63,11 @@ abstract class AbstractServer implements StartActionContract
      * @var array
      */
     protected $defaultSettings = [
-        'package_max_length' => 1024 * 1024 * 10
+        'package_max_length' => 1024 * 1024 * 10,
+        'chroot' => '/tmp',
+        'user' => 'daemon',
+        'group' => 'daemon',
+        'open_tcp_keepalive' => 1,
     ];
 
     /**

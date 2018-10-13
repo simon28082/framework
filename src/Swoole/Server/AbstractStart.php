@@ -70,7 +70,7 @@ class AbstractStart implements StartContract
      * @param array $params
      */
     public function run(Container $app, array $params): void
-    {
+    {$params = array_values($params);
         $config = require config_path('swoole.php');
         $this->serverManager = $serverManager = new Server\ServerManager(
             $app,

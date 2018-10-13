@@ -1,7 +1,8 @@
 <?php
 
-namespace CrCms\Foundation\Artisan;
+namespace CrCms\Foundation\Console;
 
+use CrCms\Foundation\Swoole\ServerCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -18,7 +19,7 @@ class Kernel extends ConsoleKernel
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
         \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
-        \CrCms\Foundation\Artisan\RegisterProviders::class,
+        \CrCms\Foundation\Console\RegisterProviders::class,
         //\Illuminate\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
@@ -29,7 +30,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        ServerCommand::class,
     ];
 
     /**

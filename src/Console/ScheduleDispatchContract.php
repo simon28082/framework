@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Artisan;
+namespace CrCms\Foundation\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 
