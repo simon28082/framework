@@ -88,6 +88,8 @@ class Start
             $mode = 'laravel';
         }
 
+        putenv("CRCMS_ENV={$mode}");
+
         return $mode;
     }
 
