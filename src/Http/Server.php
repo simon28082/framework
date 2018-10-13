@@ -10,7 +10,7 @@
 namespace CrCms\Foundation\Http;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\Http\Events\RequestEvent;
+use CrCms\Foundation\Http\Events\RequestEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Contracts\Http\Kernel;
 use Swoole\Http\Server as HttpServer;
