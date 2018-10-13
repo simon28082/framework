@@ -1,13 +1,13 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server\Commands;
+namespace CrCms\Foundation\MicroService\Commands;
 
 use CrCms\Foundation\Swoole\AbstractServerCommand;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 
 /**
  * Class ServerCommand
- * @package CrCms\Foundation\MicroService\Server\Commands
+ * @package CrCms\Foundation\MicroService\Commands
  */
 class ServerCommand extends AbstractServerCommand
 {
@@ -21,7 +21,7 @@ class ServerCommand extends AbstractServerCommand
      */
     public function server(): ServerContract
     {
-        return new \CrCms\Foundation\Swoole\MicroService\Server(
+        return new \CrCms\Foundation\MicroService\Server(
             $this->getLaravel(),
             config("swoole.servers.{$this->server}")
         );

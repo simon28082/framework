@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server\Contracts;
+namespace CrCms\Foundation\MicroService\Contracts;
 
 /**
  * Interface Kernel

@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\Console;
 
-use CrCms\Foundation\MicroService\Server\Commands\ServerCommand;
+use CrCms\Foundation\MicroService\Commands\ServerCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use CrCms\Foundation\Application;

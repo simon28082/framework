@@ -1,9 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server;
+namespace CrCms\Foundation\MicroService;
 
 use CrCms\Foundation\Application;
-use CrCms\Foundation\MicroService\Server\Contracts\Kernel as KernelContract;
+use CrCms\Foundation\MicroService\Contracts\Kernel as KernelContract;
 use Illuminate\Routing\Router;
 use Exception;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -47,7 +47,7 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $deferredBootstrappers = [
-        \CrCms\Foundation\MicroService\Server\RegisterProviders::class,
+        \CrCms\Foundation\MicroService\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
@@ -72,7 +72,7 @@ class Kernel implements KernelContract
      */
     protected $middlewareGroups = [
         'micro_service' => [
-            \CrCms\Foundation\MicroService\Server\Middleware\HashMiddleware::class,
+            \CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
 //            'throttle:60,1',
 //            'bindings',
             //\CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,

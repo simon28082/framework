@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server;
+namespace CrCms\Foundation\MicroService;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\RegisterProviders as BaseRegisterProviders;
@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class RegisterProviders
- * @package CrCms\Foundation\MicroService\Server
+ * @package CrCms\Foundation\MicroService
  */
 class RegisterProviders extends BaseRegisterProviders
 {

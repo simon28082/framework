@@ -7,12 +7,12 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\MicroService;
+namespace CrCms\Foundation\MicroService;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\MicroService\Events\RequestEvent;
+use CrCms\Foundation\MicroService\Events\RequestEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
-use CrCms\Foundation\MicroService\Server\Contracts\Kernel;
+use CrCms\Foundation\MicroService\Contracts\Kernel;
 use Swoole\Http\Server as HttpServer;
 
 /**

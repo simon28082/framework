@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server\Commands;
+namespace CrCms\Foundation\MicroService\Commands;
 
 use CrCms\Foundation\Client\Manager;
 use Illuminate\Console\Command;
@@ -8,7 +8,7 @@ use Exception;
 
 /**
  * Class ServiceRegisterCommand
- * @package CrCms\Foundation\MicroService\Server\Commands
+ * @package CrCms\Foundation\MicroService\Commands
  */
 class ServiceRegisterCommand extends Command
 {

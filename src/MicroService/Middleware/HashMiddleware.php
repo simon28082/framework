@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Server\Middleware;
+namespace CrCms\Foundation\MicroService\Middleware;
 
 use Illuminate\Http\Request;
 use Closure;
@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * Class HashMiddleware
- * @package CrCms\Foundation\MicroService\Server\Middleware
+ * @package CrCms\Foundation\MicroService\Middleware
  */
 class HashMiddleware
 {

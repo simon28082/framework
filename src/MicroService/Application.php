@@ -42,8 +42,8 @@ class Application implements ServerApplicationContract
     public function loadKernel(): void
     {
         $this->app->singleton(
-            \CrCms\Foundation\MicroService\Server\Contracts\Kernel::class,
-            \CrCms\Foundation\MicroService\Server\Kernel::class
+            \CrCms\Foundation\MicroService\Contracts\Kernel::class,
+            \CrCms\Foundation\MicroService\Kernel::class
         );
     }
 

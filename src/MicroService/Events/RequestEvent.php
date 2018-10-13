@@ -1,16 +1,15 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\MicroService\Events;
+namespace CrCms\Foundation\MicroService\Events;
 
 use Carbon\Carbon;
 use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 use Illuminate\Http\Response as IlluminateResponse;
-use Swoole\Async;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
 use Illuminate\Http\Request as IlluminateRequest;
-use CrCms\Foundation\MicroService\Server\Contracts\Kernel;
+use CrCms\Foundation\MicroService\Contracts\Kernel;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
