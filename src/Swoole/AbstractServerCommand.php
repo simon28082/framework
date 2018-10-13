@@ -2,44 +2,47 @@
 
 namespace CrCms\Foundation\Swoole;
 
+use CrCms\Foundation\Swoole\Process\ProcessManager;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
+use CrCms\Foundation\Swoole\Server\ServerManager;
 use Illuminate\Console\Command;
 use Exception;
 
-class AbstractServerCommand extends Command
+abstract class AbstractServerCommand extends Command
 {
     /**
      * @var string
      */
-    protected $signature = 'server {action}';
+    protected $signature = 'server:%s {action : start or stop or restart}';
+
+    /**
+     * @var string
+     */
+    protected $server;
+
+    /**
+     * AbstractServerCommand constructor.
+     */
+    public function __construct()
+    {
+        $this->signature = sprintf($this->signature, $this->server);
+        parent::__construct();
+    }
 
     /**
      * @return void
      */
     public function handle(): void
     {
-//        $action = $this->argument('action');
-//dd(get_class($this->laravel));
-//        dd($this->arguments());
-        (new MicroService())->run($this->laravel,$this->arguments());
-//
-//        $config = $this->config($name);
-//        $client = $this->client();
-//        try {
-//            $client->connection($name)
-//                ->request(
-//                    array_get($config, 'register.uri'),
-//                    ['payload' => array_except($config['register'], ['uri']), 'method' => 'put']
-//                );
-//            $response = $client->getResponse();
-//            if ($response->getStatusCode() === 200) {
-//                $this->info("Service register successful.");
-//            } else {
-//                $this->error('Service register failed.');
-//            }
-//        } catch (Exception $exception) {
-//            $this->error('Service register failed : ' . $exception->getMessage());
-//        } finally {
-//            $client->close();
-//        }
+        (new ServerManager)->run(
+            $this,
+            $this->server(),
+            new ProcessManager(config('swoole.process_file'))
+        );
     }
+
+    /**
+     * @return ServerContract
+     */
+    abstract public function server(): ServerContract;
 }
