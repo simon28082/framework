@@ -115,6 +115,14 @@ class Application extends BaseApplication implements Container
     }
 
     /**
+     * @return array
+     */
+    public function getServiceProviders(): array
+    {
+        return $this->serviceProviders;
+    }
+
+    /**
      * @return string
      */
     public function frameworkPath(string $path = ''): string
