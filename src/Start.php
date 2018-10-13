@@ -48,8 +48,13 @@ class Start
      */
     public function handle(array $params, ?string $basePath = null)
     {
+        $mode = $this->mode($params);
+
+        //如果指定了运行模式则判断后直接删除模式，否则会影响命令行
+        isset($params[1]) && $mode === $params[1] ? array_forget($params, 1) : null;
+
         $this->app = $this->app(
-            $this->parseServerApplication($params[1] ?? ''),
+            $this->parseServerApplication($mode),
             $basePath
         );
 
@@ -72,18 +77,27 @@ class Start
     }
 
     /**
-     * @param string $driver
+     * @param array $params
      * @return string
      */
-    protected function parseServerApplication(string $driver): string
+    protected function mode(array $params): string
     {
-        $driver = strpos($driver, ':') ? explode(':', $driver)[1] : $driver;
+        $mode = $params[1] ?? null;
 
-        if (!array_key_exists($driver, static::DRIVERS)) {
-            $driver = 'laravel';
+        if (!array_key_exists($mode, static::DRIVERS)) {
+            $mode = 'laravel';
         }
 
-        return static::DRIVERS[$driver];
+        return $mode;
+    }
+
+    /**
+     * @param string $mode
+     * @return string
+     */
+    protected function parseServerApplication(string $mode): string
+    {
+        return static::DRIVERS[$mode];
     }
 
     /**
