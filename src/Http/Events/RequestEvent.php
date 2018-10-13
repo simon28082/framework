@@ -1,12 +1,11 @@
 <?php
 
-namespace CrCms\Foundation\Swoole\Http\Events;
+namespace CrCms\Foundation\Http\Events;
 
 use Carbon\Carbon;
 use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 use Illuminate\Http\Response as IlluminateResponse;
-use Swoole\Async;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
 use Illuminate\Http\Request as IlluminateRequest;

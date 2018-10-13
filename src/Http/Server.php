@@ -7,7 +7,7 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\Http;
+namespace CrCms\Foundation\Http;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Http\Events\RequestEvent;
@@ -33,7 +33,7 @@ class Server extends AbstractServer implements ServerContract
      */
     public function bootstrap(): void
     {
-        //$this->app->make(Kernel::class)->bootstrap();
+        $this->app->make(Kernel::class)->bootstrap();
     }
 
     /**
