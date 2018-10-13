@@ -2,11 +2,13 @@
 
 namespace CrCms\Foundation\MicroService;
 
+use Illuminate\Foundation\PackageManifest;
 use CrCms\Foundation\ServerApplication as ServerApplicationContract;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\ProviderRepository;
 use CrCms\Foundation\Application as BaseApplication;
+use Illuminate\Support\Str;
 
 /**
  * Class Application
@@ -52,7 +54,10 @@ class Application implements ServerApplicationContract
      */
     public function registerConfiguredProviders(): void
     {
-        $providers = Collection::make($this->app->make('config')->get('micro-service.providers'));
+        $serverProviders = Collection::make($this->app->config['micro-service.providers']);
+        $disableProviders = Collection::make($this->app->config['micro-service.disable_providers']);
+
+        $providers = $this->app->getRegisterConfiguredProviders()->merge($serverProviders)->unique()->diff($disableProviders)->values();
 
         (new ProviderRepository($this->app, new Filesystem, $this->app->getCachedServicesPath()))
             ->load($providers->toArray());

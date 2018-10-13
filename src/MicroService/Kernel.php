@@ -41,14 +41,15 @@ class Kernel implements KernelContract
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
      * @var array
      */
     protected $deferredBootstrappers = [
-        \CrCms\Foundation\MicroService\RegisterProviders::class,
-        \Illuminate\Foundation\Bootstrap\BootProviders::class,
+
     ];
 
     /**

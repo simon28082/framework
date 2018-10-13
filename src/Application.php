@@ -10,6 +10,8 @@ use Illuminate\Foundation\Application as BaseApplication;
 use CrCms\Foundation\ServerApplication as ServerApplicationContract;
 use CrCms\Foundation\Laravel\Application as LaravelApplication;
 use BadMethodCallException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class Application
@@ -112,6 +114,21 @@ class Application extends BaseApplication implements Container
         $this->useExtensionPath($this->extensionPath());
 
         parent::bindPathsInContainer();
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getRegisterConfiguredProviders(): Collection
+    {
+        $providers = Collection::make($this->config['app.providers'])
+            ->partition(function ($provider) {
+                return Str::startsWith($provider, 'Illuminate\\');
+            });
+
+        $providers->splice(1, 0, [$this->make(BasePackageManifest::class)->providers()]);
+
+        return $providers->collapse();
     }
 
     /**
@@ -267,7 +284,7 @@ class Application extends BaseApplication implements Container
      */
     public function bootstrapPath($path = ''): string
     {
-        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src/Bootstrap/' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**

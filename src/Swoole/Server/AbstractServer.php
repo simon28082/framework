@@ -57,11 +57,6 @@ abstract class AbstractServer implements ServerActionContract
     /**
      * @var array
      */
-    protected $events = [];
-
-    /**
-     * @var array
-     */
     protected $defaultSettings = [
         'package_max_length' => 1024 * 1024 * 10,
         'chroot' => '/tmp',
@@ -69,6 +64,11 @@ abstract class AbstractServer implements ServerActionContract
         'group' => 'daemon',
         'open_tcp_keepalive' => 1,
     ];
+
+    /**
+     * @var array
+     */
+    protected $events = [];
 
     /**
      * @var array
