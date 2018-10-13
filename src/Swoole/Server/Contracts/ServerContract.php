@@ -18,7 +18,7 @@ use Swoole\Server;
 interface ServerContract
 {
     /**
-     *
+     * @return void
      */
     public function createServer(): void;
 

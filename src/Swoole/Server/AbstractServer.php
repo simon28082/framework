@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\Swoole\Server;
 
-use CrCms\Foundation\Swoole\Server\Contracts\StartActionContract;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerActionContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -15,7 +15,7 @@ use BadMethodCallException;
  * Class AbstractServer
  * @package CrCms\Foundation\Swoole\Server
  */
-abstract class AbstractServer implements StartActionContract
+abstract class AbstractServer implements ServerActionContract
 {
     /**
      * @var SwooleServer

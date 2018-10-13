@@ -1,9 +1,12 @@
 <?php
 
-namespace CrCms\Foundation\Swoole;
+namespace CrCms\Foundation\MicroService\Server\Commands;
 
 use CrCms\Foundation\Client\Manager;
+use CrCms\Foundation\MicroService\Server\Server;
 use CrCms\Foundation\Start\Drivers\MicroService;
+use CrCms\Foundation\Swoole\Process\ProcessManager;
+use CrCms\Foundation\Swoole\Server\ServerManager;
 use Illuminate\Console\Command;
 use Exception;
 
@@ -12,7 +15,8 @@ class ServerCommand extends Command
     /**
      * @var string
      */
-    protected $signature = 'server {action}';
+    protected $signature = 'server:micro-service {action : start or stop or restart}';
+
 
     /**
      * @return void
@@ -22,7 +26,22 @@ class ServerCommand extends Command
 //        $action = $this->argument('action');
 //dd(get_class($this->laravel));
 //        dd($this->arguments());
-        (new MicroService())->run($this->laravel,$this->arguments());
+
+//        $this->serverManager = $serverManager = new Server\ServerManager(
+//            $app,
+//            $config ,
+//            new \CrCms\Foundation\Swoole\MicroService\Server($app, $config['servers']['micro-service']),
+//
+//        );
+
+        (new ServerManager)->run(
+            $this,
+            new \CrCms\Foundation\Swoole\MicroService\Server(
+                $this->getLaravel(),
+                config('swoole.servers.micro-service')
+            ),
+            new ProcessManager(config('swoole.process_file'))
+        );
 //
 //        $config = $this->config($name);
 //        $client = $this->client();

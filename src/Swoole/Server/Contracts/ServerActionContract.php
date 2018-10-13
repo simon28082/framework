@@ -10,10 +10,10 @@
 namespace CrCms\Foundation\Swoole\Server\Contracts;
 
 /**
- * Interface StartActionContract
+ * Interface ServerActionContract
  * @package CrCms\Foundation\Swoole\Server\Contracts
  */
-interface StartActionContract
+interface ServerActionContract
 {
     /**
      * @return bool
