@@ -14,18 +14,23 @@ use Illuminate\Foundation\ProviderRepository;
  */
 class Application implements ServerApplication
 {
+    /**
+     * @var BaseApplication
+     */
     protected $app;
-//
-//    public function __construct(BaseApplication $application)
-//    {
-//        $this->app = $application;
-//    }
 
+    /**
+     * @param BaseApplication $app
+     * @return void
+     */
     public function setApp(BaseApplication $app)
     {
         $this->app = $app;
     }
 
+    /**
+     * @return void
+     */
     public function loadKernel(): void
     {
         $this->app->singleton(
@@ -34,6 +39,9 @@ class Application implements ServerApplication
         );
     }
 
+    /**
+     * @return void
+     */
     public function registerConfiguredProviders(): void
     {
         $providers = Collection::make($this->app->make('config')->get('http.providers'));
@@ -42,21 +50,33 @@ class Application implements ServerApplication
             ->load($providers->toArray());
     }
 
+    /**
+     * @return string
+     */
     public function getCachedServicesPath(): string
     {
         return $this->app->storagePath() . '/run-cache/laravel/services.php';
     }
 
+    /**
+     * @return string
+     */
     public function getCachedPackagesPath(): string
     {
         return $this->app->storagePath() . '/run-cache/laravel/packages.php';
     }
 
+    /**
+     * @return string
+     */
     public function getCachedConfigPath(): string
     {
         return $this->app->storagePath() . '/run-cache/laravel/config.php';
     }
 
+    /**
+     * @return string
+     */
     public function getCachedRoutesPath(): string
     {
         return $this->app->storagePath() . '/run-cache/laravel/routes.php';

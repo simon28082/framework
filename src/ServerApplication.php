@@ -10,7 +10,7 @@ interface ServerApplication
 {
     /**
      * @param Application $app
-     * @return mixed
+     * @return void
      */
     public function setApp(Application $app);
 

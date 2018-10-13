@@ -16,19 +16,14 @@ use CrCms\Foundation\Application as BaseApplication;
 class Application implements ServerApplicationContract
 {
     /**
-     * @var Container
+     * @var BaseApplication
      */
     protected $app;
 
-//    /**
-//     * Application constructor.
-//     * @param Container $app
-//     */
-//    public function __construct(BaseApplication $app)
-//    {
-//        $this->app = $app;
-//    }
-
+    /**
+     * @param BaseApplication $app
+     * @return void
+     */
     public function setApp(BaseApplication $app)
     {
         $this->app = $app;
