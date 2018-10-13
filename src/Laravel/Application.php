@@ -43,7 +43,7 @@ class Application implements ServerApplication
     {
         $this->app->singleton(
             \Illuminate\Contracts\Http\Kernel::class,
-            \CrCms\Foundation\Http\Kernel::class
+            \CrCms\Foundation\Laravel\Kernel::class
         );
     }
 
@@ -52,7 +52,10 @@ class Application implements ServerApplication
      */
     public function registerConfiguredProviders(): void
     {
-        $providers = Collection::make($this->app->make('config')->get('http.providers'));
+        $serverProviders = Collection::make($this->app->config['http.providers']);
+        $disableProviders = Collection::make($this->app->config['http.disable_providers'] ?? []);
+
+        $providers = $this->app->getRegisterConfiguredProviders()->merge($serverProviders)->unique()->diff($disableProviders)->values();
 
         (new ProviderRepository($this->app, new Filesystem, $this->app->getCachedServicesPath()))
             ->load($providers->toArray());
