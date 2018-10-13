@@ -15,6 +15,11 @@ interface ServerApplication
     public function setApp(Application $app);
 
     /**
+     * @return string
+     */
+    public function name(): string;
+
+    /**
      * @return void
      */
     public function loadKernel(): void;

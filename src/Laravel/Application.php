@@ -29,6 +29,14 @@ class Application implements ServerApplication
     }
 
     /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'Laravel';
+    }
+
+    /**
      * @return void
      */
     public function loadKernel(): void

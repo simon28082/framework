@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\MicroService;
 
 use CrCms\Foundation\ServerApplication as ServerApplicationContract;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\ProviderRepository;
@@ -27,6 +26,14 @@ class Application implements ServerApplicationContract
     public function setApp(BaseApplication $app)
     {
         $this->app = $app;
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'Micro-Service';
     }
 
     /**
