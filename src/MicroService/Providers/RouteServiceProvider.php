@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\MicroService;
+namespace CrCms\Foundation\MicroService\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
