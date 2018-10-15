@@ -28,7 +28,7 @@ class Start
      */
     const DRIVERS = [
         'laravel' => \CrCms\Foundation\Laravel\Application::class,
-        'micro-service' => \CrCms\Foundation\MicroService\Application::class,
+        'ms' => \CrCms\Foundation\MicroService\Application::class,
     ];
 
     /**
