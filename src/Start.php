@@ -81,7 +81,7 @@ class Start
      */
     protected function mode(array $params): string
     {
-        $mode = getenv('CRCMS_ENV');
+        $mode = getenv('CRCMS_MODE');
         if ($mode === false) {
             $mode = $params[1] ?? null;
         }
@@ -92,7 +92,7 @@ class Start
             $mode = 'laravel';
         }
 
-        putenv("CRCMS_ENV={$mode}");
+        putenv("CRCMS_MODE={$mode}");
 
         return $mode;
     }
