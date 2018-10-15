@@ -17,15 +17,13 @@ trait ProcessNameTrait
 {
     /**
      * @param string $name
-     * @return bool|void
+     * @return void
      */
     protected static function setProcessName(string $name)
     {
         if (function_exists('cli_set_process_title')) {
             return cli_set_process_title($name);
-        }
-
-        if (function_exists('swoole_set_process_name')) {
+        } elseif (function_exists('swoole_set_process_name')) {
             return swoole_set_process_name($name);
         }
     }
