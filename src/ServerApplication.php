@@ -25,6 +25,11 @@ interface ServerApplication
     public function loadKernel(): void;
 
     /**
+     * @return string
+     */
+    public function kernel(): string;
+
+    /**
      * @return void
      */
     public function registerConfiguredProviders(): void;

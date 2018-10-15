@@ -48,6 +48,14 @@ class Application implements ServerApplication
     }
 
     /**
+     * @return string
+     */
+    public function kernel(): string
+    {
+        return \Illuminate\Contracts\Http\Kernel::class;
+    }
+
+    /**
      * @return void
      */
     public function registerConfiguredProviders(): void

@@ -50,6 +50,14 @@ class Application implements ServerApplicationContract
     }
 
     /**
+     * @return string
+     */
+    public function kernel(): string
+    {
+        return \CrCms\Foundation\MicroService\Contracts\Kernel::class;
+    }
+
+    /**
      * @return void
      */
     public function registerConfiguredProviders(): void

@@ -145,7 +145,7 @@ class Start
      */
     protected function runWeb(array $params)
     {
-        $kernel = $this->app->make(HttpKernelContract::class);
+        $kernel = $this->app->make($this->app->getServerApplication()->kernel());
 
         $response = $kernel->handle(
             $request = Request::capture()
