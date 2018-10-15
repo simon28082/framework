@@ -86,6 +86,8 @@ class Start
             $mode = $params[1] ?? null;
         }
 
+        $mode = strtolower($mode);
+
         if (!array_key_exists($mode, static::DRIVERS)) {
             $mode = 'laravel';
         }
