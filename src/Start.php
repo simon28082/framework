@@ -50,8 +50,7 @@ class Start
     {
         $mode = $this->mode($params);
 
-        //如果指定了运行模式则判断后直接删除模式，否则会影响命令行
-        isset($params[1]) && $mode === $params[1] ? array_forget($params, 1) : null;
+        $params = $this->filterParams($mode, $params);
 
         $this->app = $this->app(
             $this->parseServerApplication($mode),
@@ -82,7 +81,10 @@ class Start
      */
     protected function mode(array $params): string
     {
-        $mode = $params[1] ?? null;
+        $mode = getenv('CRCMS_ENV');
+        if ($mode === false) {
+            $mode = $params[1] ?? null;
+        }
 
         if (!array_key_exists($mode, static::DRIVERS)) {
             $mode = 'laravel';
@@ -91,6 +93,21 @@ class Start
         putenv("CRCMS_ENV={$mode}");
 
         return $mode;
+    }
+
+    /**
+     * 过滤运行模式参数
+     *
+     * @param string $mode
+     * @param array $params
+     * @return array
+     */
+    protected function filterParams(string $mode, array $params): array
+    {
+        //如果指定了运行模式则判断后直接删除模式，否则会影响命令行
+        isset($params[1]) && $mode === $params[1] ? array_forget($params, 1) : null;
+
+        return $params;
     }
 
     /**
