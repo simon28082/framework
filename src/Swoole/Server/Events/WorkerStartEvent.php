@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\Swoole\Server\Events;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 /**
@@ -12,8 +11,6 @@ use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
  */
 class WorkerStartEvent extends AbstractEvent implements EventContract
 {
-    use ProcessNameTrait;
-
     /**
      * @var int
      */
@@ -35,23 +32,9 @@ class WorkerStartEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-        $this->setWorkOrTaskProcessName();
-    }
-
-    /**
-     *
-     */
-    protected function setWorkOrTaskProcessName(): void
-    {
-        $processPrefix = 'swoole_';
-//        $processPrefix = config('swoole.process_prefix');
-
-        $processName = (
-            $this->server->taskworker ?
-                $processPrefix . 'task_' :
-                $processPrefix . 'worker_'
-            ) . strval($this->workId);
-
-        static::setProcessName($processName);
+        parent::setEventProcessName(($this->server->taskworker ?
+                'task_' :
+                'worker_'
+            ) . strval($this->workId));
     }
 }

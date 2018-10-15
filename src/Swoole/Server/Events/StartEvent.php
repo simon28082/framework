@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\Swoole\Server\Events;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 
 /**
@@ -12,8 +11,6 @@ use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
  */
 class StartEvent extends AbstractEvent implements EventContract
 {
-    use ProcessNameTrait;
-
     /**
      * @param AbstractServer $server
      */
@@ -21,7 +18,6 @@ class StartEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-//        static::setProcessName( 'swoole_master');
-//        static::setProcessName(config('swoole.process_prefix') . 'master');
+        parent::setEventProcessName('master');
     }
 }
