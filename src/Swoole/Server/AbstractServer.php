@@ -79,14 +79,21 @@ abstract class AbstractServer implements ServerActionContract
     protected $process;
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
      * AbstractServer constructor.
      * @param Container $app
      * @param array $config
+     * @param null|string $name
      */
-    public function __construct(Container $app, array $config)//, \Swoole\Server $server = null)
+    public function __construct(Container $app, array $config, ?string $name = null)
     {
         $this->app = $app;
         $this->config = $config;
+        $this->name = $name;
     }
 
     /**
@@ -96,10 +103,12 @@ abstract class AbstractServer implements ServerActionContract
 
     /**
      * @param Process $process
+     * @return AbstractServer
      */
-    public function setProcess(Process $process)
+    public function setProcess(Process $process): AbstractServer
     {
         $this->process = $process;
+        return $this;
     }
 
     /**
@@ -108,6 +117,24 @@ abstract class AbstractServer implements ServerActionContract
     public function getProcess(): Process
     {
         return $this->process;
+    }
+
+    /**
+     * @param string $name
+     * @return AbstractServer
+     */
+    public function setName(string $name): AbstractServer
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**

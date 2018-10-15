@@ -26,7 +26,8 @@ class ServerCommand extends AbstractServerCommand
 
         return new \CrCms\Foundation\MicroService\Server(
             $this->getLaravel(),
-            config("swoole.servers.{$this->server}")
+            config("swoole.servers.{$this->server}"),
+            $this->server
         );
     }
 
