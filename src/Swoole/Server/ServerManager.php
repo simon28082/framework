@@ -5,7 +5,9 @@ namespace CrCms\Foundation\Swoole\Server;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Console\Command;
 use CrCms\Foundation\Swoole\Server;
-use Exception;
+use Swoole\Process;
+use Throwable;
+use RuntimeException;
 use CrCms\Foundation\Swoole\Process\ProcessManager;
 
 /**
@@ -49,20 +51,15 @@ class ServerManager implements Server\Contracts\ServerStartContract, Server\Cont
 
         if (in_array($action, $this->allows, true)) {
             try {
-                if ($this->{$action}()) {
-                    $command->getOutput()->success("{$action} successfully");
+                $result = call_user_func([$this, $action]);
+                if ($action === 'start') return;
+                if ($result === false) {
+                    $command->getOutput()->error("{$action} failed");
                 } else {
-                    $command->getOutput()->success("{$action} failed");
+                    $command->getOutput()->success("{$action} successfully");
                 }
-            } catch (Exception $exception) {
+            } catch (Throwable $exception) {
                 $command->getOutput()->error($exception->getMessage());
-                $command->getOutput()->block(
-                    "File:{$exception->getFile()} Line:{$exception->getLine()}" . PHP_EOL .
-                    "Message:" . $exception->getMessage() . PHP_EOL .
-                    "Code:" . $exception->getCode() . PHP_EOL .
-                    "Trace:" . PHP_EOL .
-                    $exception->getTraceAsString() . PHP_EOL
-                );
             }
         } else {
             $command->getOutput()->error("Allow only " . implode($this->allows, ' ') . "options");
@@ -74,16 +71,18 @@ class ServerManager implements Server\Contracts\ServerStartContract, Server\Cont
      */
     public function start(): bool
     {
-        if ($this->process->exists($this->command->argument('command'))) {
-            return true;
+        if (!$this->checkProcessExists()) {
+            $this->server->createServer();
+            $this->server->bootstrap();
+
+            // 写在前面，因为swoole 在 start之后就不再执行后面的代码了
+            // 如果有异常也会抛出不会执行此方法
+            $this->command->getOutput()->success("start successfully");
+
+            return $this->server->start();
         }
 
-        return $this->process->start(
-            new Server\Processes\ServerProcess(
-                $this->server, true
-            ),
-            $this->command->argument('command')
-        );
+        return true;
     }
 
     /**
@@ -91,11 +90,16 @@ class ServerManager implements Server\Contracts\ServerStartContract, Server\Cont
      */
     public function stop(): bool
     {
-        if (!$this->process->exists($this->command->argument('command'))) {
+        if (!$this->checkProcessExists()) {
+            throw new RuntimeException("The process not exists");
+        }
+
+        if (Process::kill($this->getPid())) {
+            @unlink($this->getPidFile());
             return true;
         }
 
-        return $this->process->kill($this->command->argument('command'));
+        return false;
     }
 
     /**
@@ -103,8 +107,40 @@ class ServerManager implements Server\Contracts\ServerStartContract, Server\Cont
      */
     public function restart(): bool
     {
-        $this->stop();
-        sleep(2);
+        if ($this->checkProcessExists()) {
+            $this->stop();
+            sleep(2);
+        }
+
         return $this->start();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPidFile(): string
+    {
+        return $this->server->pidFile();
+    }
+
+    /**
+     * @return int
+     */
+    protected function getPid(): int
+    {
+        $pidFile = $this->getPidFile();
+        if (!file_exists($pidFile)) {
+            return -99999;
+        }
+
+        return (int)file_get_contents($pidFile);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function checkProcessExists(): bool
+    {
+        return Process::kill($this->getPid(), 0);
     }
 }

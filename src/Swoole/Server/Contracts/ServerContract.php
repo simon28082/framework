@@ -22,9 +22,13 @@ interface ServerContract
      */
     public function createServer(): void;
 
-
     /**
      * @return Server
      */
     public function getServer(): Server;
+
+    /**
+     * @return string
+     */
+    public function pidFile(): string;
 }

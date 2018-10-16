@@ -3,10 +3,10 @@
 namespace CrCms\Foundation\Swoole\Server;
 
 use CrCms\Foundation\Swoole\Server\Contracts\ServerActionContract;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Exception;
 use Swoole\Process;
 use Swoole\Server as SwooleServer;
 use BadMethodCallException;
@@ -15,7 +15,7 @@ use BadMethodCallException;
  * Class AbstractServer
  * @package CrCms\Foundation\Swoole\Server
  */
-abstract class AbstractServer implements ServerActionContract
+abstract class AbstractServer implements ServerActionContract, ServerContract
 {
     /**
      * @var SwooleServer
@@ -59,7 +59,7 @@ abstract class AbstractServer implements ServerActionContract
      */
     protected $defaultSettings = [
         'package_max_length' => 1024 * 1024 * 10,
-        'daemonize' => false,
+        'daemonize' => true,
         'user' => 'daemon',
         'group' => 'daemon',
     ];
@@ -90,7 +90,7 @@ abstract class AbstractServer implements ServerActionContract
      * @param array $config
      * @param null|string $name
      */
-    public function __construct(Container $app, array $config, ?string $name = null)
+    public function __construct(Container $app, array $config, string $name)
     {
         $this->app = $app;
         $this->config = $config;
@@ -106,19 +106,19 @@ abstract class AbstractServer implements ServerActionContract
      * @param Process $process
      * @return AbstractServer
      */
-    public function setProcess(Process $process): AbstractServer
-    {
-        $this->process = $process;
-        return $this;
-    }
-
-    /**
-     * @return Process
-     */
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
+//    public function setProcess(Process $process): AbstractServer
+//    {
+//        $this->process = $process;
+//        return $this;
+//    }
+//
+//    /**
+//     * @return Process
+//     */
+//    public function getProcess(): Process
+//    {
+//        return $this->process;
+//    }
 
     /**
      * @param string $name
@@ -151,7 +151,8 @@ abstract class AbstractServer implements ServerActionContract
      */
     public function stop(): bool
     {
-        return $this->server->shutdown();
+        $this->server->shutdown();
+        return true;
     }
 
     /**
@@ -160,6 +161,18 @@ abstract class AbstractServer implements ServerActionContract
     public function restart(): bool
     {
         return $this->server->reload();
+    }
+
+    /**
+     * @return string
+     */
+    public function pidFile(): string
+    {
+        if (empty($this->config['settings']['pid_file'])) {
+            $this->config['settings']['pid_file'] = storage_path($this->name . '.pid');
+        }
+
+        return $this->config['settings']['pid_file'];
     }
 
     /**
