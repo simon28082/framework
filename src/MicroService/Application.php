@@ -2,6 +2,8 @@
 
 namespace CrCms\Foundation\MicroService;
 
+use CrCms\Foundation\Swoole\Server\Contracts\ServerBindApplicationContract;
+use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Foundation\PackageManifest;
 use CrCms\Foundation\ServerApplication as ServerApplicationContract;
 use Illuminate\Support\Collection;
@@ -14,12 +16,17 @@ use Illuminate\Support\Str;
  * Class Application
  * @package CrCms\Foundation\MicroService
  */
-class Application implements ServerApplicationContract
+class Application implements ServerApplicationContract, ServerBindApplicationContract
 {
     /**
      * @var BaseApplication
      */
     protected $app;
+
+    /**
+     * @var ServerContract
+     */
+    protected $server;
 
     /**
      * @param BaseApplication $app
@@ -36,6 +43,23 @@ class Application implements ServerApplicationContract
     public function name(): string
     {
         return 'Micro-Service';
+    }
+
+    /**
+     * @param ServerContract $server
+     * @return void
+     */
+    public function bindServer(ServerContract $server): void
+    {
+        $this->server = $server;
+    }
+
+    /**
+     * @return ServerContract
+     */
+    public function getServer(): ServerContract
+    {
+        return $this->server;
     }
 
     /**
