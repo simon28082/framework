@@ -80,7 +80,7 @@ class ServerManager implements Server\Contracts\ServerStartContract, Server\Cont
 
         return $this->process->start(
             new Server\Processes\ServerProcess(
-                $this->server
+                $this->server, true
             ),
             $this->command->argument('command')
         );

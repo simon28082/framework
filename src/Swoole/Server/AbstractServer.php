@@ -59,6 +59,7 @@ abstract class AbstractServer implements ServerActionContract
      */
     protected $defaultSettings = [
         'package_max_length' => 1024 * 1024 * 10,
+        'daemonize' => false,
         'user' => 'daemon',
         'group' => 'daemon',
     ];
