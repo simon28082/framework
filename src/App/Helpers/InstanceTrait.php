@@ -9,6 +9,7 @@
 
 namespace CrCms\Foundation\App\Helpers;
 
+use CrCms\Foundation\Swoole\Server\AbstractServer;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Str;
@@ -16,6 +17,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Swoole\Server;
 
 /**
  * @property-read Container $app
@@ -23,6 +25,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
  * @property-read Cache $cache
  * @property-read AuthFactory $auth
  * @property-read Dispatcher $dispatcher
+ * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
  * Trait ComponentTrait
  * @package CrCms\Foundation\App\Helpers
@@ -79,6 +82,14 @@ trait InstanceTrait
     public function guard(): Guard
     {
         return $this->auth->guard($this->config->get('auth.defaults.guard'));
+    }
+
+    /**
+     * @return AbstractServer
+     */
+    public function server(): AbstractServer
+    {
+        return $this->app->getServerApplication()->getServer();
     }
 
     /**
