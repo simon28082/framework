@@ -103,7 +103,7 @@ abstract class AbstractProcess implements ProcessContract
     public function __call(string $name, array $arguments)
     {
         if (method_exists($this->process, $name)) {
-            return $this->process->{$name(...$arguments)};
+            return $this->process->$name(...$arguments);
         }
 
         throw new BadMethodCallException("The method[{$name}] not exists");
