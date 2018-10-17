@@ -22,7 +22,7 @@ class HashMiddleware
         $token = $request->headers->get('Authorization');
         $hash = hash_hmac('ripemd256', serialize($request->all()), config('micro-service.secret'));
         if ($token !== $hash) {
-            throw new UnauthorizedHttpException($token);
+            throw new UnauthorizedHttpException(strval($token));
         }
 
         return $next($request);
