@@ -2,7 +2,6 @@
 
 namespace CrCms\Foundation\Swoole\Server\Events;
 
-use App\Modules\Sms\Tasks\TestTask;
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 use CrCms\Foundation\Swoole\Server\Contracts\TaskContract;
