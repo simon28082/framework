@@ -22,7 +22,12 @@ trait HideTrait
     /**
      * @var array
      */
-    protected $withoutFields = [];
+    protected $fields = [];
+
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * Set the keys that are supposed to be filtered out.
@@ -32,7 +37,19 @@ trait HideTrait
      */
     public function hide(array $fields): self
     {
-        $this->withoutFields = $fields;
+        $this->fields = $fields;
+        $this->type = 'hide';
+        return $this;
+    }
+
+    /**
+     * @param array $fields
+     * @return HideTrait
+     */
+    public function only(array $fields): self
+    {
+        $this->fields = $fields;
+        $this->type = 'only';
         return $this;
     }
 
@@ -44,8 +61,7 @@ trait HideTrait
      */
     protected function filterFields(array $array): array
     {
-        Arr::forget($array, $this->withoutFields);
-        return $array;
+        return Arr::{$this->type}($array, $this->fields);
     }
 
     /**
@@ -57,7 +73,7 @@ trait HideTrait
     protected function processCollection(Request $request): array
     {
         return $this->collection->map(function (Resource $resource) use ($request) {
-            return $resource->hide($this->withoutFields)->resolve($request);
+            return $resource->{$this->type}($this->fields)->resolve($request);
         })->all();
     }
 }
