@@ -6,6 +6,7 @@ use App\Modules\Sms\Tasks\TestTask;
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
 use CrCms\Foundation\Swoole\Server\Contracts\TaskContract;
+use Exception;
 
 /**
  * Class TaskEvent
@@ -43,6 +44,7 @@ class TaskEvent extends AbstractEvent implements EventContract
 
     /**
      * @param AbstractServer $server
+     * @throws Exception
      */
     public function handle(AbstractServer $server): void
     {
@@ -53,6 +55,16 @@ class TaskEvent extends AbstractEvent implements EventContract
         /* @var array $params */
         $params = $this->data['params'];
 
-        $this->server->finish($object->handle(...$params));
+        try {
+            $result = $object->handle(...$params);
+        } catch (Exception $exception) {
+            if (method_exists($object, 'failed')) {
+                $object->failed($exception);
+            }
+
+            throw $exception;
+        }
+
+        $this->server->finish($result);
     }
 }
