@@ -50,27 +50,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof UnauthorizedHttpException) {
-            return $this->unauthenticated($request, new AuthenticationException());
-        }
-
         return parent::render($request, $exception);
-    }
-
-    /**
-     * Convert an authentication exception into a response.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Illuminate\Auth\AuthenticationException $exception
-     * @return \Illuminate\Http\Response
-     */
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
-        $scheme = config('foundation.passport.ssl') ? 'https://' : 'http://';
-        $url = $scheme . config('foundation.passport.routes.login');
-
-        return $request->expectsJson()
-            ? response()->json(['message' => $exception->getMessage(), 'url' => $url], 401)
-            : redirect()->guest($url . '?_redirect=' . rawurlencode($request->fullUrl()));
     }
 }
