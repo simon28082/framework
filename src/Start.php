@@ -36,9 +36,17 @@ class Start
      * @param null|string $basePath
      * @return void
      */
-    public static function run(array $params, ?string $basePath = null): void
+    public static function run(array $params = [], ?string $basePath = null): void
     {
-        (new static())->handle($params);
+        static::instance()->handle($params);
+    }
+
+    /**
+     * @return Start
+     */
+    public static function instance(): self
+    {
+        return new static;
     }
 
     /**
@@ -52,10 +60,7 @@ class Start
 
         $params = $this->filterParams($mode, $params);
 
-        $this->app = $this->app(
-            $this->parseServerApplication($mode),
-            $basePath
-        );
+        $this->bindApp($mode, $basePath);
 
         $this->loadKernel();
 
@@ -63,16 +68,20 @@ class Start
     }
 
     /**
-     * @param string $serverApplicationName
+     * @param string $mode
      * @param null|string $basePath
      * @return Application
      */
-    protected function app(string $serverApplicationName, ?string $basePath = null): Application
+    public function bindApp(string $mode, ?string $basePath = null): Application
     {
-        return new \CrCms\Foundation\Application(
+        $serverApplicationName = $this->parseServerApplication($mode);
+
+        $this->app = new \CrCms\Foundation\Application(
             $basePath ? $basePath : realpath(__DIR__ . '/../../../../'),
             new $serverApplicationName
         );
+
+        return $this->app;
     }
 
     /**
@@ -124,7 +133,7 @@ class Start
     /**
      * @return void
      */
-    protected function loadKernel()
+    public function loadKernel()
     {
         $this->app->singleton(
             \Illuminate\Contracts\Console\Kernel::class,
