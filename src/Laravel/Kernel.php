@@ -53,7 +53,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
-            \CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
+            //\CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
             //\Barryvdh\Cors\HandleCors::class,
         ],
     ];
@@ -75,7 +75,5 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'passport.user' => \CrCms\Foundation\App\Http\Middleware\Passport\UserMiddleware::class,
-        'passport.auth' => \CrCms\Foundation\App\Http\Middleware\Passport\AuthMiddleware::class,
     ];
 }
