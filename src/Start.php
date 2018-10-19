@@ -5,7 +5,6 @@ namespace CrCms\Foundation;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 
 /**
  * Class Start
@@ -22,6 +21,11 @@ class Start
      * @var array
      */
     protected $params;
+
+    /**
+     * @var string
+     */
+    protected $mode;
 
     /**
      * @var array
@@ -54,45 +58,56 @@ class Start
      * @param null|string $basePath
      * @return void
      */
-    public function handle(array $params, ?string $basePath = null)
+    public function handle(array $params, ?string $basePath = null): void
     {
-        $mode = $this->mode($params);
-
-        $params = $this->filterParams($mode, $params);
-
-        $this->bindApp($mode, $basePath);
-
-        $this->loadKernel();
+        $this->bootstrap($params['mode'] ?? $params[1] ?? null, $basePath);
 
         $this->app->runningInConsole() ? $this->runConsole($params) : $this->runWeb($params);
     }
 
     /**
-     * @param string $mode
+     * @param null|string $mode
+     */
+    public function bootstrap(?string $mode = null, ?string $basePath = null): void
+    {
+        $this->mode = $this->mode($mode);
+
+        $this->app = $this->app($basePath);
+
+        $this->loadKernel();
+    }
+
+    /**
+     * @return Application
+     */
+    public function getApp(): Application
+    {
+        return $this->app;
+    }
+
+    /**
      * @param null|string $basePath
      * @return Application
      */
-    public function bindApp(string $mode, ?string $basePath = null): Application
+    protected function app(?string $basePath = null): Application
     {
-        $serverApplicationName = $this->parseServerApplication($mode);
+        $serverApplicationName = $this->parseServerApplication();
 
-        $this->app = new \CrCms\Foundation\Application(
+        return new \CrCms\Foundation\Application(
             $basePath ? $basePath : realpath(__DIR__ . '/../../../../'),
             new $serverApplicationName
         );
-
-        return $this->app;
     }
 
     /**
      * @param array $params
      * @return string
      */
-    protected function mode(array $params): string
+    protected function mode(?string $mode = null): string
     {
-        $mode = getenv('CRCMS_MODE');
-        if ($mode === false) {
-            $mode = $params[1] ?? null;
+        $envMode = getenv('CRCMS_MODE');
+        if ($envMode !== false) {
+            $mode = $envMode;
         }
 
         $mode = strtolower($mode);
@@ -107,27 +122,27 @@ class Start
     }
 
     /**
-     * 过滤运行模式参数
+     * 过滤CLI运行模式参数
      *
      * @param string $mode
      * @param array $params
      * @return array
      */
-    protected function filterParams(string $mode, array $params): array
+    protected function consoleParams(array $params): array
     {
         //如果指定了运行模式则判断后直接删除模式，否则会影响命令行
-        isset($params[1]) && $mode === $params[1] ? array_forget($params, 1) : null;
+        isset($params[1]) && $this->mode === $params[1] ? array_forget($params, 1) : null;
+        array_forget($params, ['mode']);
 
         return $params;
     }
 
     /**
-     * @param string $mode
      * @return string
      */
-    protected function parseServerApplication(string $mode): string
+    protected function parseServerApplication(): string
     {
-        return static::DRIVERS[$mode];
+        return static::DRIVERS[$this->mode];
     }
 
     /**
@@ -171,6 +186,8 @@ class Start
      */
     protected function runConsole(array $params)
     {
+        $params = $this->consoleParams($params);
+
         $kernel = $this->app->make(\Illuminate\Contracts\Console\Kernel::class);
 
         $status = $kernel->handle(
