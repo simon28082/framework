@@ -67,14 +67,18 @@ class Start
 
     /**
      * @param null|string $mode
+     * @param null|string $basePath
+     * @return Start
      */
-    public function bootstrap(?string $mode = null, ?string $basePath = null): void
+    public function bootstrap(?string $mode = null, ?string $basePath = null): self
     {
         $this->mode = $this->mode($mode);
 
         $this->app = $this->app($basePath);
 
         $this->loadKernel();
+
+        return $this;
     }
 
     /**
