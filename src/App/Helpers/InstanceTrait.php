@@ -25,6 +25,7 @@ use Swoole\Server;
  * @property-read Cache $cache
  * @property-read AuthFactory $auth
  * @property-read Dispatcher $dispatcher
+ * @property-read Guard $guard
  * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
  * Trait ComponentTrait
@@ -72,7 +73,7 @@ trait InstanceTrait
      */
     public function dispatcher(): Dispatcher
     {
-        return app(Dispatcher::class);
+        return $this->app->make(Dispatcher::class);
     }
 
     /**
