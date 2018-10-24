@@ -14,8 +14,13 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-        //\Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-        \CrCms\Foundation\Http\RegisterProviders::class,
+    ];
+
+    /**
+     * @var array
+     */
+    protected $deferredBootstrappers = [
+        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
@@ -76,4 +81,35 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
+
+    /**
+     * Send the given request through the middleware / router.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    protected function sendRequestThroughRouter($request)
+    {
+        $this->app->instance('request', $request);
+
+        Facade::clearResolvedInstance('request');
+
+        $this->bootstrap();
+        $this->deferredBootstrap();
+
+        return (new Pipeline($this->app))
+            ->send($request)
+            ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+            ->then($this->dispatchToRouter());
+    }
+
+    /**
+     * @return void
+     */
+    public function deferredBootstrap()
+    {
+        if (! $this->app->hasBeenDeferredBootstrapped()) {
+            $this->app->deferredBootstrapWith($this->deferredBootstrappers);
+        }
+    }
 }

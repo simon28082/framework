@@ -33,6 +33,7 @@ class Start
     const DRIVERS = [
         'laravel' => \CrCms\Foundation\Laravel\Application::class,
         'ms' => \CrCms\Foundation\MicroService\Application::class,
+        'http' => \CrCms\Foundation\Http\Application::class,
     ];
 
     /**

@@ -50,9 +50,18 @@ class Server extends AbstractServer implements ServerContract
         ];
 
         $this->server = new HttpServer(...$serverParams);
+        $this->setPidFile();
         $this->setSettings($this->config['settings'] ?? []);
         $this->eventDispatcher($this->config['events'] ?? []);
     }
 
-
+    /**
+     * @return void
+     */
+    protected function setPidFile()
+    {
+        if (empty($this->config['settings']['pid_file'])) {
+            $this->config['settings']['pid_file'] = $this->pidFile();
+        }
+    }
 }
