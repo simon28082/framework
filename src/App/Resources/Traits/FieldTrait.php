@@ -14,10 +14,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 /**
- * Trait HideTrait
+ * Trait FieldTrait
  * @package CrCms\Foundation\App\Resources\Traits
  */
-trait HideTrait
+trait FieldTrait
 {
     /**
      * @var array
@@ -27,7 +27,7 @@ trait HideTrait
     /**
      * @var string
      */
-    protected $type;
+    protected $type = 'only';
 
     /**
      * Set the keys that are supposed to be filtered out.
@@ -38,7 +38,7 @@ trait HideTrait
     public function hide(array $fields): self
     {
         $this->fields = $fields;
-        $this->type = 'hide';
+        $this->type = 'except';
         return $this;
     }
 

@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\App\Http\Resources;
 
-use CrCms\Foundation\App\Resources\Traits\HideTrait;
+use CrCms\Foundation\App\Resources\Traits\FieldTrait;
 use CrCms\Foundation\App\Resources\Traits\IncludeTrait;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 
 class Resource extends BaseResource
 {
-    use IncludeTrait, HideTrait;
+    use IncludeTrait, FieldTrait;
 
     /**
      * @param null $request
