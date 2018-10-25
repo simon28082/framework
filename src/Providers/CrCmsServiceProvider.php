@@ -32,28 +32,22 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerCommands();
+        $this->registerAlias();
 
-        $this->app->bind(DataProviderContract::class, function ($app) {
+        $this->registerServices();
+
+        $this->registerCommands();
+    }
+
+    /**
+     * @return void
+     */
+    protected function registerServices(): void
+    {
+        $this->app->bind('data.provider', function ($app) {
             return new DataProvider($app['request']);
         });
-    }
 
-    /**
-     *
-     */
-    protected function registerCommands()
-    {
-        $this->registerDirectoryMakeCommand();
-        $this->commands('command.crcms.make.directory');
-        $this->commands('command.route.cache');
-    }
-
-    /**
-     *
-     */
-    protected function registerDirectoryMakeCommand()
-    {
         $this->app->singleton('command.crcms.make.directory', function ($app) {
             return new DirectoryMakeCommand($app['files']);
         });
@@ -64,13 +58,33 @@ class CrCmsServiceProvider extends ServiceProvider
     }
 
     /**
+     * @return void
+     */
+    protected function registerCommands(): void
+    {
+        $this->commands('command.crcms.make.directory');
+        $this->commands('command.route.cache');
+    }
+
+    /**
+     * @return void
+     */
+    protected function registerAlias(): void
+    {
+        $this->app->alias('data.provider', DataProviderContract::class);
+        $this->app->alias('command.crcms.make.directory', DirectoryMakeCommand::class);
+        $this->app->alias('command.route.cache', RouteCacheCommand::class);
+    }
+
+    /**
      * @return array
      */
     public function provides(): array
     {
         return [
-            DataProviderContract::class,
+            'data.provider',
             'command.crcms.make.directory',
+            'command.route.cache',
         ];
     }
 }
