@@ -10,6 +10,7 @@
 namespace CrCms\Foundation\App\Helpers;
 
 use CrCms\Foundation\Swoole\Server\AbstractServer;
+use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Str;
@@ -18,6 +19,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Swoole\Server;
+use InvalidArgumentException;
 
 /**
  * @property-read Container $app
@@ -26,6 +28,7 @@ use Swoole\Server;
  * @property-read AuthFactory $auth
  * @property-read Dispatcher $dispatcher
  * @property-read Guard $guard
+ * @property-read DataProviderContract $data
  * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
  * Trait ComponentTrait
@@ -86,11 +89,26 @@ trait InstanceTrait
     }
 
     /**
+     * @return DataProviderContract
+     */
+    public function data(): DataProviderContract
+    {
+        return $this->app->make('data.provider');
+    }
+
+    /**
      * @return AbstractServer
      */
     public function server(): AbstractServer
     {
-        return $this->app->getServerApplication()->getServer();
+        $serverApplication = $this->app->getServerApplication();
+
+        if ($serverApplication instanceof AbstractServer) {
+            return $serverApplication->getServer();
+        }
+
+        $class = get_class($serverApplication);
+        throw new InvalidArgumentException("The server application[{$class}] is not instanceof AbstractServer");
     }
 
     /**
