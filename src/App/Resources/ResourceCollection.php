@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\App\Http\Resources;
 
-use CrCms\Foundation\App\Resources\Traits\HideTrait;
+use CrCms\Foundation\App\Resources\Traits\FieldTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection as BaseResourceCollection;
 
@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection as BaseResourceCollection;
  */
 class ResourceCollection extends BaseResourceCollection
 {
-    use HideTrait;
+    use FieldTrait;
 
     /**
      * ResourceCollection constructor.

@@ -27,13 +27,13 @@ trait FieldTrait
     /**
      * @var string
      */
-    protected $type = 'only';
+    protected $type = 'except';
 
     /**
      * Set the keys that are supposed to be filtered out.
      *
      * @param array $fields
-     * @return $this
+     * @return FieldTrait
      */
     public function hide(array $fields): self
     {
@@ -44,7 +44,16 @@ trait FieldTrait
 
     /**
      * @param array $fields
-     * @return HideTrait
+     * @return FieldTrait
+     */
+    public function except(array $fields): self
+    {
+        return $this->hide($fields);
+    }
+
+    /**
+     * @param array $fields
+     * @return FieldTrait
      */
     public function only(array $fields): self
     {

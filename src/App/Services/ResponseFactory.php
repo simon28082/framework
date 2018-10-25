@@ -81,72 +81,30 @@ class ResponseFactory
     }
 
     /**
-     * @param $collection
-     * @param string $collect
-     * @param array $hide
+     * @param ResourceCollection $collection
      * @return JsonResponse
      */
-    public function collection($collection, string $collect = '', array $hide = []): JsonResponse
+    public function collection(ResourceCollection $collection): JsonResponse
     {
-        if (is_object($collection) && $collection instanceof ResourceCollection) {
-            return $collection->hide($hide)->response();
-        }
-
-        if (!class_exists($collect)) {
-            throw new InvalidArgumentException('Non-existent resource converter');
-        }
-
-        if (substr($collect, -8) === 'Resource') {
-            return call_user_func([$collect, 'collection'], $collection)->hide($hide)->response();
-        } elseif (substr($collect, -10) === 'Collection') {
-            return (new $collect($collection))->hide($hide)->response();
-        } else {
-            throw new InvalidArgumentException('Non-existent resource converter');
-        }
+        return $collection->response();
     }
 
     /**
-     * @param $resource
-     * @param string $collect
-     * @param array $hide
+     * @param Resource $resource
      * @return JsonResponse
      */
-    public function resource($resource, string $collect = '', array $hide = []): JsonResponse
+    public function resource(Resource $resource): JsonResponse
     {
-        if (is_object($resource) && $resource instanceof Resource) {
-            return $resource->hide($hide)->response();
-        }
-
-        if (!class_exists($collect)) {
-            throw new InvalidArgumentException('Non-existent resource converter');
-        }
-
-        return (new $collect($resource))->hide($hide)->response();
+        return $resource->response();
     }
 
     /**
-     * @param $paginator
-     * @param string $collect
-     * @param array $hide
+     * @param ResourceCollection $paginator
      * @return JsonResponse
      */
-    public function paginator($paginator, string $collect = '', array $hide = []): JsonResponse
+    public function paginator(ResourceCollection $paginator): JsonResponse
     {
-        if (is_object($paginator) && $paginator instanceof ResourceCollection) {
-            return $paginator->hide($hide)->response();
-        }
-
-        if (!class_exists($collect)) {
-            throw new InvalidArgumentException('Non-existent resource converter');
-        }
-
-        if (substr($collect, -10) === 'Collection') {
-            return (new $collect($paginator))->hide($hide)->response();
-        } elseif (substr($collect, -8) === 'Resource') {
-            return (new ResourceCollection($paginator, $collect))->hide($hide)->response();
-        } else {
-            throw new InvalidArgumentException('Non-existent resource converter');
-        }
+        return $this->collection($paginator);
     }
 
     /***
