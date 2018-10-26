@@ -5,9 +5,7 @@ namespace CrCms\Foundation\App\Services;
 use CrCms\Foundation\App\Http\Resources\ResourceCollection;
 use Illuminate\Http\JsonResponse;
 use CrCms\Foundation\App\Http\Resources\Resource;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use BadMethodCallException;
@@ -81,30 +79,61 @@ class ResponseFactory
     }
 
     /**
-     * @param ResourceCollection $collection
+     * @param $collection
+     * @param string $collect
+     * @param array $fields
+     * @param array $includes
      * @return JsonResponse
      */
-    public function collection(ResourceCollection $collection): JsonResponse
+    public function collection($collection, string $collect = '', array $fields = [], array $includes = []): JsonResponse
     {
-        return $collection->response();
+        if (!$collection instanceof ResourceCollection && class_exists($collect)) {
+            if (substr($collect, -8) === 'Resource') {
+                $collection = call_user_func([$collect, 'collection'], $collection);
+            } elseif (substr($collect, -10) === 'Collection') {
+                $collection = (new $collect($collection));
+            } else {
+                throw new InvalidArgumentException('Non-existent resource converter');
+            }
+        }
+
+        if (!$collection instanceof ResourceCollection) {
+            throw new InvalidArgumentException('Non-existent resource converter');
+        }
+
+        return $this->resourceToResponse($collection, $fields, $includes);
     }
 
     /**
-     * @param Resource $resource
+     * @param $resource
+     * @param string $collect
+     * @param array $fields
+     * @param array $includes
      * @return JsonResponse
      */
-    public function resource(Resource $resource): JsonResponse
+    public function resource($resource, string $collect = '', array $fields = [], array $includes = []): JsonResponse
     {
-        return $resource->response();
+        if (!$resource instanceof Resource && class_exists($collect)) {
+            $resource = (new $collect($resource));
+        }
+
+        if (!$resource instanceof Resource) {
+            throw new InvalidArgumentException('Non-existent resource converter');
+        }
+
+        return $this->resourceToResponse($resource, $fields, $includes);
     }
 
     /**
-     * @param ResourceCollection $paginator
+     * @param $paginator
+     * @param string $collect
+     * @param array $fields
+     * @param array $includes
      * @return JsonResponse
      */
-    public function paginator(ResourceCollection $paginator): JsonResponse
+    public function paginator($paginator, string $collect = '', array $fields = [], array $includes = []): JsonResponse
     {
-        return $this->collection($paginator);
+        return $this->collection($paginator, $collect, $fields, $includes);
     }
 
     /***
@@ -224,6 +253,23 @@ class ResponseFactory
         }
 
         return $this->array([$key => $data]);
+    }
+
+    /**
+     * @param ResourceCollection|Resource $resource
+     * @param array $fields
+     * @param array $includes
+     * @return JsonResponse
+     */
+    protected function resourceToResponse($resource, array $fields, array $includes = []): JsonResponse
+    {
+        if ($includes) {
+            $resource->setIncludes($includes);
+        }
+
+        list($type, $fields) = [$fields['type'] ?? 'hide', $fields['fields'] ?? $fields];
+
+        return $resource->$type($fields)->response();
     }
 
     /**
