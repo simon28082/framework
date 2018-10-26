@@ -248,6 +248,8 @@ class ResponseFactory
             $data = $data->jsonSerialize();
         } elseif ($data instanceof Traversable) {
             $data = iterator_to_array($data);
+        } elseif (is_object($data)) {
+            $data = get_object_vars($data);
         } else {
             throw new InvalidArgumentException('Incorrect parameter format');
         }
