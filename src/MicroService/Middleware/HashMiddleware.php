@@ -4,6 +4,7 @@ namespace CrCms\Foundation\MicroService\Middleware;
 
 use Illuminate\Http\Request;
 use Closure;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
@@ -19,10 +20,10 @@ class HashMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('X-CRCMS-Microservice-Hash');
         $hash = hash_hmac('ripemd256', serialize($request->all()), config('micro-service.secret'));
         if ($token !== $hash) {
-            throw new UnauthorizedHttpException(strval($token));
+            throw new AccessDeniedHttpException(strval($token));
         }
 
         return $next($request);
