@@ -97,7 +97,7 @@ trait IncludeTrait
             $includes = array_merge($includes, $this->defaultIncludes);
         }
 
-        return $includes;
+        return array_unique($includes);
     }
 
     /**
