@@ -265,11 +265,19 @@ class ResponseFactory
      */
     protected function resourceToResponse($resource, array $fields, array $includes = []): JsonResponse
     {
-        if ($includes) {
+        if ($includes && $resource instanceof Resource) {
             $resource->setIncludes($includes);
         }
 
-        list($type, $fields) = [$fields['type'] ?? 'hide', $fields['fields'] ?? $fields];
+        if (isset($fields['only'])) {
+            $type = 'only';
+            $fields = $fields['only'];
+        } elseif (isset($fields['except']) || isset($fields['hide'])) {
+            $type = 'except';
+            $fields = $fields['except'] ?? $fields['hide'];
+        } else {
+            $type = 'except';
+        }
 
         return $resource->$type($fields)->response();
     }
