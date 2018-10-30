@@ -47,7 +47,8 @@ class Resource extends BaseResource
         $includes = $this->includes($request);
 
         if ($this->fields && $includes) {
-            $includes = call_user_func("array_{$this->type}", $includes, $this->fields);
+            $func = $this->type === 'only' ? 'array_intersect' : 'array_diff';
+            $includes = call_user_func($func, $includes, $this->fields);
         }
 
         return array_merge(
