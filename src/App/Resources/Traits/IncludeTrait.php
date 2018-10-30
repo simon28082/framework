@@ -88,9 +88,16 @@ trait IncludeTrait
      * @param Request $request
      * @return array
      */
-    protected function includes(Request $request): array
+    public function includes(Request $request): array
     {
-        return array_merge($this->parseIncludeParams($request), $this->includes);
+        $includes = array_merge($this->parseIncludeParams($request), $this->includes);
+
+        //原有属性兼容
+        if (property_exists($this, 'defaultIncludes')) {
+            $includes = array_merge($includes, $this->defaultIncludes);
+        }
+
+        return $includes;
     }
 
     /**
