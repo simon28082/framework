@@ -10,6 +10,9 @@
 namespace CrCms\Foundation\App\Resources\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -28,7 +31,7 @@ trait IncludeTrait
     /**
      * @var string
      */
-    protected $includeRequestKey = 'include';
+    protected $includeRequestKey = 'includes';
 
     /**
      * @param array $includes
@@ -96,7 +99,7 @@ trait IncludeTrait
      */
     protected function parseIncludeParams(Request $request): array
     {
-        $includes = $request->input($this->includeRequestKey);
+        $includes = $request->input($this->includeRequestKey, []);
         return is_array($includes) ? $includes : explode(',', $includes);
     }
 
@@ -127,6 +130,14 @@ trait IncludeTrait
      */
     protected function resolveIncludeResource(Request $request, $resource)
     {
+        if ($resource instanceof Resource) {
+            $resource = $resource->resolve($request);
+        } elseif ($resource instanceof ResourceCollection) {
+            $resource = $resource->resource instanceof AbstractPaginator ?
+                $resource->toResponse($request)->getData() :
+                $resource->resolve($request);
+        }
+
         return $resource;
     }
 }
