@@ -174,7 +174,7 @@ abstract class AbstractDataProvider implements DataProviderContract, ArrayAccess
     protected function resolveData($object)
     {
         if ($object instanceof Request) {
-            return $object->all();
+            return array_merge($object->route()->parameters(), $object->all());
         } elseif ($object instanceof Arrayable) {
             return $object->toArray();
         } elseif (is_array($object)) {
