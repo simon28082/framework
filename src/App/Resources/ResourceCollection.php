@@ -31,7 +31,8 @@ class ResourceCollection extends BaseResourceCollection
      */
     public function toArray($request): array
     {
-        return $this->processCollection($request);
-//        return $this->collection->map->toArray($request)->all();
+        return $this->collection->map(function (Resource $resource) use ($request) {
+            return $resource->{$this->type}($this->fields)->resolve($request);
+        })->all();
     }
 }

@@ -44,8 +44,14 @@ class Resource extends BaseResource
      */
     protected function mergeIncludeData(Request $request): array
     {
+        $includes = $this->includes($request);
+
+        if ($this->type !== 'only' && $this->fields) {
+            $includes = array_except($includes, $this->fields);
+        }
+
         return array_merge(
-            $this->parseIncludes($request),
+            $this->execIncludes($includes, $request),
             $this->toArray($request)
         );
     }

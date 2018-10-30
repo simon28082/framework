@@ -10,6 +10,8 @@
 namespace CrCms\Foundation\App\Resources\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
@@ -21,7 +23,7 @@ trait IncludeTrait
     /**
      * @var array
      */
-    protected $defaultIncludes = [];
+    protected $includes = [];
 
     /**
      * @var string
@@ -34,20 +36,48 @@ trait IncludeTrait
      */
     public function setIncludes(array $includes): self
     {
-        $this->defaultIncludes = $includes;
+        $this->includes = $includes;
 
         return $this;
     }
 
     /**
      * @param string $include
-     * @return self
+     * @return IncludeTrait
      */
     public function addInclude(string $include): self
     {
-        if (!in_array($include, $this->defaultIncludes, true)) {
-            $this->defaultIncludes[] = $include;
+        if (!in_array($include, $this->includes, true)) {
+            $this->includes[] = $include;
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string $include
+     * @return IncludeTrait
+     */
+    public function removeInclude(string $include): self
+    {
+        $key = array_search($include, $this->includes);
+        if ($key) {
+            unset($this->includes[$key]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $includes
+     * @return IncludeTrait
+     */
+    public function removeIncludes(array $includes): self
+    {
+        array_map(function ($include) {
+            $this->removeInclude($include);
+        }, $includes);
+
         return $this;
     }
 
@@ -55,20 +85,19 @@ trait IncludeTrait
      * @param Request $request
      * @return array
      */
-    protected function parseIncludes(Request $request)
+    protected function includes(Request $request): array
     {
-        return $this->execIncludes(
-            $this->parseParams($request), $request
-        );
+        return array_merge($this->parseIncludeParams($request), $this->includes);
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    protected function parseParams(Request $request): array
+    protected function parseIncludeParams(Request $request): array
     {
-        return array_merge(explode(',', $request->input($this->includeRequestKey)), $this->defaultIncludes);
+        $includes = $request->input($this->includeRequestKey);
+        return is_array($includes) ? $includes : explode(',', $includes);
     }
 
     /**
@@ -78,7 +107,7 @@ trait IncludeTrait
      */
     protected function execIncludes(array $includes, Request $request): array
     {
-        return collect($includes)->map(function ($include) {
+        return (new Collection($includes))->map(function ($include) {
             return [
                 'key' => $include,
                 'method' => Str::camel("include-{$include}"),
@@ -86,8 +115,18 @@ trait IncludeTrait
         })->filter(function ($include) {
             return method_exists($this, $include['method']);
         })->mapWithKeys(function ($include) use ($request) {
-            $resource = call_user_func([$this, $include['method']], $this->resource, $request);
-            return [$include['key'] => $resource];
+            $resource = call_user_func([$this, $include['method']], $request);
+            return [$include['key'] => $this->resolveIncludeResource($request, $resource)];
         })->all();
+    }
+
+    /**
+     * @param Request $request
+     * @param $resource
+     * @return mixed
+     */
+    protected function resolveIncludeResource(Request $request, $resource)
+    {
+        return $resource;
     }
 }

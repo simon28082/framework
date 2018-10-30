@@ -72,17 +72,4 @@ trait FieldTrait
     {
         return Arr::{$this->type}($array, $this->fields);
     }
-
-    /**
-     * Send fields to hide to UsersResource while processing the collection.
-     *
-     * @param $request
-     * @return array
-     */
-    protected function processCollection(Request $request): array
-    {
-        return $this->collection->map(function (Resource $resource) use ($request) {
-            return $resource->{$this->type}($this->fields)->resolve($request);
-        })->all();
-    }
 }
