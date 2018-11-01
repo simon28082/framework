@@ -22,12 +22,12 @@ trait FieldTrait
     /**
      * @var array
      */
-    protected $fields = [];
+    protected $resourceFields = [];
 
     /**
      * @var string
      */
-    protected $type = 'except';
+    protected $resourceType = 'except';
 
     /**
      * Set the keys that are supposed to be filtered out.
@@ -37,8 +37,8 @@ trait FieldTrait
      */
     public function hide(array $fields): self
     {
-        $this->fields = $fields;
-        $this->type = 'except';
+        $this->resourceFields = $fields;
+        $this->resourceType = 'except';
         return $this;
     }
 
@@ -57,8 +57,8 @@ trait FieldTrait
      */
     public function only(array $fields): self
     {
-        $this->fields = $fields;
-        $this->type = 'only';
+        $this->resourceFields = $fields;
+        $this->resourceType = 'only';
         return $this;
     }
 
@@ -70,6 +70,6 @@ trait FieldTrait
      */
     protected function filterFields(array $array): array
     {
-        return Arr::{$this->type}($array, $this->fields);
+        return Arr::{$this->resourceType}($array, $this->resourceFields);
     }
 }
