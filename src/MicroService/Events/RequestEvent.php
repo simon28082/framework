@@ -3,8 +3,11 @@
 namespace CrCms\Foundation\MicroService\Events;
 
 use Carbon\Carbon;
+use CrCms\Foundation\Application;
 use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
+use Illuminate\Auth\AuthServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
@@ -14,6 +17,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use CrCms\Foundation\Swoole\Server\AbstractServer;
+use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 /**
  * Class RequestEvent
@@ -55,9 +59,6 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         $this->request = $request;
         $this->response = $response;
-        $this->kernel = app(Kernel::class);
-        $this->illuminateRequest = $this->createIlluminateRequest();
-        $this->illuminateResponse = $this->createIlluminateResponse();
     }
 
     /**
@@ -67,23 +68,26 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-//        $this->requestLog();
+        $kernel = $server->getApplication()->make(Kernel::class);
 
-        $this->setResponse();
+        $this->setResponse($kernel);
     }
 
     /**
      *
      */
-    protected function setResponse()
+    protected function setResponse(Kernel $kernel)
     {
-        $this->response->status($this->illuminateResponse->getStatusCode());
+        $illuminateRequest = $this->createIlluminateRequest();
+        $illuminateResponse = $this->createIlluminateResponse($kernel, $illuminateRequest);
 
-        foreach ($this->illuminateResponse->headers->allPreserveCaseWithoutCookies() as $key => $value) {
+        $this->response->status($illuminateResponse->getStatusCode());
+
+        foreach ($illuminateResponse->headers->allPreserveCaseWithoutCookies() as $key => $value) {
             $this->response->header($key, implode(';', $value));
         }
 
-        foreach ($this->illuminateResponse->headers->getCookies() as $cookie) {
+        foreach ($illuminateResponse->headers->getCookies() as $cookie) {
             $this->response->cookie(
                 $cookie->getName(),
                 $cookie->getValue(),
@@ -97,17 +101,21 @@ class RequestEvent extends AbstractEvent implements EventContract
 
         //$this->response->gzip(1);
 
-        $this->response->end($this->illuminateResponse->getContent());
+        $this->response->end($illuminateResponse->getContent());
 
-        $this->kernel->terminate($this->illuminateRequest, $this->illuminateResponse);
+        $kernel->terminate($illuminateRequest, $illuminateResponse);
+
+        //$this->requestLog();
     }
 
     /**
-     * @return IlluminateResponse
+     * @param Kernel $kernel
+     * @param IlluminateRequest $request
+     * @return Response
      */
-    protected function createIlluminateResponse(): Response
+    protected function createIlluminateResponse(Kernel $kernel, Request $request): Response
     {
-        return $this->kernel->handle($this->illuminateRequest);
+        return $kernel->handle($request);
     }
 
     /**
@@ -193,14 +201,14 @@ class RequestEvent extends AbstractEvent implements EventContract
     /**
      *
      */
-    protected function requestLog()
+    protected function requestLog(Request $illuminateRequest)
     {
-        $params = http_build_query($this->illuminateRequest->all());
+        $params = http_build_query($illuminateRequest->all());
         $currentTime = Carbon::now()->toDateTimeString();
-        $header = http_build_query($this->illuminateRequest->headers->all());
+        $header = http_build_query($illuminateRequest->headers->all());
 
-        $requestTime = Carbon::createFromTimestamp($this->illuminateRequest->server('REQUEST_TIME'));
-        $content = "RecordTime:{$currentTime} RequestTime:{$requestTime} METHOD:{$this->illuminateRequest->method()} IP:{$this->illuminateRequest->ip()} Params:{$params} Header:{$header}" . PHP_EOL;
+        $requestTime = Carbon::createFromTimestamp($illuminateRequest->server('REQUEST_TIME'));
+        $content = "RecordTime:{$currentTime} RequestTime:{$requestTime} METHOD:{$illuminateRequest->method()} IP:{$illuminateRequest->ip()} Params:{$params} Header:{$header}" . PHP_EOL;
 
         $this->server->getProcess()->write($content);
     }

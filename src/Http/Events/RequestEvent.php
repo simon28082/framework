@@ -55,9 +55,6 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         $this->request = $request;
         $this->response = $response;
-        $this->kernel = app(Kernel::class);
-        $this->illuminateRequest = $this->createIlluminateRequest();
-        $this->illuminateResponse = $this->createIlluminateResponse();
     }
 
     /**
@@ -67,7 +64,11 @@ class RequestEvent extends AbstractEvent implements EventContract
     {
         parent::handle($server);
 
-        $this->requestLog();
+        $this->kernel = $server->getApplication->make(Kernel::class);
+        $this->illuminateRequest = $this->createIlluminateRequest();
+        $this->illuminateResponse = $this->createIlluminateResponse();
+
+        //$this->requestLog();
 
         $this->setResponse();
     }
