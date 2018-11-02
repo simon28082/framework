@@ -58,6 +58,14 @@ class Application implements ServerApplication
     /**
      * @return void
      */
+    public function reloadProviders(): void
+    {
+        return ;
+    }
+
+    /**
+     * @return void
+     */
     public function registerConfiguredProviders(): void
     {
         $serverProviders = Collection::make($this->app->config['http.providers']);
