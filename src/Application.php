@@ -47,7 +47,7 @@ class Application extends BaseApplication implements Container
     /**
      * @var bool
      */
-    protected $hasBeenDeferredBootstrapped = false;
+    //protected $hasBeenDeferredBootstrapped = false;
 
     /**
      * @var ServerApplicationContract
@@ -79,7 +79,7 @@ class Application extends BaseApplication implements Container
     /**
      * @param array $bootstrappers
      */
-    public function deferredBootstrapWith(array $bootstrappers)
+    /*public function deferredBootstrapWith(array $bootstrappers)
     {
         $this->hasBeenDeferredBootstrapped = true;
 
@@ -90,7 +90,7 @@ class Application extends BaseApplication implements Container
 
             $this['events']->fire('bootstrapped: ' . $bootstrapper, [$this]);
         }
-    }
+    }*/
 
     /**
      * Determine if the application has been bootstrapped before.

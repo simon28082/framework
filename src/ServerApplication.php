@@ -32,6 +32,11 @@ interface ServerApplication
     /**
      * @return void
      */
+    public function reloadProviders(): void;
+
+    /**
+     * @return void
+     */
     public function registerConfiguredProviders(): void;
 
     /**

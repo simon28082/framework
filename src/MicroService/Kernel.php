@@ -4,6 +4,7 @@ namespace CrCms\Foundation\MicroService;
 
 use CrCms\Foundation\Application;
 use CrCms\Foundation\MicroService\Contracts\Kernel as KernelContract;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Exception;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -41,14 +42,16 @@ class Kernel implements KernelContract
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
      * @var array
      */
     protected $deferredBootstrappers = [
-        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
-        \Illuminate\Foundation\Bootstrap\BootProviders::class,
+//        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
+//        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
@@ -179,7 +182,7 @@ class Kernel implements KernelContract
         Facade::clearResolvedInstance('request');
 
         $this->bootstrap();
-        $this->deferredBootstrap();
+        //$this->deferredBootstrap();
 
         return (new Pipeline($this->app))
             ->send($request)
@@ -197,17 +200,20 @@ class Kernel implements KernelContract
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
+
+        // Reload each time
+        $this->app->getServerApplication()->reloadProviders();
     }
 
     /**
      * @return void
      */
-    public function deferredBootstrap()
+    /*public function deferredBootstrap()
     {
         if (! $this->app->hasBeenDeferredBootstrapped()) {
             $this->app->deferredBootstrapWith($this->deferredBootstrappers);
         }
-    }
+    }*/
 
     /**
      * Get the route dispatcher callback.

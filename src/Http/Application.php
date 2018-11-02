@@ -84,6 +84,23 @@ class Application implements ServerApplicationContract, ServerBindApplicationCon
     /**
      * @return void
      */
+    public function reloadProviders(): void
+    {
+        $providers = $this->app->config['http.reload_providers'];
+
+        foreach ($providers as $provider) {
+            $this->app->register($provider,true);
+            $provider = $this->app->getProvider($provider);
+            if (method_exists($provider, 'boot')) {
+                $provider->boot();
+            }
+        }
+    }
+
+
+    /**
+     * @return void
+     */
     public function registerConfiguredProviders(): void
     {
         $serverProviders = Collection::make($this->app->config['http.providers']);
