@@ -23,7 +23,7 @@ class HashMiddleware
         $token = $request->headers->get('X-CRCMS-Microservice-Hash');
         $hash = hash_hmac('ripemd256', serialize($request->all()), config('micro-service.secret'));
         if ($token !== $hash) {
-            throw new AccessDeniedHttpException(strval($token));
+            throw new AccessDeniedHttpException("Microservice Hash error:" . strval($token));
         }
 
         return $next($request);
