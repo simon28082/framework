@@ -200,6 +200,14 @@ abstract class AbstractServer implements ServerActionContract, ServerContract
     }
 
     /**
+     * @return Container
+     */
+    public function getApplication(): Container
+    {
+        return $this->getApp();
+    }
+
+    /**
      * @param array $settings
      * @return void
      */
