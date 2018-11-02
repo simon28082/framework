@@ -25,6 +25,7 @@ class CrCmsServiceProvider extends ServiceProvider
         //
     }
 
+
     /**
      * Register any application services.
      *
@@ -52,8 +53,8 @@ class CrCmsServiceProvider extends ServiceProvider
             return new DirectoryMakeCommand($app['files']);
         });
 
-        $this->app->singleton('command.route.cache', function ($app) {
-            return new RouteCacheCommand($app['files']);
+        $this->app->extend('command.route.cache', function () {
+            return new RouteCacheCommand($this->app['files']);
         });
     }
 
@@ -63,7 +64,6 @@ class CrCmsServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         $this->commands('command.crcms.make.directory');
-        $this->commands('command.route.cache');
     }
 
     /**
@@ -84,7 +84,6 @@ class CrCmsServiceProvider extends ServiceProvider
         return [
             'data.provider',
             'command.crcms.make.directory',
-            'command.route.cache',
         ];
     }
 }
