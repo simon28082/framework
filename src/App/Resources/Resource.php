@@ -2,8 +2,8 @@
 
 namespace CrCms\Foundation\App\Http\Resources;
 
-use CrCms\Foundation\App\Resources\Traits\FieldTrait;
-use CrCms\Foundation\App\Resources\Traits\IncludeTrait;
+use CrCms\Foundation\App\Resources\Concerns\FieldConcern;
+use CrCms\Foundation\App\Resources\Concerns\IncludeConcern;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 
 class Resource extends BaseResource
 {
-    use IncludeTrait, FieldTrait;
+    use IncludeConcern, FieldConcern;
 
     /**
      * @param null $request

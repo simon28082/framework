@@ -7,17 +7,17 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Resources\Traits;
+namespace CrCms\Foundation\App\Resources\Concerns;
 
 use CrCms\Foundation\App\Http\Resources\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 /**
- * Trait FieldTrait
+ * Trait FieldConcern
  * @package CrCms\Foundation\App\Resources\Traits
  */
-trait FieldTrait
+trait FieldConcern
 {
     /**
      * @var array

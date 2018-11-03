@@ -2,9 +2,9 @@
 
 namespace CrCms\Foundation\Swoole\Server\Events;
 
+use CrCms\Foundation\Swoole\Concerns\ProcessNameConcern;
 use CrCms\Foundation\Swoole\Server\AbstractServer;
 use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
-use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
 
 /**
  * Class AbstractEvent
@@ -12,7 +12,7 @@ use CrCms\Foundation\Swoole\Traits\ProcessNameTrait;
  */
 abstract class AbstractEvent implements EventContract
 {
-    use ProcessNameTrait;
+    use ProcessNameConcern;
 
     /**
      * @var AbstractServer

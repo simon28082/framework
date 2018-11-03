@@ -31,10 +31,10 @@ use InvalidArgumentException;
  * @property-read DataProviderContract $data
  * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
- * Trait ComponentTrait
+ * Trait InstanceConcern
  * @package CrCms\Foundation\App\Helpers
  */
-trait InstanceTrait
+trait InstanceConcern
 {
     /**
      * @return Container

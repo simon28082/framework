@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation\App\Http\Controllers;
 
-use CrCms\Foundation\App\Helpers\InstanceTrait;
+use CrCms\Foundation\App\Helpers\InstanceConcern;
 use CrCms\Foundation\App\Services\ResponseFactory;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -17,7 +17,7 @@ use InvalidArgumentException;
  */
 class Controller extends BaseController
 {
-    use InstanceTrait, AuthorizesRequests, ValidatesRequests {
+    use InstanceConcern, AuthorizesRequests, ValidatesRequests {
         __get as __instanceGet;
     }
 

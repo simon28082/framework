@@ -7,13 +7,13 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Swoole\Traits;
+namespace CrCms\Foundation\Swoole\Concerns;
 
 /**
- * Trait ProcessNameTrait
+ * Trait ProcessNameConcern
  * @package CrCms\Foundation\Swoole\Traits
  */
-trait ProcessNameTrait
+trait ProcessNameConcern
 {
     /**
      * @param string $name

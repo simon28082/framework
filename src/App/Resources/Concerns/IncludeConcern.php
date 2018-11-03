@@ -7,7 +7,7 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Resources\Traits;
+namespace CrCms\Foundation\App\Resources\Concerns;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\Resource;
@@ -18,10 +18,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * Trait IncludeTrait
+ * Trait IncludeConcern
  * @package CrCms\Foundation\App\Resources
  */
-trait IncludeTrait
+trait IncludeConcern
 {
     /**
      * @var array
