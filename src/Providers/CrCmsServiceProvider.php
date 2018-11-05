@@ -2,6 +2,7 @@
 
 namespace CrCms\Foundation\Providers;
 
+use CrCms\Foundation\Console\Commands\ConfigCacheCommand;
 use CrCms\Foundation\Console\Commands\DirectoryMakeCommand;
 use CrCms\Foundation\Console\Commands\RouteCacheCommand;
 use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
@@ -55,6 +56,10 @@ class CrCmsServiceProvider extends ServiceProvider
 
         $this->app->extend('command.route.cache', function () {
             return new RouteCacheCommand($this->app['files']);
+        });
+
+        $this->app->extend('command.config.cache', function () {
+            return new ConfigCacheCommand($this->app['files']);
         });
     }
 
