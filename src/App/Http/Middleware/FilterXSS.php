@@ -34,7 +34,7 @@ class FilterXSS
 
             $response instanceof JsonResponse ?
                 $response->setData($this->filter($response->getData(true))) :
-                $response->setContent($this->filter($response->getContent()));
+                $response->setContent($response->exception ? $response->getContent() : $this->filter($response->getContent()));
         });
     }
 
