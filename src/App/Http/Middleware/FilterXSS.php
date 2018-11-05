@@ -24,19 +24,17 @@ class FilterXSS
         /* @var Response|JsonResponse $response */
         $response = $next($request);
 
-        return tap($response, function ($response) use ($filter) {
+        return tap($response, function ($response) use ($request, $filter) {
             /* @var Response|JsonResponse $response */
 
             if (!$this->isFilter($filter)) {
                 return;
             }
 
-            $content = $this->filter($response->getOriginalContent());
-            if ($response instanceof JsonResponse) {
-                $response->setData($content);
-            } elseif ($response instanceof Response) {
-                $response->setContent($content);
-            }
+            $content = $response->getContent();
+            $response instanceof JsonResponse ?
+                $response->setData($this->filter(json_decode($content, true))) :
+                $response->setContent($this->filter($content));
         });
     }
 
