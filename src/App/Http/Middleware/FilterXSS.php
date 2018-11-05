@@ -4,6 +4,7 @@ namespace CrCms\Foundation\App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 
@@ -31,10 +32,9 @@ class FilterXSS
                 return;
             }
 
-            $content = $response->getContent();
             $response instanceof JsonResponse ?
-                $response->setData($this->filter(json_decode($content, true))) :
-                $response->setContent($this->filter($content));
+                $response->setData($this->filter($response->getData(true))) :
+                $response->setContent($this->filter($response->getContent()));
         });
     }
 
