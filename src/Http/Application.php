@@ -1,102 +1,64 @@
 <?php
 
-namespace CrCms\Foundation\Http;
+namespace CrCms\Foundation;
 
-use CrCms\Foundation\Swoole\Server\Contracts\ServerBindApplicationContract;
-use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
-use Illuminate\Foundation\PackageManifest;
-use CrCms\Foundation\ServerApplication as ServerApplicationContract;
-use Illuminate\Support\Collection;
+use CrCms\Foundation\Contracts\ApplicationContract;
+use CrCms\Foundation\Foundation\PackageManifest;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\PackageManifest as BasePackageManifest;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Foundation\Application as BaseApplication;
+use CrCms\Foundation\ServerApplication as ServerApplicationContract;
+use CrCms\Foundation\Laravel\Application as LaravelApplication;
+use BadMethodCallException;
 use Illuminate\Foundation\ProviderRepository;
-use CrCms\Foundation\Application as BaseApplication;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
  * Class Application
- * @package CrCms\Foundation\MicroService
+ * @package CrCms
  */
-class Application implements ServerApplicationContract, ServerBindApplicationContract
+class Application extends BaseApplication implements Container, ApplicationContract
 {
     /**
-     * @var BaseApplication
+     * @var string
      */
-    protected $app;
+    protected $modulePath;
 
     /**
-     * @var ServerContract
+     * @var string
      */
-    protected $server;
+    protected $extensionPath;
 
     /**
-     * @param BaseApplication $app
-     * @return void
+     * @var string
      */
-    public function setApp(BaseApplication $app)
-    {
-        $this->app = $app;
-    }
+    protected $frameworkPath;
 
     /**
-     * @return string
+     * @var string
      */
-    public function name(): string
-    {
-        return 'http';
-    }
+    protected $frameworkConfigPath;
 
     /**
-     * @param ServerContract $server
-     * @return void
+     * @var string
      */
-    public function bindServer(ServerContract $server): void
-    {
-        $this->server = $server;
-    }
-
-    /**
-     * @return ServerContract
-     */
-    public function getServer(): ServerContract
-    {
-        return $this->server;
-    }
+    protected $frameworkResourcePath;
 
     /**
      * @return void
      */
-    public function loadKernel(): void
+    protected function bindPathsInContainer()
     {
-        $this->app->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
-            \CrCms\Foundation\Http\Kernel::class
-        );
+        $this->useFrameworkPath($this->frameworkPath());
+        $this->useFrameworkConfigPath($this->frameworkConfigPath());
+        $this->useFrameworkResourcePath($this->frameworkResourcePath());
+        $this->useModulePath($this->modulePath());
+        $this->useExtensionPath($this->extensionPath());
+
+        parent::bindPathsInContainer();
     }
-
-    /**
-     * @return string
-     */
-    public function kernel(): string
-    {
-        return \Illuminate\Contracts\Http\Kernel::class;
-    }
-
-    /**
-     * @return void
-     */
-    public function reloadProviders(): void
-    {
-        $providers = $this->app->config['http.reload_providers'];
-
-        foreach ($providers as $provider) {
-            $this->app->register($provider,true);
-            $provider = $this->app->getProvider($provider);
-            if (method_exists($provider, 'boot')) {
-                $provider->boot();
-            }
-        }
-    }
-
 
     /**
      * @return void
@@ -113,21 +75,164 @@ class Application implements ServerApplicationContract, ServerBindApplicationCon
     }
 
     /**
+     * @return void
+     */
+    public function bindKernel(): void
+    {
+        $this->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \CrCms\Foundation\App\Exceptions\Handler::class
+        );
+
+        $this->singleton(
+            \Illuminate\Contracts\Http\Kernel::class,
+            \CrCms\Foundation\Http\Kernel::class
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function run(): void
+    {
+        $kernel = $this->make(\Illuminate\Contracts\Http\Kernel::class);
+
+        $response = $kernel->handle(
+            $request = Request::capture()
+        );
+
+        $response->send();
+
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @return array
+     */
+    public function getServiceProviders(): array
+    {
+        return $this->serviceProviders;
+    }
+
+    /**
+     * @return string
+     */
+    public function frameworkPath(string $path = ''): string
+    {
+        return realpath(__DIR__ . '/../') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkPath(string $path)
+    {
+        $this->frameworkPath = $path;
+        $this->instance('path.framework', $path);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function frameworkResourcePath(string $path = ''): string
+    {
+        return $this->frameworkPath('resources') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkResourcePath(string $path)
+    {
+        $this->frameworkResourcePath = $path;
+        $this->instance('path.framework_resource', $path);
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function frameworkConfigPath(string $path = ''): string
+    {
+        return $this->frameworkPath('config') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useFrameworkConfigPath(string $path)
+    {
+        $this->frameworkConfigPath = $path;
+        $this->instance('path.framework_config', $path);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function modulePath(string $path = ''): string
+    {
+        return $this->basePath . DIRECTORY_SEPARATOR . 'modules' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useModulePath(string $path)
+    {
+        $this->modulePath = $path;
+        $this->instance('path.module', $path);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function extensionPath(string $path = ''): string
+    {
+        return $this->basePath . DIRECTORY_SEPARATOR . 'extensions' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function useExtensionPath(string $path)
+    {
+        $this->extensionPath = $path;
+        $this->instance('path.extension', $path);
+
+        return $this;
+    }
+
+    /**
      * Get the path to the cached services.php file.
      *
      * @return string
      */
     public function getCachedServicesPath(): string
     {
-        return $this->app->storagePath() . '/run-cache/http/services.php';
+        return $this->storagePath() . '/run-cache/http/services.php';
     }
 
     /**
+     * Get the path to the cached packages.php file.
+     *
      * @return string
      */
     public function getCachedPackagesPath(): string
     {
-        return $this->app->storagePath() . '/run-cache/http/packages.php';
+        return $this->storagePath() . '/run-cache/http/packages.php';
     }
 
     /**
@@ -137,7 +242,7 @@ class Application implements ServerApplicationContract, ServerBindApplicationCon
      */
     public function getCachedConfigPath(): string
     {
-        return $this->app->storagePath() . '/run-cache/http/config.php';
+        return $this->storagePath() . '/run-cache/http/config.php';
     }
 
     /**
@@ -145,6 +250,38 @@ class Application implements ServerApplicationContract, ServerBindApplicationCon
      */
     public function getCachedRoutesPath(): string
     {
-        return $this->app->storagePath() . '/run-cache/http/routes.php';
+        return $this->storagePath() . '/run-cache/http/routes.php';
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function bootstrapPath($path = ''): string
+    {
+        return $this->frameworkPath . DIRECTORY_SEPARATOR . 'src/Bootstrap/' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * @return void
+     */
+    public function registerCoreContainerAliases()
+    {
+        parent::registerCoreContainerAliases();
+        $this->alias('app', self::class);
+    }
+
+    /**
+     * Register the basic bindings into the container.
+     *
+     * @return void
+     */
+    protected function registerBaseBindings()
+    {
+        parent::registerBaseBindings();
+
+        $this->instance(BasePackageManifest::class, new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 }

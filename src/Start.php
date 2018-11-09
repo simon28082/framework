@@ -2,6 +2,7 @@
 
 namespace CrCms\Foundation;
 
+use CrCms\Foundation\Contracts\ApplicationContract;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -63,8 +64,9 @@ class Start
     {
         $this->bootstrap($params['mode'] ?? $params[1] ?? null, $basePath);
 
-        $this->app->runningInConsole() ? $this->runConsole($params) : $this->runWeb($params);
+        $this->runningInConsole() ? $this->runConsole($params) : $this->runApplication($params);
     }
+
 
     /**
      * @param null|string $mode
@@ -77,31 +79,27 @@ class Start
 
         $this->app = $this->app($basePath);
 
-        $this->loadKernel();
+        $this->app->bindKernel();
 
         return $this;
     }
 
     /**
-     * @return Application
+     * @return ApplicationContract
      */
-    public function getApp(): Application
+    public function getApp(): ApplicationContract
     {
         return $this->app;
     }
 
     /**
      * @param null|string $basePath
-     * @return Application
+     * @return ApplicationContract
      */
-    protected function app(?string $basePath = null): Application
+    protected function app(?string $basePath = null): ApplicationContract
     {
-        $serverApplicationName = $this->parseServerApplication();
-
-        return new \CrCms\Foundation\Application(
-            $basePath ? $basePath : realpath(__DIR__ . '/../../../../'),
-            new $serverApplicationName
-        );
+        $app = self::DRIVERS[$this->mode];
+        return new $app($basePath ? $basePath : realpath(__DIR__ . '/../../../../'));
     }
 
     /**
@@ -118,7 +116,7 @@ class Start
         $mode = strtolower($mode);
 
         if (!array_key_exists($mode, static::DRIVERS)) {
-            $mode = 'laravel';
+            $mode = 'http';
         }
 
         putenv("CRCMS_MODE={$mode}");
@@ -143,46 +141,12 @@ class Start
     }
 
     /**
-     * @return string
-     */
-    protected function parseServerApplication(): string
-    {
-        return static::DRIVERS[$this->mode];
-    }
-
-    /**
-     * @return void
-     */
-    public function loadKernel()
-    {
-        $this->app->singleton(
-            \Illuminate\Contracts\Console\Kernel::class,
-            \CrCms\Foundation\Console\Kernel::class
-        );
-
-        $this->app->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \CrCms\Foundation\App\Exceptions\Handler::class
-        );
-
-        $this->app->getServerApplication()->loadKernel();
-    }
-
-    /**
      * @param array $params
      * @return void
      */
-    protected function runWeb(array $params)
+    protected function runApplication(array $params)
     {
-        $kernel = $this->app->make($this->app->getServerApplication()->kernel());
-
-        $response = $kernel->handle(
-            $request = Request::capture()
-        );
-
-        $response->send();
-
-        $kernel->terminate($request, $response);
+        $this->app->run();
     }
 
     /**
@@ -203,5 +167,13 @@ class Start
         $kernel->terminate($input, $status);
 
         exit($status);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function runningInConsole(): bool
+    {
+        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
     }
 }

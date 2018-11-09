@@ -76,9 +76,6 @@ class Kernel implements KernelContract
     protected $middlewareGroups = [
         'micro_service' => [
             \CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
-//            'throttle:60,1',
-//            'bindings',
-            //\CrCms\Foundation\App\Http\Middleware\ApiResponseType::class,
         ],
     ];
 
@@ -90,15 +87,6 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 
     /**
@@ -109,12 +97,6 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middlewarePriority = [
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Auth\Middleware\Authenticate::class,
-        \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
     ];
 
     /**
@@ -138,6 +120,31 @@ class Kernel implements KernelContract
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->aliasMiddleware($key, $middleware);
         }
+    }
+
+    public function handle2()
+    {
+        $request = new \CrCms\Foundation\MicroService\Request();
+
+        try {
+            $request->enableHttpMethodParameterOverride();
+
+            $response = $this->sendRequestThroughRouter($request);
+        } catch (Exception $e) {
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
+            $this->reportException($e = new FatalThrowableError($e));
+
+            $response = $this->renderException($request, $e);
+        }
+
+        $this->app['events']->dispatch(
+            new RequestHandled($request, $response)
+        );
+
+        return $response;
     }
 
     /**
