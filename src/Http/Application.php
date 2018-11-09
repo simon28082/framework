@@ -67,16 +67,16 @@ class Application extends BaseApplication implements Container, ApplicationContr
     public function registerConfiguredProviders(): void
     {
         $providers = Collection::make($this->config['app.providers'])
+            ->merge(Collection::make($this->config['http.providers']))
             ->partition(function ($provider) {
                 return Str::startsWith($provider, 'Illuminate\\');
             });
 
-        $providers->splice(1, 0, [$this->make(BasePackageManifest::class)->providers()]);
+        $providers->splice(2, 0, [$this->make(BasePackageManifest::class)->providers()]);
 
-        $appProviders = Collection::make($this->config['http.providers']);
         $disableProviders = Collection::make($this->config['http.disable_providers']);
 
-        $providers = $providers->collapse()->merge($appProviders)->unique()->diff($disableProviders)->values();
+        $providers = $providers->collapse()->unique()->diff($disableProviders)->values();
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
             ->load($providers->toArray());
