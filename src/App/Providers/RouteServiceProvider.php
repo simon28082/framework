@@ -18,7 +18,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
         $this->mapWebRoutes();
-        $this->mapRpcRoutes();
     }
 
     /**
@@ -45,31 +44,5 @@ class RouteServiceProvider extends ServiceProvider
     {
         $routePath = base_path('routes/api.php');
         file_exists($routePath) && require $routePath;
-    }
-
-    /**
-     * @return void
-     */
-    protected function mapRpcRoutes(): void
-    {
-        $routePath = base_path('routes/rpc.php');
-        file_exists($routePath) && require $routePath;
-    }
-
-    /**
-     * @return void
-     */
-    public function register(): void
-    {
-        parent::register();
-
-
-        /*$this->app->bind(\Illuminate\Routing\ControllerDispatcher::class, function ($app) {
-            return new WebSocketControllerDispatcher($app);
-        });
-
-        $this->app->singleton(ControllerDispatcher::class, function ($app) {
-            return new WebSocketControllerDispatcher($app);
-        });*/
     }
 }

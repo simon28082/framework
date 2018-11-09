@@ -37,7 +37,7 @@ class ServerCommand extends AbstractServerCommand
     protected function cleanRunCache(): void
     {
         (new Filesystem())->cleanDirectory(
-            dirname($this->getLaravel()->getServerApplication()->getCachedServicesPath())
+            dirname($this->getLaravel()->getCachedServicesPath())
         );
     }
 }

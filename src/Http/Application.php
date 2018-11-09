@@ -12,6 +12,7 @@ use CrCms\Foundation\ServerApplication as ServerApplicationContract;
 use CrCms\Foundation\Laravel\Application as LaravelApplication;
 use BadMethodCallException;
 use Illuminate\Foundation\ProviderRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -65,12 +66,19 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function registerConfiguredProviders(): void
     {
-        $serverProviders = Collection::make($this->app->config['http.providers']);
-        $disableProviders = Collection::make($this->app->config['http.disable_providers']);
+        $providers = Collection::make($this->config['app.providers'])
+            ->partition(function ($provider) {
+                return Str::startsWith($provider, 'Illuminate\\');
+            });
 
-        $providers = $this->app->getRegisterConfiguredProviders()->merge($serverProviders)->unique()->diff($disableProviders)->values();
+        $providers->splice(1, 0, [$this->make(BasePackageManifest::class)->providers()]);
 
-        (new ProviderRepository($this->app, new Filesystem, $this->app->getCachedServicesPath()))
+        $appProviders = Collection::make($this->config['http.providers']);
+        $disableProviders = Collection::make($this->config['http.disable_providers']);
+
+        $providers = $providers->collapse()->merge($appProviders)->unique()->diff($disableProviders)->values();
+
+        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
             ->load($providers->toArray());
     }
 

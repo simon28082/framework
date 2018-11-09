@@ -32,8 +32,7 @@ class Start
      * @var array
      */
     const DRIVERS = [
-        'laravel' => \CrCms\Foundation\Laravel\Application::class,
-        'ms' => \CrCms\Foundation\MicroService\Application::class,
+//        'ms' => \CrCms\Foundation\MicroService\Application::class,
         'http' => \CrCms\Foundation\Http\Application::class,
     ];
 
@@ -80,6 +79,11 @@ class Start
         $this->app = $this->app($basePath);
 
         $this->app->bindKernel();
+
+        $this->app->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \CrCms\Foundation\Console\Kernel::class
+        );
 
         return $this;
     }
