@@ -1,8 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\MicroService\Routing\Routing;
+namespace CrCms\Foundation\MicroService\Routing;
 
 use Closure;
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -91,7 +92,7 @@ class Route
      */
     protected $router;
     
-    protected $name;
+    protected $mark;
 
     /**
      * The container instance used by the route.
@@ -115,10 +116,15 @@ class Route
      * @param  \Closure|array  $action
      * @return void
      */
-    public function __construct($name, $action)
+    public function __construct($mark, $action)
     {
-        $this->name = $name;
+        $this->mark = $mark;
         $this->action = $this->parseAction($action);
+    }
+
+    public function mark(): string
+    {
+        return $this->mark;
     }
 
     /**
@@ -131,7 +137,7 @@ class Route
      */
     protected function parseAction($action)
     {
-        return RouteAction::parse($this->name, $action);
+        return RouteAction::parse($this->mark, $action);
     }
 
     /**
@@ -144,6 +150,7 @@ class Route
         $this->container = $this->container ?: new Container;
 
         try {
+
             if ($this->isControllerAction()) {
                 return $this->runController();
             }
@@ -272,14 +279,14 @@ class Route
      * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
-    public function bind(Request $request)
+    public function bind(ServiceContract $service)
     {
-        $this->compileRoute();
+        //$this->compileRoute();
 
-        $this->parameters = (new RouteParameterBinder($this))
-                        ->parameters($request);
-
-        return $this;
+//        $this->parameters = (new RouteParameterBinder($this))
+//                        ->parameters($request);
+//
+//        return $this;
     }
 
     /**
@@ -520,82 +527,6 @@ class Route
     public function secure()
     {
         return in_array('https', $this->action, true);
-    }
-
-    /**
-     * Get or set the domain for the route.
-     *
-     * @param  string|null  $domain
-     * @return $this|string|null
-     */
-    public function domain($domain = null)
-    {
-        if (is_null($domain)) {
-            return $this->getDomain();
-        }
-
-        $this->action['domain'] = $domain;
-
-        return $this;
-    }
-
-    /**
-     * Get the domain defined for the route.
-     *
-     * @return string|null
-     */
-    public function getDomain()
-    {
-        return isset($this->action['domain'])
-                ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
-    }
-
-    /**
-     * Get the prefix of the route instance.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->action['prefix'] ?? null;
-    }
-
-    /**
-     * Add a prefix to the route URI.
-     *
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function prefix($prefix)
-    {
-        $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
-
-        $this->uri = trim($uri, '/');
-
-        return $this;
-    }
-
-    /**
-     * Get the URI associated with the route.
-     *
-     * @return string
-     */
-    public function uri()
-    {
-        return $this->uri;
-    }
-
-    /**
-     * Set the URI that the route responds to.
-     *
-     * @param  string  $uri
-     * @return $this
-     */
-    public function setUri($uri)
-    {
-        $this->uri = $uri;
-
-        return $this;
     }
 
     /**

@@ -21,7 +21,7 @@ interface Kernel
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle($request);
+    public function handle(ServiceContract $service);
 
     /**
      * Perform any final actions for the request lifecycle.

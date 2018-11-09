@@ -32,7 +32,7 @@ class Start
      * @var array
      */
     const DRIVERS = [
-//        'ms' => \CrCms\Foundation\MicroService\Application::class,
+        'ms' => \CrCms\Foundation\MicroService\Application::class,
         'http' => \CrCms\Foundation\Http\Application::class,
     ];
 
@@ -124,6 +124,8 @@ class Start
         }
 
         putenv("CRCMS_MODE={$mode}");
+
+        define('CRCMS_MODE', $mode);
 
         return $mode;
     }

@@ -4,6 +4,7 @@ namespace CrCms\Foundation\MicroService\Routing;
 
 use Countable;
 use ArrayIterator;
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use IteratorAggregate;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
@@ -64,13 +65,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function addToCollections($route)
     {
-        $domainAndUri = $route->getDomain().$route->uri();
-
-        foreach ($route->methods() as $method) {
-            $this->routes[$method][$domainAndUri] = $route;
-        }
-
-        $this->allRoutes[$method.$domainAndUri] = $route;
+        $this->allRoutes[$route->mark()] = $route;
+        $this->routes[$route->mark()] = $route;
     }
 
     /**
@@ -146,35 +142,27 @@ class RouteCollection implements Countable, IteratorAggregate
         }
     }
 
-    /**
-     * Find the first route matching a given request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function match(Request $request)
+    public function match(ServiceContract $service)
     {
-        $routes = $this->get($request->getMethod());
-
+        $route = $this->get($service->currentName());
+return $route;
         // First, we will see if we can find a matching route for this current request
         // method. If we can, great, we can just return it so that it can be called
         // by the consumer. Otherwise we will check for routes with another verb.
-        $route = $this->matchAgainstRoutes($routes, $request);
+        //$route = $this->matchAgainstRoutes($routes, $service);
 
-        if (! is_null($route)) {
-            return $route->bind($request);
-        }
-
+//        if (! is_null($route)) {
+//            return $route->bind($service);
+//        }
+//exit(get_class_methods(get_class($this)));
         // If no route was found we will now check if a matching route is specified by
         // another HTTP verb. If it is we will need to throw a MethodNotAllowed and
         // inform the user agent of which HTTP verb it should use for this route.
-        $others = $this->checkForAlternateVerbs($request);
-
-        if (count($others) > 0) {
-            return $this->getRouteForMethods($request, $others);
-        }
+//        $others = $this->checkForAlternateVerbs($request);
+//
+//        if (count($others) > 0) {
+//            return $this->getRouteForMethods($request, $others);
+//        }
 
         throw new NotFoundHttpException;
     }
@@ -263,7 +251,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
+        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method);
     }
 
     /**

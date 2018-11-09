@@ -2,148 +2,119 @@
 
 namespace CrCms\Foundation\MicroService;
 
+use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
+use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract;
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
+use CrCms\Foundation\MicroService\Exceptions\ExceptionHandler;
+use CrCms\Foundation\MicroService\Http\Service;
+use CrCms\Foundation\MicroService\Routing\Router;
+use CrCms\Foundation\MicroService\Routing\RoutingServiceProvider;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerBindApplicationContract;
 use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
+use Illuminate\Container\Container;
 use Illuminate\Foundation\PackageManifest;
-use CrCms\Foundation\ServerApplication as ServerApplicationContract;
 use Illuminate\Support\Collection;
+use Illuminate\Log\LogServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\ProviderRepository;
-use CrCms\Foundation\Application as BaseApplication;
+use CrCms\Foundation\Http\Application as Base2Application;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 
 /**
  * Class Application
  * @package CrCms\Foundation\MicroService
  */
-class Application implements ServerApplicationContract, ServerBindApplicationContract
+class Application extends Base2Application implements ContainerContract, ApplicationContract
 {
-    /**
-     * @var BaseApplication
-     */
-    protected $app;
-
-    /**
-     * @var ServerContract
-     */
-    protected $server;
-
-    /**
-     * @param BaseApplication $app
-     * @return void
-     */
-    public function setApp(BaseApplication $app)
+    public function bindKernel(): void
     {
-        $this->app = $app;
-    }
-
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'Micro-Service';
-    }
-
-    /**
-     * @param ServerContract $server
-     * @return void
-     */
-    public function bindServer(ServerContract $server): void
-    {
-        $this->server = $server;
-    }
-
-    /**
-     * @return ServerContract
-     */
-    public function getServer(): ServerContract
-    {
-        return $this->server;
-    }
-
-    /**
-     * @return void
-     */
-    public function loadKernel(): void
-    {
-        $this->app->singleton(
+        $this->singleton(
             \CrCms\Foundation\MicroService\Contracts\Kernel::class,
-            \CrCms\Foundation\MicroService\Kernel::class
+            Kernel::class
         );
+
+        $this->singleton(
+            ExceptionHandlerContract::class,
+            ExceptionHandler::class
+        );
+
+        //$this->singleton()
     }
 
-    /**
-     * @return string
-     */
-    public function kernel(): string
+    public function run(): void
     {
-        return \CrCms\Foundation\MicroService\Contracts\Kernel::class;
+        $kernel = $this->make(\CrCms\Foundation\MicroService\Contracts\Kernel::class);
+
+        $kernel->bootstrap();
+
+        $response = $kernel->handle(
+            new Service
+        );
+
+        $response->send();
+
+        //$kernel->terminate($request, $response);
     }
 
     /**
+     * Register the core class aliases in the container.
+     *
      * @return void
      */
-    public function reloadProviders(): void
+    public function registerCoreContainerAliases()
     {
-        $providers = $this->app->config['micro-service.reload_providers'];
-
-        foreach ($providers as $provider) {
-            $this->app->register($provider,true);
-            $provider = $this->app->getProvider($provider);
-            if (method_exists($provider, 'boot')) {
-                $provider->boot();
+        foreach ([
+                     'app'                  => [\Illuminate\Foundation\Application::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class,  \Psr\Container\ContainerInterface::class],
+                     'cache'                => [\Illuminate\Cache\CacheManager::class, \Illuminate\Contracts\Cache\Factory::class],
+                     'cache.store'          => [\Illuminate\Cache\Repository::class, \Illuminate\Contracts\Cache\Repository::class],
+                     'config'               => [\Illuminate\Config\Repository::class, \Illuminate\Contracts\Config\Repository::class],
+                     'encrypter'            => [\Illuminate\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\Encrypter::class],
+                     'db'                   => [\Illuminate\Database\DatabaseManager::class],
+                     'db.connection'        => [\Illuminate\Database\Connection::class, \Illuminate\Database\ConnectionInterface::class],
+                     'events'               => [\Illuminate\Events\Dispatcher::class, \Illuminate\Contracts\Events\Dispatcher::class],
+                     'files'                => [\Illuminate\Filesystem\Filesystem::class],
+                     'filesystem'           => [\Illuminate\Filesystem\FilesystemManager::class, \Illuminate\Contracts\Filesystem\Factory::class],
+                     'filesystem.disk'      => [\Illuminate\Contracts\Filesystem\Filesystem::class],
+                     'filesystem.cloud'     => [\Illuminate\Contracts\Filesystem\Cloud::class],
+                     'hash'                 => [\Illuminate\Hashing\HashManager::class],
+                     'hash.driver'          => [\Illuminate\Contracts\Hashing\Hasher::class],
+                     'translator'           => [\Illuminate\Translation\Translator::class, \Illuminate\Contracts\Translation\Translator::class],
+                     'log'                  => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
+                     'mailer'               => [\Illuminate\Mail\Mailer::class, \Illuminate\Contracts\Mail\Mailer::class, \Illuminate\Contracts\Mail\MailQueue::class],
+                     'queue'                => [\Illuminate\Queue\QueueManager::class, \Illuminate\Contracts\Queue\Factory::class, \Illuminate\Contracts\Queue\Monitor::class],
+                     'queue.connection'     => [\Illuminate\Contracts\Queue\Queue::class],
+                     'queue.failer'         => [\Illuminate\Queue\Failed\FailedJobProviderInterface::class],
+                     'redis'                => [\Illuminate\Redis\RedisManager::class, \Illuminate\Contracts\Redis\Factory::class],
+                     //'request'              => [\Illuminate\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
+                     'router'               => [Router::class],
+                     'validator'            => [\Illuminate\Validation\Factory::class, \Illuminate\Contracts\Validation\Factory::class],
+                     'service' => [Service::class,ServiceContract::class],
+                 ] as $key => $aliases) {
+            foreach ($aliases as $alias) {
+                $this->alias($key, $alias);
             }
         }
+
+        $this->alias('app', static::class);
+        $this->alias('app', ApplicationContract::class);
     }
 
+
     /**
+     * Register all of the base service providers.
+     *
      * @return void
      */
-    public function registerConfiguredProviders(): void
+    protected function registerBaseServiceProviders()
     {
-        $serverProviders = Collection::make($this->app->config['micro-service.providers']);
-        $disableProviders = Collection::make($this->app->config['micro-service.disable_providers']);
+        $this->register(new EventServiceProvider($this));
 
-        $providers = $this->app->getRegisterConfiguredProviders()->merge($serverProviders)->unique()->diff($disableProviders)->values();
+        $this->register(new LogServiceProvider($this));
 
-        (new ProviderRepository($this->app, new Filesystem, $this->app->getCachedServicesPath()))
-            ->load($providers->toArray());
-    }
-
-    /**
-     * Get the path to the cached services.php file.
-     *
-     * @return string
-     */
-    public function getCachedServicesPath(): string
-    {
-        return $this->app->storagePath() . '/run-cache/micro-service/services.php';
-    }
-
-    /**
-     * @return string
-     */
-    public function getCachedPackagesPath(): string
-    {
-        return $this->app->storagePath() . '/run-cache/micro-service/packages.php';
-    }
-
-    /**
-     * Get the path to the configuration cache file.
-     *
-     * @return string
-     */
-    public function getCachedConfigPath(): string
-    {
-        return $this->app->storagePath() . '/run-cache/micro-service/config.php';
-    }
-
-    /**
-     * @return string
-     */
-    public function getCachedRoutesPath(): string
-    {
-        return $this->app->storagePath() . '/run-cache/micro-service/routes.php';
+        $this->register(new RoutingServiceProvider($this));
     }
 }

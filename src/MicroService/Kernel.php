@@ -4,15 +4,17 @@ namespace CrCms\Foundation\MicroService;
 
 use CrCms\Foundation\Application;
 use CrCms\Foundation\MicroService\Contracts\Kernel as KernelContract;
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
+//use Illuminate\Routing\Router;
+use CrCms\Foundation\MicroService\Routing\Router;
 use Exception;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Throwable;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract as ExceptionHandler;
 
 /**
  * Class Kernel
@@ -30,7 +32,7 @@ class Kernel implements KernelContract
     /**
      * The router instance.
      *
-     * @var \Illuminate\Routing\Router
+     * @var \CrCms\Foundation\MicroService\Routing\Router
      */
     protected $router;
 
@@ -40,18 +42,10 @@ class Kernel implements KernelContract
     protected $bootstrappers = [
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
-        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+//        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
-    ];
-
-    /**
-     * @var array
-     */
-    protected $deferredBootstrappers = [
-//        \CrCms\Foundation\Bootstrap\RegisterProviders::class,
-//        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
@@ -62,10 +56,6 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middleware = [
-        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \CrCms\Foundation\App\Http\Middleware\TrimStrings::class,
-        \CrCms\Foundation\App\Http\Middleware\TrustProxies::class,
     ];
 
     /**
@@ -106,7 +96,7 @@ class Kernel implements KernelContract
      * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    public function __construct(Application $app, Router $router)
+    public function __construct(\Illuminate\Contracts\Foundation\Application $app, Router $router)
     {
         $this->app = $app;
         $this->router = $router;
@@ -120,15 +110,17 @@ class Kernel implements KernelContract
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->aliasMiddleware($key, $middleware);
         }
+
     }
 
     public function handle2()
     {
-        $request = new \CrCms\Foundation\MicroService\Request();
+        $request = new \CrCms\Foundation\MicroService\Request(
+            Factory::request()
+        );
+        //取得不同的驱动来创建不同的Request
 
         try {
-            $request->enableHttpMethodParameterOverride();
-
             $response = $this->sendRequestThroughRouter($request);
         } catch (Exception $e) {
             $this->reportException($e);
@@ -147,18 +139,10 @@ class Kernel implements KernelContract
         return $response;
     }
 
-    /**
-     * Handle an incoming HTTP request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function handle($request)
+    public function handle(ServiceContract $service)
     {
         try {
-            $request->enableHttpMethodParameterOverride();
-
-            $response = $this->sendRequestThroughRouter($request);
+            $response = $this->sendRequestThroughRouter($service);
         } catch (Exception $e) {
             $this->reportException($e);
 
@@ -182,17 +166,16 @@ class Kernel implements KernelContract
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    protected function sendRequestThroughRouter($request)
+    protected function sendRequestThroughRouter($service)
     {
-        $this->app->instance('request', $request);
+        $this->app->instance('service', $service);
 
-        Facade::clearResolvedInstance('request');
+        Facade::clearResolvedInstance('service');
 
         $this->bootstrap();
-        //$this->deferredBootstrap();
 
         return (new Pipeline($this->app))
-            ->send($request)
+            ->send($service)
             ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
             ->then($this->dispatchToRouter());
     }
@@ -209,18 +192,8 @@ class Kernel implements KernelContract
         }
 
         // Reload each time
-        $this->app->getServerApplication()->reloadProviders();
+        //$this->app->getServerApplication()->reloadProviders();
     }
-
-    /**
-     * @return void
-     */
-    /*public function deferredBootstrap()
-    {
-        if (! $this->app->hasBeenDeferredBootstrapped()) {
-            $this->app->deferredBootstrapWith($this->deferredBootstrappers);
-        }
-    }*/
 
     /**
      * Get the route dispatcher callback.
@@ -229,10 +202,10 @@ class Kernel implements KernelContract
      */
     protected function dispatchToRouter()
     {
-        return function ($request) {
-            $this->app->instance('request', $request);
+        return function ($service) {
+            $this->app->instance('service', $service);
 
-            return $this->router->dispatch($request);
+            return $this->router->dispatch($service);
         };
     }
 
@@ -382,7 +355,7 @@ class Kernel implements KernelContract
      */
     protected function renderException($request, Exception $e)
     {
-        return $this->app[ExceptionHandler::class]->render($request, $e);
+//        return $this->app[ExceptionHandler::class]->render($request, $e);
     }
 
     /**

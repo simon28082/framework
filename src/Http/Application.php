@@ -66,15 +66,17 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function registerConfiguredProviders(): void
     {
+        $mode = strtolower(getenv('CRCMS_MODE'));
+
         $providers = Collection::make($this->config['app.providers'])
-            ->merge(Collection::make($this->config['http.providers']))
+            ->merge(Collection::make($this->config[$mode . '.providers']))
             ->partition(function ($provider) {
                 return Str::startsWith($provider, 'Illuminate\\');
             });
 
         $providers->splice(2, 0, [$this->make(BasePackageManifest::class)->providers()]);
 
-        $disableProviders = Collection::make($this->config['http.disable_providers']);
+        $disableProviders = Collection::make($this->config[$mode . '.disable_providers']);
 
         $providers = $providers->collapse()->unique()->diff($disableProviders)->values();
 
@@ -112,14 +114,6 @@ class Application extends BaseApplication implements Container, ApplicationContr
         $response->send();
 
         $kernel->terminate($request, $response);
-    }
-
-    /**
-     * @return array
-     */
-    public function getServiceProviders(): array
-    {
-        return $this->serviceProviders;
     }
 
     /**
@@ -230,7 +224,7 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function getCachedServicesPath(): string
     {
-        return $this->storagePath() . '/run-cache/http/services.php';
+        return $this->storagePath() . '/run-cache/' . getenv('CRCMS_MODE') . '/services.php';
     }
 
     /**
@@ -240,7 +234,7 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function getCachedPackagesPath(): string
     {
-        return $this->storagePath() . '/run-cache/http/packages.php';
+        return $this->storagePath() . '/run-cache/' . getenv('CRCMS_MODE') . '/packages.php';
     }
 
     /**
@@ -250,7 +244,7 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function getCachedConfigPath(): string
     {
-        return $this->storagePath() . '/run-cache/http/config.php';
+        return $this->storagePath() . '/run-cache/' . getenv('CRCMS_MODE') . '/config.php';
     }
 
     /**
@@ -258,7 +252,7 @@ class Application extends BaseApplication implements Container, ApplicationContr
      */
     public function getCachedRoutesPath(): string
     {
-        return $this->storagePath() . '/run-cache/http/routes.php';
+        return $this->storagePath() . '/run-cache/' . getenv('CRCMS_MODE') . '/routes.php';
     }
 
     /**
@@ -276,7 +270,8 @@ class Application extends BaseApplication implements Container, ApplicationContr
     public function registerCoreContainerAliases()
     {
         parent::registerCoreContainerAliases();
-        $this->alias('app', self::class);
+        $this->alias('app', static::class);
+        $this->alias('app', ApplicationContract::class);
     }
 
     /**

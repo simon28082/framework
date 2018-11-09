@@ -14,17 +14,6 @@ class RouteCompiler
     protected $route;
 
     /**
-     * Create a new Route compiler instance.
-     *
-     * @param  \CrCms\Foundation\MicroService\Routing\Route  $route
-     * @return void
-     */
-    public function __construct($route)
-    {
-        $this->route = $route;
-    }
-
-    /**
      * Compile the route.
      *
      * @return \Symfony\Component\Routing\CompiledRoute
@@ -38,6 +27,17 @@ class RouteCompiler
         return (
             new SymfonyRoute($uri, $optionals, $this->route->wheres, ['utf8' => true], $this->route->getDomain() ?: '')
         )->compile();
+    }
+
+    /**
+     * Create a new Route compiler instance.
+     *
+     * @param  \CrCms\Foundation\MicroService\Routing\Route  $route
+     * @return void
+     */
+    public function __construct($route)
+    {
+        $this->route = $route;
     }
 
     /**

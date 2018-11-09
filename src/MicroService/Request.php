@@ -1,6 +1,7 @@
 <?php
 
 namespace CrCms\Foundation\MicroService;
+
 use CrCms\Foundation\MicroService\Contracts\RequestContract;
 
 /**
@@ -13,7 +14,7 @@ class Request
 
     protected $name;
 
-    public function __construct(RequestContract $request,string $name)
+    public function __construct( $request,string $name = '')
     {
         $this->request = $request;
         $this->name = $name;
