@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Contracts;
+namespace CrCms\Foundation\Foundation\Contracts;
 
 /**
  * Interface ApplicationContract

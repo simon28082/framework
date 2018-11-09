@@ -2,7 +2,7 @@
 
 namespace CrCms\Foundation;
 
-use CrCms\Foundation\Contracts\ApplicationContract;
+use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;

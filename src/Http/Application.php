@@ -1,8 +1,8 @@
 <?php
 
-namespace CrCms\Foundation;
+namespace CrCms\Foundation\Http;
 
-use CrCms\Foundation\Contracts\ApplicationContract;
+use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
 use CrCms\Foundation\Foundation\PackageManifest;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
