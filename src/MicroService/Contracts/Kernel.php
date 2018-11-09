@@ -2,6 +2,8 @@
 
 namespace CrCms\Foundation\MicroService\Contracts;
 
+use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
+
 /**
  * Interface Kernel
  * @package CrCms\Foundation\Rpc\Server\Contracts
@@ -9,33 +11,24 @@ namespace CrCms\Foundation\MicroService\Contracts;
 interface Kernel
 {
     /**
-     * Bootstrap the application for HTTP requests.
-     *
-     * @return void
+     * @return ResponseContract
      */
-    public function bootstrap();
+    public function bootstrap(): void ;
 
     /**
-     * Handle an incoming HTTP request.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param ServiceContract $service
+     * @return ResponseContract
      */
-    public function handle(ServiceContract $service);
+    public function handle(ServiceContract $service): ResponseContract;
 
     /**
-     * Perform any final actions for the request lifecycle.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @return void
+     * @param ServiceContract $service
+     * @return mixed
      */
-    public function terminate($request, $response);
+    public function terminate(ServiceContract $service);
 
     /**
-     * Get the Laravel application instance.
-     *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return ApplicationContract
      */
-    public function getApplication();
+    public function getApplication(): ApplicationContract;
 }

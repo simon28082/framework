@@ -2,23 +2,21 @@
 
 namespace CrCms\Foundation\MicroService;
 
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
+use CrCms\Foundation\MicroService\Http\Service as HttpService;
+use Illuminate\Contracts\Container\Container;
+
 /**
  * Class Factory
  * @package CrCms\Foundation\MicroService
  */
 class Factory
 {
-    public static function request()
+    public static function service(Container $app,string $driver): ServiceContract
     {
-        $default = config('micro-service')->get('default');
-        switch ($default) {
+        switch ($driver) {
             case 'http':
-                return \Illuminate\Http\Request::capture();
+                return new HttpService($app,\CrCms\Foundation\MicroService\Http\Request::capture());
         }
-    }
-
-    public static function response()
-    {
-
     }
 }

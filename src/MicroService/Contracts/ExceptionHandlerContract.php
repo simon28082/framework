@@ -10,6 +10,10 @@ use Exception;
  */
 interface ExceptionHandlerContract
 {
+    /**
+     * @param Exception $e
+     * @return mixed
+     */
     public function report(Exception $e);
 
     /**

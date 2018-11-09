@@ -23,6 +23,7 @@ use CrCms\Foundation\Http\Application as Base2Application;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
+use CrCms\Foundation\MicroService\Contracts\Kernel as KernelContract;
 
 /**
  * Class Application
@@ -33,31 +34,36 @@ class Application extends Base2Application implements ContainerContract, Applica
     public function bindKernel(): void
     {
         $this->singleton(
-            \CrCms\Foundation\MicroService\Contracts\Kernel::class,
+            KernelContract::class,
             Kernel::class
         );
 
-        $this->singleton(
-            ExceptionHandlerContract::class,
-            ExceptionHandler::class
-        );
-
-        //$this->singleton()
+//        $this->singleton(
+//            ExceptionHandlerContract::class,
+//            $service::exceptionHandler()
+//        );
     }
 
     public function run(): void
     {
-        $kernel = $this->make(\CrCms\Foundation\MicroService\Contracts\Kernel::class);
+        $kernel = $this->make(KernelContract::class);
 
         $kernel->bootstrap();
 
+        $service = Factory::service($this,$this['config']->get('ms.default'));
+
+        $this->singleton(
+            ExceptionHandlerContract::class,
+            $service::exceptionHandler()
+        );
+
         $response = $kernel->handle(
-            new Service
+            $service
         );
 
         $response->send();
 
-        //$kernel->terminate($request, $response);
+        $kernel->terminate($service);
     }
 
     /**
@@ -92,7 +98,7 @@ class Application extends Base2Application implements ContainerContract, Applica
                      //'request'              => [\Illuminate\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
                      'router'               => [Router::class],
                      'validator'            => [\Illuminate\Validation\Factory::class, \Illuminate\Contracts\Validation\Factory::class],
-                     'service' => [Service::class,ServiceContract::class],
+                     'service' => [ServiceContract::class],
                  ] as $key => $aliases) {
             foreach ($aliases as $alias) {
                 $this->alias($key, $alias);

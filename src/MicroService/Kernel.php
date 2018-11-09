@@ -2,7 +2,8 @@
 
 namespace CrCms\Foundation\MicroService;
 
-use CrCms\Foundation\Application;
+use CrCms\Foundation\MicroService\Contracts\ResponseContract;
+use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
 use CrCms\Foundation\MicroService\Contracts\Kernel as KernelContract;
 use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class Kernel implements KernelContract
     /**
      * The application implementation.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var ApplicationContract|Application
      */
     protected $app;
 
@@ -56,6 +57,7 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middleware = [
+        //CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
     ];
 
     /**
@@ -64,9 +66,6 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middlewareGroups = [
-        'micro_service' => [
-            \CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
-        ],
     ];
 
     /**
@@ -92,11 +91,11 @@ class Kernel implements KernelContract
     /**
      * Create a new HTTP kernel instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
+     * @param  ApplicationContract  $app
+     * @param  Router  $router
      * @return void
      */
-    public function __construct(\Illuminate\Contracts\Foundation\Application $app, Router $router)
+    public function __construct(ApplicationContract $app, Router $router)
     {
         $this->app = $app;
         $this->router = $router;
@@ -110,52 +109,32 @@ class Kernel implements KernelContract
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->aliasMiddleware($key, $middleware);
         }
-
     }
 
-    public function handle2()
-    {
-        $request = new \CrCms\Foundation\MicroService\Request(
-            Factory::request()
-        );
-        //取得不同的驱动来创建不同的Request
-
-        try {
-            $response = $this->sendRequestThroughRouter($request);
-        } catch (Exception $e) {
-            $this->reportException($e);
-
-            $response = $this->renderException($request, $e);
-        } catch (Throwable $e) {
-            $this->reportException($e = new FatalThrowableError($e));
-
-            $response = $this->renderException($request, $e);
-        }
-
-        $this->app['events']->dispatch(
-            new RequestHandled($request, $response)
-        );
-
-        return $response;
-    }
-
-    public function handle(ServiceContract $service)
+    /**
+     * @param ServiceContract $service
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     * @throws \ReflectionException
+     */
+    public function handle(ServiceContract $service): ResponseContract
     {
         try {
             $response = $this->sendRequestThroughRouter($service);
         } catch (Exception $e) {
+
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
+//            throw $e;
             $this->reportException($e = new FatalThrowableError($e));
 
             $response = $this->renderException($request, $e);
         }
 
-        $this->app['events']->dispatch(
-            new RequestHandled($request, $response)
-        );
+//        $this->app['events']->dispatch(
+//            new RequestHandled($request, $response)
+//        );
 
         return $response;
     }
@@ -185,14 +164,11 @@ class Kernel implements KernelContract
      *
      * @return void
      */
-    public function bootstrap()
+    public function bootstrap(): void
     {
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
-
-        // Reload each time
-        //$this->app->getServerApplication()->reloadProviders();
     }
 
     /**
@@ -210,15 +186,12 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Call the terminate method on any terminable middleware.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return void
+     * @param ServiceContract $service
+     * @return mixed|void
      */
-    public function terminate($request, $response)
+    public function terminate(ServiceContract $service)
     {
-        $this->terminateMiddleware($request, $response);
+        $this->terminateMiddleware($service);
 
         $this->app->terminate();
     }
@@ -230,10 +203,10 @@ class Kernel implements KernelContract
      * @param  \Illuminate\Http\Response  $response
      * @return void
      */
-    protected function terminateMiddleware($request, $response)
+    protected function terminateMiddleware(ServiceContract $service)
     {
         $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
-            $this->gatherRouteMiddleware($request),
+            $this->gatherRouteMiddleware($service),
             $this->middleware
         );
 
@@ -247,7 +220,7 @@ class Kernel implements KernelContract
             $instance = $this->app->make($name);
 
             if (method_exists($instance, 'terminate')) {
-                $instance->terminate($request, $response);
+                $instance->terminate($service);
             }
         }
     }
@@ -258,9 +231,9 @@ class Kernel implements KernelContract
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function gatherRouteMiddleware($request)
+    protected function gatherRouteMiddleware(ServiceContract $service)
     {
-        if ($route = $request->route()) {
+        if ($route = $service->route()) {
             return $this->router->gatherRouteMiddleware($route);
         }
 
@@ -353,17 +326,17 @@ class Kernel implements KernelContract
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderException($request, Exception $e)
+    protected function renderException(ServiceContract $service, Exception $e)
     {
-//        return $this->app[ExceptionHandler::class]->render($request, $e);
+        return $this->app[ExceptionHandler::class]->render($service, $e);
     }
 
     /**
      * Get the Laravel application instance.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return ApplicationContract|Application
      */
-    public function getApplication()
+    public function getApplication(): ApplicationContract
     {
         return $this->app;
     }

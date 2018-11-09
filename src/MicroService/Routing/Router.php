@@ -60,12 +60,8 @@ class Router implements BindingRegistrar
     protected $current;
 
     /**
-     * The request currently being dispatched.
-     *
-     * @var \Illuminate\Http\Request
+     * @var ServiceContract
      */
-    protected $currentRequest;
-
     protected $currentService;
 
     /**
@@ -133,14 +129,7 @@ class Router implements BindingRegistrar
         $this->container = $container ?: new Container;
     }
 
-    /**
-     * Register a new GET route with the router.
-     *
-     * @param  string $uri
-     * @param  \Closure|array|string|null $action
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-    public function register($name, $action = null)
+    public function register($name, $action)
     {
         return $this->addRoute($name, $action);
     }
@@ -158,48 +147,6 @@ class Router implements BindingRegistrar
         return $this->addRoute(
             'GET', "{{$placeholder}}", $action
         )->where($placeholder, '.*')->fallback();
-    }
-
-    /**
-     * Create a redirect from one URI to another.
-     *
-     * @param  string $uri
-     * @param  string $destination
-     * @param  int $status
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-    public function redirect($uri, $destination, $status = 302)
-    {
-        return $this->any($uri, '\CrCms\Foundation\MicroService\Routing\RedirectController')
-            ->defaults('destination', $destination)
-            ->defaults('status', $status);
-    }
-
-    /**
-     * Create a permanent redirect from one URI to another.
-     *
-     * @param  string $uri
-     * @param  string $destination
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-    public function permanentRedirect($uri, $destination)
-    {
-        return $this->redirect($uri, $destination, 301);
-    }
-
-    /**
-     * Register a new route that returns a view.
-     *
-     * @param  string $uri
-     * @param  string $view
-     * @param  array $data
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-    public function view($uri, $view, $data = [])
-    {
-        return $this->match(['GET', 'HEAD'], $uri, '\CrCms\Foundation\MicroService\Routing\ViewController')
-            ->defaults('view', $view)
-            ->defaults('data', $data);
     }
 
     /**
@@ -502,12 +449,7 @@ class Router implements BindingRegistrar
         return $this->runRoute($this->currentRequest, $route);
     }
 
-    /**
-     * Dispatch the request to the application.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     */
+
     public function dispatch(ServiceContract $service)
     {
         $this->currentService = $service;
@@ -515,23 +457,11 @@ class Router implements BindingRegistrar
         return $this->dispatchToRoute($service);
     }
 
-    /**
-     * Dispatch the request to a route and return the response.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return mixed
-     */
     public function dispatchToRoute(ServiceContract $service)
     {
         return $this->runRoute($service, $this->findRoute($service));
     }
 
-    /**
-     * Find the route matching a given request.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
     protected function findRoute(ServiceContract $service)
     {
         $this->current = $route = $this->routes->match($service);
@@ -541,18 +471,9 @@ class Router implements BindingRegistrar
         return $route;
     }
 
-    /**
-     * Return the response for the given route.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \CrCms\Foundation\MicroService\Routing\Route $route
-     * @return mixed
-     */
     protected function runRoute(ServiceContract $service, Route $route)
     {
-//        $request->setRouteResolver(function () use ($route) {
-//        });
-//            return $route;
+        $service->setRoute($route);
 
         $this->events->dispatch(new Events\RouteMatched($route, $service));
 
@@ -561,13 +482,6 @@ class Router implements BindingRegistrar
         );
     }
 
-    /**
-     * Run the given route within a Stack "onion" instance.
-     *
-     * @param  \CrCms\Foundation\MicroService\Routing\Route $route
-     * @param  \Illuminate\Http\Request $request
-     * @return mixed
-     */
     protected function runRouteWithinStack(Route $route, ServiceContract $service)
     {
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
@@ -611,16 +525,11 @@ class Router implements BindingRegistrar
         return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
     }
 
-    /**
-     * Create a response instance from the given value.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request $request
-     * @param  mixed $response
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     */
     public function prepareResponse(ServiceContract $service, $response)
     {
-        return $service->response($response);
+        $response = new \CrCms\Foundation\MicroService\Http\Response($response);
+        $service->setResponse($response);
+        return $response;
     }
 
     /**

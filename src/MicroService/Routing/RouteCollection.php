@@ -144,7 +144,7 @@ class RouteCollection implements Countable, IteratorAggregate
 
     public function match(ServiceContract $service)
     {
-        $route = $this->get($service->currentName());
+        $route = $this->get($service->name());
 return $route;
         // First, we will see if we can find a matching route for this current request
         // method. If we can, great, we can just return it so that it can be called
