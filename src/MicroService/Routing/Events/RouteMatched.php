@@ -10,7 +10,7 @@ class RouteMatched
     /**
      * The route instance.
      *
-     * @var \CrCms\Foundation\MicroService\Routing\Route
+     * @var Route
      */
     public $route;
 
@@ -19,6 +19,11 @@ class RouteMatched
      */
     public $service;
 
+    /**
+     * RouteMatched constructor.
+     * @param Route $route
+     * @param ServiceContract $service
+     */
     public function __construct(Route $route, ServiceContract $service)
     {
         $this->route = $route;

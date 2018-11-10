@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use CrCms\Foundation\MicroService\Routing\Route;
 use CrCms\Foundation\MicroService\Http\Response;
 
-class Router 
+class Router
 {
     use Macroable {
         __call as macroCall;
