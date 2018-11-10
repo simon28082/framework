@@ -19,4 +19,10 @@ interface ResponseContract
      * @return void
      */
     //public function send();
+
+    /**
+     * @param $response
+     * @return ResponseContract
+     */
+    public static function createReponse($response): ResponseContract;
 }

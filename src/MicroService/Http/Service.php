@@ -3,15 +3,28 @@
 namespace CrCms\Foundation\MicroService\Http;
 
 use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
-use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract;
+//use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract;
 use CrCms\Foundation\MicroService\Contracts\RequestContract;
 use CrCms\Foundation\MicroService\Contracts\ResponseContract;
 use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use CrCms\Foundation\MicroService\Routing\Route;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use CrCms\Foundation\MicroService\Http\Response as HttpResponse;
 
 /**
  * Class Service
@@ -27,15 +40,18 @@ class Service implements ServiceContract
 
     protected $app;
 
-    public function __construct(Container $app,RequestContract $request)
+    protected $indexes;
+
+    public function __construct(Container $app, RequestContract $request)
     {
         $this->app = $app;
         $this->setRequest($request);
     }
 
-    public function setRoute(Route $route)
+    public function setRoute(Route $route): ServiceContract
     {
         $this->route = $route;
+        return $this;
     }
 
     public function getRoute(): Route
@@ -54,6 +70,7 @@ class Service implements ServiceContract
         $hash = hash_hmac('ripemd256', serialize($this->request->all()), config('ms.secret'));
         if ($token !== $hash) {
             throw new AccessDeniedHttpException("Microservice Hash error:" . strval($token));
+            return false;
         }
 
         return true;
@@ -74,7 +91,7 @@ class Service implements ServiceContract
     /**
      * Set the route resolver callback.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure $callback
      * @return $this
      */
     public function setRouteResolver(Closure $callback)
@@ -84,15 +101,68 @@ class Service implements ServiceContract
         return $this;
     }
 
-    public function setRequest(RequestContract $request)
+    public function setRequest(RequestContract $request): ServiceContract
     {
         $this->request = $request;
+        return $this;
     }
 
-    public function setResponse(ResponseContract $response)
+    public function setResponse($response): ServiceContract
     {
-        $this->response = $response;
+        $this->response = HttpResponse::createReponse($response);
+        return $this;
     }
+
+
+
+//    public function setResponse($response): ServiceContract
+//    {
+//        if ($response instanceof Model && $response->wasRecentlyCreated) {
+//            $response = new Response($response, 201);
+//        } elseif ($response instanceof JsonResponse) {
+//            $response = new Response($response->getData(), $response->getStatusCode(), $response->headers, $response->getEncodingOptions());
+//        } elseif (!$response instanceof SymfonyResponse &&
+//            ($response instanceof Arrayable ||
+//                $response instanceof Jsonable ||
+//                $response instanceof ArrayObject ||
+//                $response instanceof JsonSerializable ||
+//                is_array($response))) {
+//            $response = new Response($response);
+//        } else {
+//            $response = new Response($response);
+//        }
+//
+//        if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
+//            $response->setNotModified();
+//        }
+//
+//        $this->response = $response;
+//        return $this;
+//    }
+
+//    public static function createResponse($response)
+//    {
+//        if ($response instanceof Model && $response->wasRecentlyCreated) {
+//            $response = new Response($response, 201);
+//        } elseif ($response instanceof JsonResponse) {
+//            $response = new Response($response->getData(), $response->getStatusCode(), $response->headers, $response->getEncodingOptions());
+//        } elseif (!$response instanceof SymfonyResponse &&
+//            ($response instanceof Arrayable ||
+//                $response instanceof Jsonable ||
+//                $response instanceof ArrayObject ||
+//                $response instanceof JsonSerializable ||
+//                is_array($response))) {
+//            $response = new Response($response);
+//        } else {
+//            $response = new Response($response);
+//        }
+//
+//        if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
+//            $response->setNotModified();
+//        }
+//
+//        return $response;
+//    }
 
     public function getRequest(): RequestContract
     {
@@ -104,11 +174,20 @@ class Service implements ServiceContract
         return $this->response;
     }
 
-    public function name(): string
+    public function indexes(?string $key = null)
     {
-        return $this->request->get('method');
+        if (is_null($this->indexes)) {
+            $method = explode('.', $this->request->get('method'));
+            $this->indexes = ['name' => $method[0], 'method' => $method[1] ?? null];
+        }
+
+        return $this->indexes[$key];
     }
 
+    public static function toResponse(RequestContract $request, ResponseContract $response): ResponseContract
+    {
+        return $response->prepare($request);
+    }
 //
 //    public function response($response)
 //    {

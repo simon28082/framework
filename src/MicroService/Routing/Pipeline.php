@@ -3,10 +3,10 @@
 namespace CrCms\Foundation\MicroService\Routing;
 
 use Closure;
+use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use Exception;
 use Throwable;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract as ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -72,7 +72,7 @@ class Pipeline extends BasePipeline
     protected function handleException($passable, Exception $e)
     {
         if (! $this->container->bound(ExceptionHandler::class) ||
-            ! $passable instanceof Request) {
+            ! $passable instanceof ServiceContract) {
             throw $e;
         }
 

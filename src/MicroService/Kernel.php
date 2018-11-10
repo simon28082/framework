@@ -44,7 +44,7 @@ class Kernel implements KernelContract
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         //\Illuminate\Foundation\Bootstrap\HandleExceptions::class,
-        \CrCms\Foundation\MicroService\Bootstrap\HandleExceptions::class,
+        //\CrCms\Foundation\MicroService\Bootstrap\HandleExceptions::class,
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
         \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
@@ -58,7 +58,7 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $middleware = [
-        //CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
+        \CrCms\Foundation\MicroService\Middleware\HashMiddleware::class,
     ];
 
     /**
@@ -122,12 +122,12 @@ class Kernel implements KernelContract
         try {
             $response = $this->sendRequestThroughRouter($service);
         } catch (Exception $e) {
-
+            throw $e;
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
-//            throw $e;
+            throw $e;
             $this->reportException($e = new FatalThrowableError($e));
 
             $response = $this->renderException($request, $e);

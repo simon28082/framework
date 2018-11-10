@@ -40,7 +40,7 @@ class Application extends Base2Application implements ContainerContract, Applica
 
 //        $this->singleton(
 //            ExceptionHandlerContract::class,
-//            $service::exceptionHandler()
+//            \CrCms\Foundation\MicroService\Http\ExceptionHandler::class
 //        );
     }
 
@@ -51,7 +51,7 @@ class Application extends Base2Application implements ContainerContract, Applica
         $kernel->bootstrap();
 
         $service = Factory::service($this,$this['config']->get('ms.default'));
-
+        //这里还有问题，一旦被Service之前有异常或出错，则会报ExceptionHandlerContract没有绑定
         $this->singleton(
             ExceptionHandlerContract::class,
             $service::exceptionHandler()

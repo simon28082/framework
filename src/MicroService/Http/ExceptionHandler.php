@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use CrCms\Foundation\MicroService\Http\Response;
 use Exception as BaseException;
+use Illuminate\Support\Arr;
 
 /**
  * Class ExceptionHandler
@@ -32,7 +33,7 @@ class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerC
      * @param BaseException $e
      * @return Response|\Illuminate\Http\JsonResponse|null|\Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\Response\
      */
-    public function render(ServiceContract $service, BaseException $e)
+    public function render(ServiceContract $service, \Throwable $e)
     {
         if (method_exists($e, 'render') && $response = $e->render($service)) {
             return new Response($response);
@@ -68,7 +69,7 @@ class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerC
      * @param  \Exception $e
      * @return array
      */
-    protected function convertExceptionToArray(Exception $e)
+    protected function convertExceptionToArray(\Throwable $e)
     {
         return config('app.debug') ? [
             'message' => $e->getMessage(),
@@ -90,7 +91,7 @@ class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerC
      * @param  \Exception $e
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function prepareJsonResponse(ServiceContract $service, Exception $e)
+    protected function prepareJsonResponse(ServiceContract $service, \Throwable $e)
     {
         return new Response(
             $this->convertExceptionToArray($e),
@@ -125,7 +126,7 @@ class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerC
      * @param  \Exception $e
      * @return \Exception
      */
-    protected function prepareException(Exception $e)
+    protected function prepareException(\Throwable $e)
     {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);

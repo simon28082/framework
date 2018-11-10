@@ -23,7 +23,7 @@ interface ExceptionHandlerContract
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function render(ServiceContract $service, Exception $e);
+    public function render(ServiceContract $service, \Throwable $e);
 
     /**
      * Render an exception to the console.
