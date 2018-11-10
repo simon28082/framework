@@ -8,7 +8,6 @@ use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-//use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
@@ -89,32 +88,11 @@ class Router
     public $middlewarePriority = [];
 
     /**
-     * The registered route value binders.
-     *
-     * @var array
-     */
-    protected $binders = [];
-
-    /**
-     * The globally available parameter patterns.
-     *
-     * @var array
-     */
-    protected $patterns = [];
-
-    /**
      * The route group attribute stack.
      *
      * @var array
      */
     protected $groupStack = [];
-
-    /**
-     * All of the verbs supported by the router.
-     *
-     * @var array
-     */
-    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
      * Create a new Router instance.
@@ -166,89 +144,6 @@ class Router
             'GET', "{{$placeholder}}", $action
         )->where($placeholder, '.*')->fallback();
     }
-
-    /**
-     * Register a new route with the given verbs.
-     *
-     * @param  array|string $methods
-     * @param  string $uri
-     * @param  \Closure|array|string|null $action
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-//    public function match($methods, $uri, $action = null)
-//    {
-//        return $this->addRoute(array_map('strtoupper', (array)$methods), $uri, $action);
-//    }
-
-    /**
-     * Register an array of resource controllers.
-     *
-     * @param  array $resources
-     * @param  array $options
-     * @return void
-     */
-//    public function resources(array $resources, array $options = [])
-//    {
-//        foreach ($resources as $name => $controller) {
-//            $this->resource($name, $controller, $options);
-//        }
-//    }
-
-    /**
-     * Route a resource to a controller.
-     *
-     * @param  string $name
-     * @param  string $controller
-     * @param  array $options
-     * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
-     */
-//    public function resource($name, $controller, array $options = [])
-//    {
-//        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-//            $registrar = $this->container->make(ResourceRegistrar::class);
-//        } else {
-//            $registrar = new ResourceRegistrar($this);
-//        }
-//
-//        return new PendingResourceRegistration(
-//            $registrar, $name, $controller, $options
-//        );
-//    }
-
-    /**
-     * Register an array of API resource controllers.
-     *
-     * @param  array $resources
-     * @param  array $options
-     * @return void
-     */
-//    public function apiResources(array $resources, array $options = [])
-//    {
-//        foreach ($resources as $name => $controller) {
-//            $this->apiResource($name, $controller, $options);
-//        }
-//    }
-
-    /**
-     * Route an API resource to a controller.
-     *
-     * @param  string $name
-     * @param  string $controller
-     * @param  array $options
-     * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
-     */
-//    public function apiResource($name, $controller, array $options = [])
-//    {
-//        $only = ['index', 'show', 'store', 'update', 'destroy'];
-//
-//        if (isset($options['except'])) {
-//            $only = array_diff($only, (array)$options['except']);
-//        }
-//
-//        return $this->resource($name, $controller, array_merge([
-//            'only' => $only,
-//        ], $options));
-//    }
 
     /**
      * Create a route group with shared attributes.
@@ -553,82 +448,6 @@ class Router
     }
 
     /**
-     * Static version of prepareResponse.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request $request
-     * @param  mixed $response
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     */
-//    public static function toResponse($request, $response)
-//    {
-//        if ($response instanceof Responsable) {
-//            $response = $response->toResponse($request);
-//        }
-//
-//        if ($response instanceof PsrResponseInterface) {
-//            $response = (new HttpFoundationFactory)->createResponse($response);
-//        } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
-//            $response = new JsonResponse($response, 201);
-//        } elseif (!$response instanceof SymfonyResponse &&
-//            ($response instanceof Arrayable ||
-//                $response instanceof Jsonable ||
-//                $response instanceof ArrayObject ||
-//                $response instanceof JsonSerializable ||
-//                is_array($response))) {
-//            $response = new JsonResponse($response);
-//        } elseif (!$response instanceof SymfonyResponse) {
-//            $response = new Response($response);
-//        }
-//
-//        if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
-//            $response->setNotModified();
-//        }
-//
-//        return $response->prepare($request);
-//    }
-
-    /**
-     * Substitute the route bindings onto the route.
-     *
-     * @param  \CrCms\Foundation\MicroService\Routing\Route $route
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-//    public function substituteBindings($route)
-//    {
-//        foreach ($route->parameters() as $key => $value) {
-//            if (isset($this->binders[$key])) {
-//                $route->setParameter($key, $this->performBinding($key, $value, $route));
-//            }
-//        }
-//
-//        return $route;
-//    }
-
-    /**
-     * Substitute the implicit Eloquent model bindings for the route.
-     *
-     * @param  \CrCms\Foundation\MicroService\Routing\Route $route
-     * @return void
-     */
-//    public function substituteImplicitBindings($route)
-//    {
-//        ImplicitRouteBinding::resolveForRoute($this->container, $route);
-//    }
-
-    /**
-     * Call the binding callback for the given key.
-     *
-     * @param  string $key
-     * @param  string $value
-     * @param  \CrCms\Foundation\MicroService\Routing\Route $route
-     * @return mixed
-     */
-//    protected function performBinding($key, $value, $route)
-//    {
-//        return call_user_func($this->binders[$key], $value, $route);
-//    }
-
-    /**
      * Register a route matched event listener.
      *
      * @param  string|callable $callback
@@ -737,83 +556,6 @@ class Router
 
         return $this;
     }
-
-    /**
-     * Add a new route parameter binder.
-     *
-     * @param  string $key
-     * @param  string|callable $binder
-     * @return void
-     */
-//    public function bind($key, $binder)
-//    {
-//        $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
-//            $this->container, $binder
-//        );
-//    }
-
-    /**
-     * Register a model binder for a wildcard.
-     *
-     * @param  string $key
-     * @param  string $class
-     * @param  \Closure|null $callback
-     * @return void
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
-//    public function model($key, $class, Closure $callback = null)
-//    {
-//        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
-//    }
-
-    /**
-     * Get the binding callback for a given binding.
-     *
-     * @param  string $key
-     * @return \Closure|null
-     */
-//    public function getBindingCallback($key)
-//    {
-//        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
-//            return $this->binders[$key];
-//        }
-//    }
-
-    /**
-     * Get the global "where" patterns.
-     *
-     * @return array
-     */
-//    public function getPatterns()
-//    {
-//        return $this->patterns;
-//    }
-
-    /**
-     * Set a global where pattern on all routes.
-     *
-     * @param  string $key
-     * @param  string $pattern
-     * @return void
-     */
-//    public function pattern($key, $pattern)
-//    {
-//        $this->patterns[$key] = $pattern;
-//    }
-
-    /**
-     * Set a group of global where patterns on all routes.
-     *
-     * @param  array $patterns
-     * @return void
-     */
-//    public function patterns($patterns)
-//    {
-//        foreach ($patterns as $key => $pattern) {
-//            $this->pattern($key, $pattern);
-//        }
-//    }
 
     /**
      * Determine if the router currently has a group stack.
@@ -967,39 +709,6 @@ class Router
     {
         return $this->currentRouteAction() == $action;
     }
-
-    /**
-     * Set the unmapped global resource parameters to singular.
-     *
-     * @param  bool $singular
-     * @return void
-     */
-//    public function singularResourceParameters($singular = true)
-//    {
-//        ResourceRegistrar::singularParameters($singular);
-//    }
-
-    /**
-     * Set the global resource parameter mapping.
-     *
-     * @param  array $parameters
-     * @return void
-     */
-//    public function resourceParameters(array $parameters = [])
-//    {
-//        ResourceRegistrar::setParameters($parameters);
-//    }
-
-    /**
-     * Get or set the verbs used in the resource URIs.
-     *
-     * @param  array $verbs
-     * @return array|null
-     */
-//    public function resourceVerbs(array $verbs = [])
-//    {
-//        return ResourceRegistrar::verbs($verbs);
-//    }
 
     /**
      * Get the underlying route collection.
