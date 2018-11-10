@@ -12,6 +12,7 @@ namespace CrCms\Foundation\MicroService\Http;
 use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract;
 use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use CrCms\Foundation\MicroService\Exceptions\ExceptionHandler as BaseExceptionHandler;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
@@ -26,8 +27,6 @@ use Exception as BaseException;
  */
 class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerContract
 {
-
-
     /**
      * @param ServiceContract $service
      * @param BaseException $e
@@ -35,10 +34,10 @@ class ExceptionHandler extends BaseExceptionHandler implements ExceptionHandlerC
      */
     public function render(ServiceContract $service, BaseException $e)
     {
-        if (method_exists($e, 'render') && $response = $e->render($request)) {
-            return Router::toResponse($request, $response);
+        if (method_exists($e, 'render') && $response = $e->render($service)) {
+            return new Response($response);
         } elseif ($e instanceof Responsable) {
-            return $e->toResponse($request);
+            return $e->toResponse($service->getRequest());
         }
 
         $e = $this->prepareException($e);
