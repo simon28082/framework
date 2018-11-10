@@ -18,7 +18,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use CrCms\Foundation\MicroService\Http\Response;
 use Exception as BaseException;
 use Illuminate\Support\Arr;
 

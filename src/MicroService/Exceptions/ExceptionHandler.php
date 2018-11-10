@@ -3,7 +3,6 @@
 namespace CrCms\Foundation\MicroService\Exceptions;
 
 use CrCms\Foundation\MicroService\Contracts\ExceptionHandlerContract;
-use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Container\Container;
 use Exception;
