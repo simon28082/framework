@@ -2,8 +2,6 @@
 
 namespace CrCms\Foundation\MicroService\Routing;
 
-use Closure;
-use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -35,34 +33,6 @@ class Route
      * @var mixed
      */
     public $controller;
-
-    /**
-     * The default values for the route.
-     *
-     * @var array
-     */
-    public $defaults = [];
-
-    /**
-     * The regular expression requirements.
-     *
-     * @var array
-     */
-    public $wheres = [];
-
-    /**
-     * The array of matched parameters.
-     *
-     * @var array
-     */
-    public $parameters;
-
-    /**
-     * The parameter names for the route.
-     *
-     * @var array|null
-     */
-    public $parameterNames;
 
     /**
      * The computed gathered middleware.
@@ -166,7 +136,7 @@ class Route
         $callable = $this->action['uses'];
 
         return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            [], new ReflectionFunction($this->action['uses'])
         )));
     }
 
@@ -230,50 +200,6 @@ class Route
         $this->isFallback = true;
 
         return $this;
-    }
-
-    /**
-     * Get the name of the route instance.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->action['as'] ?? null;
-    }
-
-    /**
-     * Add or change the route name.
-     *
-     * @param  string  $name
-     * @return $this
-     */
-    public function name($name)
-    {
-        $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
-
-        return $this;
-    }
-
-    /**
-     * Determine whether the route's name matches the given patterns.
-     *
-     * @param  mixed  ...$patterns
-     * @return bool
-     */
-    public function named(...$patterns)
-    {
-        if (is_null($routeName = $this->getName())) {
-            return false;
-        }
-
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

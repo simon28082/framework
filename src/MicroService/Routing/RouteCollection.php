@@ -7,10 +7,9 @@ use ArrayIterator;
 use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use IteratorAggregate;
 use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use UnexpectedValueException;
 
 class RouteCollection implements Countable, IteratorAggregate
 {
@@ -80,7 +79,7 @@ class RouteCollection implements Countable, IteratorAggregate
         // If the route has a name, we will add it to the name look-up table so that we
         // will quickly be able to find any route associate with a name and not have
         // to iterate through every route every time we need to perform a look-up.
-        if ($name = $route->getName()) {
+        if ($name = $route->mark()) {
             $this->nameList[$name] = $route;
         }
 
@@ -118,8 +117,8 @@ class RouteCollection implements Countable, IteratorAggregate
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
-            if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
+            if ($route->mark()) {
+                $this->nameList[$route->mark()] = $route;
             }
         }
     }
@@ -146,102 +145,11 @@ class RouteCollection implements Countable, IteratorAggregate
     {
         $route = $this->get($service->name());
 
-return $route;
-        // First, we will see if we can find a matching route for this current request
-        // method. If we can, great, we can just return it so that it can be called
-        // by the consumer. Otherwise we will check for routes with another verb.
-        //$route = $this->matchAgainstRoutes($routes, $service);
-
-//        if (! is_null($route)) {
-//            return $route->bind($service);
-//        }
-//exit(get_class_methods(get_class($this)));
-        // If no route was found we will now check if a matching route is specified by
-        // another HTTP verb. If it is we will need to throw a MethodNotAllowed and
-        // inform the user agent of which HTTP verb it should use for this route.
-//        $others = $this->checkForAlternateVerbs($request);
-//
-//        if (count($others) > 0) {
-//            return $this->getRouteForMethods($request, $others);
-//        }
-
-        throw new NotFoundHttpException;
-    }
-
-    /**
-     * Determine if a route in the array matches the request.
-     *
-     * @param  array  $routes
-     * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $includingMethod
-     * @return \CrCms\Foundation\MicroService\Routing\Route|null
-     */
-    protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
-    {
-        [$fallbacks, $routes] = collect($routes)->partition(function ($route) {
-            return $route->isFallback;
-        });
-
-        return $routes->merge($fallbacks)->first(function ($value) use ($request, $includingMethod) {
-            return $value->matches($request, $includingMethod);
-        });
-    }
-
-    /**
-     * Determine if any routes match on another HTTP verb.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    protected function checkForAlternateVerbs($request)
-    {
-        $methods = array_diff(Router::$verbs, [$request->getMethod()]);
-
-        // Here we will spin through all verbs except for the current request verb and
-        // check to see if any routes respond to them. If they do, we will return a
-        // proper error response with the correct headers on the response string.
-        $others = [];
-
-        foreach ($methods as $method) {
-            if (! is_null($this->matchAgainstRoutes($this->get($method), $request, false))) {
-                $others[] = $method;
-            }
+        if (is_null($route)) {
+            throw new UnexpectedValueException("The route[{$service->name()}] not found");
         }
 
-        return $others;
-    }
-
-    /**
-     * Get a route (if necessary) that responds when other available methods are present.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $methods
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     */
-    protected function getRouteForMethods($request, array $methods)
-    {
-        if ($request->method() === 'OPTIONS') {
-            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
-                return new Response('', 200, ['Allow' => implode(',', $methods)]);
-            }))->bind($request);
-        }
-
-        $this->methodNotAllowed($methods);
-    }
-
-    /**
-     * Throw a method not allowed HTTP exception.
-     *
-     * @param  array  $others
-     * @return void
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     */
-    protected function methodNotAllowed(array $others)
-    {
-        throw new MethodNotAllowedHttpException($others);
+        return $route;
     }
 
     /**
