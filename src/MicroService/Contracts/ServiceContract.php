@@ -11,6 +11,11 @@ use CrCms\Foundation\MicroService\Routing\Route;
 interface ServiceContract
 {
     /**
+     * @return string
+     */
+    public function name(): string;
+
+    /**
      * @param null|string $key
      * @return array|string
      */

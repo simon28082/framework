@@ -174,6 +174,11 @@ class Service implements ServiceContract
         return $this->response;
     }
 
+    public function name(): string
+    {
+        return $this->request->get('method');
+    }
+
     public function indexes(?string $key = null)
     {
         if (is_null($this->indexes)) {

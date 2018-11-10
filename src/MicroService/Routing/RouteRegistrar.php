@@ -45,7 +45,7 @@ class RouteRegistrar
      * @var array
      */
     protected $passthru = [
-        'get', 'post', 'put', 'patch', 'delete', 'options', 'any',
+        'single', 'register','multiple',//'post', 'put', 'patch', 'delete', 'options', 'any',
     ];
 
     /**
@@ -54,7 +54,7 @@ class RouteRegistrar
      * @var array
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'where',
+        'middleware',  'namespace',//'name','as',  'domain', 'where',
     ];
 
     /**
@@ -105,10 +105,10 @@ class RouteRegistrar
      * @param  array  $options
      * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
      */
-    public function resource($name, $controller, array $options = [])
-    {
-        return $this->router->resource($name, $controller, $this->attributes + $options);
-    }
+//    public function resource($name, $controller, array $options = [])
+//    {
+//        return $this->router->resource($name, $controller, $this->attributes + $options);
+//    }
 
     /**
      * Create a route group with shared attributes.
@@ -129,10 +129,10 @@ class RouteRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \CrCms\Foundation\MicroService\Routing\Route
      */
-    public function match($methods, $uri, $action = null)
-    {
-        return $this->router->match($methods, $uri, $this->compileAction($action));
-    }
+//    public function match($methods, $uri, $action = null)
+//    {
+//        return $this->router->match($methods, $uri, $this->compileAction($action));
+//    }
 
     /**
      * Register a new route with the router.

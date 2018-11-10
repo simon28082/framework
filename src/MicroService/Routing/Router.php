@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use CrCms\Foundation\MicroService\Routing\Route;
 use CrCms\Foundation\MicroService\Http\Response;
 
-class Router implements BindingRegistrar
+class Router 
 {
     use Macroable {
         __call as macroCall;
@@ -132,7 +132,24 @@ class Router implements BindingRegistrar
 
     public function register($name, $action)
     {
+        return $this->multiple($name, $action);
+
+    }
+
+    public function single($name, $action)
+    {
         return $this->addRoute($name, $action);
+    }
+
+    public function multiple($name, $action)
+    {
+        $namespaceAction = $this->convertToControllerAction($action);
+
+        $methods = (new ReflectionAction($this))->getMethods($namespaceAction['uses']);
+        foreach ($methods as $method) {
+            $uses = isset($action['uses']) ? "{$action['uses']}@{$method}" : "{$action}@{$method}";
+            $this->single("{$name}.{$method}", array_merge($namespaceAction, ['controller' => $uses, 'uses' => $uses]));
+        }
     }
 
     /**
@@ -158,10 +175,10 @@ class Router implements BindingRegistrar
      * @param  \Closure|array|string|null $action
      * @return \CrCms\Foundation\MicroService\Routing\Route
      */
-    public function match($methods, $uri, $action = null)
-    {
-        return $this->addRoute(array_map('strtoupper', (array)$methods), $uri, $action);
-    }
+//    public function match($methods, $uri, $action = null)
+//    {
+//        return $this->addRoute(array_map('strtoupper', (array)$methods), $uri, $action);
+//    }
 
     /**
      * Register an array of resource controllers.
@@ -170,12 +187,12 @@ class Router implements BindingRegistrar
      * @param  array $options
      * @return void
      */
-    public function resources(array $resources, array $options = [])
-    {
-        foreach ($resources as $name => $controller) {
-            $this->resource($name, $controller, $options);
-        }
-    }
+//    public function resources(array $resources, array $options = [])
+//    {
+//        foreach ($resources as $name => $controller) {
+//            $this->resource($name, $controller, $options);
+//        }
+//    }
 
     /**
      * Route a resource to a controller.
@@ -185,18 +202,18 @@ class Router implements BindingRegistrar
      * @param  array $options
      * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
      */
-    public function resource($name, $controller, array $options = [])
-    {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
-
-        return new PendingResourceRegistration(
-            $registrar, $name, $controller, $options
-        );
-    }
+//    public function resource($name, $controller, array $options = [])
+//    {
+//        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+//            $registrar = $this->container->make(ResourceRegistrar::class);
+//        } else {
+//            $registrar = new ResourceRegistrar($this);
+//        }
+//
+//        return new PendingResourceRegistration(
+//            $registrar, $name, $controller, $options
+//        );
+//    }
 
     /**
      * Register an array of API resource controllers.
@@ -205,12 +222,12 @@ class Router implements BindingRegistrar
      * @param  array $options
      * @return void
      */
-    public function apiResources(array $resources, array $options = [])
-    {
-        foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller, $options);
-        }
-    }
+//    public function apiResources(array $resources, array $options = [])
+//    {
+//        foreach ($resources as $name => $controller) {
+//            $this->apiResource($name, $controller, $options);
+//        }
+//    }
 
     /**
      * Route an API resource to a controller.
@@ -220,18 +237,18 @@ class Router implements BindingRegistrar
      * @param  array $options
      * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
      */
-    public function apiResource($name, $controller, array $options = [])
-    {
-        $only = ['index', 'show', 'store', 'update', 'destroy'];
-
-        if (isset($options['except'])) {
-            $only = array_diff($only, (array)$options['except']);
-        }
-
-        return $this->resource($name, $controller, array_merge([
-            'only' => $only,
-        ], $options));
-    }
+//    public function apiResource($name, $controller, array $options = [])
+//    {
+//        $only = ['index', 'show', 'store', 'update', 'destroy'];
+//
+//        if (isset($options['except'])) {
+//            $only = array_diff($only, (array)$options['except']);
+//        }
+//
+//        return $this->resource($name, $controller, array_merge([
+//            'only' => $only,
+//        ], $options));
+//    }
 
     /**
      * Create a route group with shared attributes.
@@ -576,16 +593,16 @@ class Router implements BindingRegistrar
      * @param  \CrCms\Foundation\MicroService\Routing\Route $route
      * @return \CrCms\Foundation\MicroService\Routing\Route
      */
-    public function substituteBindings($route)
-    {
-        foreach ($route->parameters() as $key => $value) {
-            if (isset($this->binders[$key])) {
-                $route->setParameter($key, $this->performBinding($key, $value, $route));
-            }
-        }
-
-        return $route;
-    }
+//    public function substituteBindings($route)
+//    {
+//        foreach ($route->parameters() as $key => $value) {
+//            if (isset($this->binders[$key])) {
+//                $route->setParameter($key, $this->performBinding($key, $value, $route));
+//            }
+//        }
+//
+//        return $route;
+//    }
 
     /**
      * Substitute the implicit Eloquent model bindings for the route.
@@ -593,10 +610,10 @@ class Router implements BindingRegistrar
      * @param  \CrCms\Foundation\MicroService\Routing\Route $route
      * @return void
      */
-    public function substituteImplicitBindings($route)
-    {
-        ImplicitRouteBinding::resolveForRoute($this->container, $route);
-    }
+//    public function substituteImplicitBindings($route)
+//    {
+//        ImplicitRouteBinding::resolveForRoute($this->container, $route);
+//    }
 
     /**
      * Call the binding callback for the given key.
@@ -606,10 +623,10 @@ class Router implements BindingRegistrar
      * @param  \CrCms\Foundation\MicroService\Routing\Route $route
      * @return mixed
      */
-    protected function performBinding($key, $value, $route)
-    {
-        return call_user_func($this->binders[$key], $value, $route);
-    }
+//    protected function performBinding($key, $value, $route)
+//    {
+//        return call_user_func($this->binders[$key], $value, $route);
+//    }
 
     /**
      * Register a route matched event listener.
@@ -728,12 +745,12 @@ class Router implements BindingRegistrar
      * @param  string|callable $binder
      * @return void
      */
-    public function bind($key, $binder)
-    {
-        $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
-            $this->container, $binder
-        );
-    }
+//    public function bind($key, $binder)
+//    {
+//        $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
+//            $this->container, $binder
+//        );
+//    }
 
     /**
      * Register a model binder for a wildcard.
@@ -745,10 +762,10 @@ class Router implements BindingRegistrar
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function model($key, $class, Closure $callback = null)
-    {
-        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
-    }
+//    public function model($key, $class, Closure $callback = null)
+//    {
+//        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+//    }
 
     /**
      * Get the binding callback for a given binding.
@@ -756,22 +773,22 @@ class Router implements BindingRegistrar
      * @param  string $key
      * @return \Closure|null
      */
-    public function getBindingCallback($key)
-    {
-        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
-            return $this->binders[$key];
-        }
-    }
+//    public function getBindingCallback($key)
+//    {
+//        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
+//            return $this->binders[$key];
+//        }
+//    }
 
     /**
      * Get the global "where" patterns.
      *
      * @return array
      */
-    public function getPatterns()
-    {
-        return $this->patterns;
-    }
+//    public function getPatterns()
+//    {
+//        return $this->patterns;
+//    }
 
     /**
      * Set a global where pattern on all routes.
@@ -780,10 +797,10 @@ class Router implements BindingRegistrar
      * @param  string $pattern
      * @return void
      */
-    public function pattern($key, $pattern)
-    {
-        $this->patterns[$key] = $pattern;
-    }
+//    public function pattern($key, $pattern)
+//    {
+//        $this->patterns[$key] = $pattern;
+//    }
 
     /**
      * Set a group of global where patterns on all routes.
@@ -791,12 +808,12 @@ class Router implements BindingRegistrar
      * @param  array $patterns
      * @return void
      */
-    public function patterns($patterns)
-    {
-        foreach ($patterns as $key => $pattern) {
-            $this->pattern($key, $pattern);
-        }
-    }
+//    public function patterns($patterns)
+//    {
+//        foreach ($patterns as $key => $pattern) {
+//            $this->pattern($key, $pattern);
+//        }
+//    }
 
     /**
      * Determine if the router currently has a group stack.
@@ -825,19 +842,19 @@ class Router implements BindingRegistrar
      * @param  string $default
      * @return mixed
      */
-    public function input($key, $default = null)
-    {
-        return $this->current()->parameter($key, $default);
-    }
+//    public function input($key, $default = null)
+//    {
+//        return $this->current()->parameter($key, $default);
+//    }
 
     /**
      * Get the request currently being dispatched.
      *
      * @return \Illuminate\Http\Request
      */
-    public function getCurrentRequest()
+    public function getCurrentService()
     {
-        return $this->currentRequest;
+        return $this->currentService;
     }
 
     /**
@@ -957,10 +974,10 @@ class Router implements BindingRegistrar
      * @param  bool $singular
      * @return void
      */
-    public function singularResourceParameters($singular = true)
-    {
-        ResourceRegistrar::singularParameters($singular);
-    }
+//    public function singularResourceParameters($singular = true)
+//    {
+//        ResourceRegistrar::singularParameters($singular);
+//    }
 
     /**
      * Set the global resource parameter mapping.
@@ -968,10 +985,10 @@ class Router implements BindingRegistrar
      * @param  array $parameters
      * @return void
      */
-    public function resourceParameters(array $parameters = [])
-    {
-        ResourceRegistrar::setParameters($parameters);
-    }
+//    public function resourceParameters(array $parameters = [])
+//    {
+//        ResourceRegistrar::setParameters($parameters);
+//    }
 
     /**
      * Get or set the verbs used in the resource URIs.
@@ -979,10 +996,10 @@ class Router implements BindingRegistrar
      * @param  array $verbs
      * @return array|null
      */
-    public function resourceVerbs(array $verbs = [])
-    {
-        return ResourceRegistrar::verbs($verbs);
-    }
+//    public function resourceVerbs(array $verbs = [])
+//    {
+//        return ResourceRegistrar::verbs($verbs);
+//    }
 
     /**
      * Get the underlying route collection.
