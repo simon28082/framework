@@ -3,18 +3,11 @@
 namespace CrCms\Foundation\MicroService\Routing;
 
 use Closure;
-use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Container\Container;
-use Illuminate\Support\Traits\Macroable;
-use CrCms\Foundation\MicroService\Routing\Matching\UriValidator;
-use CrCms\Foundation\MicroService\Routing\Matching\HostValidator;
-use CrCms\Foundation\MicroService\Routing\Matching\MethodValidator;
-use CrCms\Foundation\MicroService\Routing\Matching\SchemeValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use CrCms\Foundation\MicroService\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
@@ -79,19 +72,15 @@ class Route
     public $computedMiddleware;
 
     /**
-     * The compiled version of the route.
-     *
-     * @var \Symfony\Component\Routing\CompiledRoute
-     */
-    public $compiled;
-
-    /**
      * The router instance used by the route.
      *
      * @var \CrCms\Foundation\MicroService\Routing\Router
      */
     protected $router;
-    
+
+    /**
+     * @var string
+     */
     protected $mark;
 
     /**
@@ -100,13 +89,6 @@ class Route
      * @var \Illuminate\Container\Container
      */
     protected $container;
-
-    /**
-     * The validators used by the routes.
-     *
-     * @var array
-     */
-    public static $validators;
 
     /**
      * Create a new Route instance.
@@ -122,6 +104,9 @@ class Route
         $this->action = $this->parseAction($action);
     }
 
+    /**
+     * @return string
+     */
     public function mark(): string
     {
         return $this->mark;
@@ -236,248 +221,6 @@ class Route
     }
 
     /**
-     * Determine if the route matches given request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $includingMethod
-     * @return bool
-     */
-    public function matches(Request $request, $includingMethod = true)
-    {
-        $this->compileRoute();
-
-        foreach ($this->getValidators() as $validator) {
-            if (! $includingMethod && $validator instanceof MethodValidator) {
-                continue;
-            }
-
-            if (! $validator->matches($this, $request)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Compile the route into a Symfony CompiledRoute instance.
-     *
-     * @return \Symfony\Component\Routing\CompiledRoute
-     */
-    protected function compileRoute()
-    {
-        if (! $this->compiled) {
-            $this->compiled = (new RouteCompiler($this))->compile();
-        }
-
-        return $this->compiled;
-    }
-
-    /**
-     * Bind the route to a given request for execution.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return $this
-     */
-    public function bind(ServiceContract $service)
-    {
-        //$this->compileRoute();
-
-//        $this->parameters = (new RouteParameterBinder($this))
-//                        ->parameters($request);
-//
-//        return $this;
-    }
-
-    /**
-     * Determine if the route has parameters.
-     *
-     * @return bool
-     */
-    public function hasParameters()
-    {
-        return isset($this->parameters);
-    }
-
-    /**
-     * Determine a given parameter exists from the route.
-     *
-     * @param  string $name
-     * @return bool
-     */
-    public function hasParameter($name)
-    {
-        if ($this->hasParameters()) {
-            return array_key_exists($name, $this->parameters());
-        }
-
-        return false;
-    }
-
-    /**
-     * Get a given parameter from the route.
-     *
-     * @param  string  $name
-     * @param  mixed   $default
-     * @return string|object
-     */
-    public function parameter($name, $default = null)
-    {
-        return Arr::get($this->parameters(), $name, $default);
-    }
-
-    /**
-     * Set a parameter to the given value.
-     *
-     * @param  string  $name
-     * @param  mixed   $value
-     * @return void
-     */
-    public function setParameter($name, $value)
-    {
-        $this->parameters();
-
-        $this->parameters[$name] = $value;
-    }
-
-    /**
-     * Unset a parameter on the route if it is set.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function forgetParameter($name)
-    {
-        $this->parameters();
-
-        unset($this->parameters[$name]);
-    }
-
-    /**
-     * Get the key / value list of parameters for the route.
-     *
-     * @return array
-     *
-     * @throws \LogicException
-     */
-    public function parameters()
-    {
-        if (isset($this->parameters)) {
-            return $this->parameters;
-        }
-
-        throw new LogicException('Route is not bound.');
-    }
-
-    /**
-     * Get the key / value list of parameters without null values.
-     *
-     * @return array
-     */
-    public function parametersWithoutNulls()
-    {
-        return array_filter($this->parameters(), function ($p) {
-            return ! is_null($p);
-        });
-    }
-
-    /**
-     * Get all of the parameter names for the route.
-     *
-     * @return array
-     */
-    public function parameterNames()
-    {
-        if (isset($this->parameterNames)) {
-            return $this->parameterNames;
-        }
-
-        return $this->parameterNames = $this->compileParameterNames();
-    }
-
-    /**
-     * Get the parameter names for the route.
-     *
-     * @return array
-     */
-    protected function compileParameterNames()
-    {
-        preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
-
-        return array_map(function ($m) {
-            return trim($m, '?');
-        }, $matches[1]);
-    }
-
-    /**
-     * Get the parameters that are listed in the route / controller signature.
-     *
-     * @param  string|null  $subClass
-     * @return array
-     */
-    public function signatureParameters($subClass = null)
-    {
-        return RouteSignatureParameters::fromAction($this->action, $subClass);
-    }
-
-    /**
-     * Set a default value for the route.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function defaults($key, $value)
-    {
-        $this->defaults[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Set a regular expression requirement on the route.
-     *
-     * @param  array|string  $name
-     * @param  string  $expression
-     * @return $this
-     */
-    public function where($name, $expression = null)
-    {
-        foreach ($this->parseWhere($name, $expression) as $name => $expression) {
-            $this->wheres[$name] = $expression;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Parse arguments to the where method into an array.
-     *
-     * @param  array|string  $name
-     * @param  string  $expression
-     * @return array
-     */
-    protected function parseWhere($name, $expression)
-    {
-        return is_array($name) ? $name : [$name => $expression];
-    }
-
-    /**
-     * Set a list of regular expression requirements on the route.
-     *
-     * @param  array  $wheres
-     * @return $this
-     */
-    protected function whereArray(array $wheres)
-    {
-        foreach ($wheres as $name => $expression) {
-            $this->where($name, $expression);
-        }
-
-        return $this;
-    }
-
-    /**
      * Mark this route as a fallback route.
      *
      * @return $this
@@ -487,46 +230,6 @@ class Route
         $this->isFallback = true;
 
         return $this;
-    }
-
-    /**
-     * Get the HTTP verbs the route responds to.
-     *
-     * @return array
-     */
-    public function methods()
-    {
-        return $this->methods;
-    }
-
-    /**
-     * Determine if the route only responds to HTTP requests.
-     *
-     * @return bool
-     */
-    public function httpOnly()
-    {
-        return in_array('http', $this->action, true);
-    }
-
-    /**
-     * Determine if the route only responds to HTTPS requests.
-     *
-     * @return bool
-     */
-    public function httpsOnly()
-    {
-        return $this->secure();
-    }
-
-    /**
-     * Determine if the route only responds to HTTPS requests.
-     *
-     * @return bool
-     */
-    public function secure()
-    {
-        return in_array('https', $this->action, true);
     }
 
     /**
@@ -722,36 +425,6 @@ class Route
     }
 
     /**
-     * Get the route validators for the instance.
-     *
-     * @return array
-     */
-    public static function getValidators()
-    {
-        if (isset(static::$validators)) {
-            return static::$validators;
-        }
-
-        // To match the route, we will use a chain of responsibility pattern with the
-        // validator implementations. We will spin through each one making sure it
-        // passes and then we will know if the route as a whole matches request.
-        return static::$validators = [
-            new UriValidator, new MethodValidator,
-            new SchemeValidator, new HostValidator,
-        ];
-    }
-
-    /**
-     * Get the compiled version of the route.
-     *
-     * @return \Symfony\Component\Routing\CompiledRoute
-     */
-    public function getCompiled()
-    {
-        return $this->compiled;
-    }
-
-    /**
      * Set the router instance on the route.
      *
      * @param  \CrCms\Foundation\MicroService\Routing\Router  $router
@@ -775,34 +448,5 @@ class Route
         $this->container = $container;
 
         return $this;
-    }
-
-    /**
-     * Prepare the route instance for serialization.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function prepareForSerialization()
-    {
-        if ($this->action['uses'] instanceof Closure) {
-            throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
-        }
-
-        $this->compileRoute();
-
-        unset($this->router, $this->container);
-    }
-
-    /**
-     * Dynamically access route parameters.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->parameter($key);
     }
 }

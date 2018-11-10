@@ -4,24 +4,14 @@ namespace CrCms\Foundation\MicroService\Routing;
 
 use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
- * @method \CrCms\Foundation\MicroService\Routing\Route get(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route post(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar as(string $value)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar domain(string $value)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar middleware(array|string|null $middleware)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar name(string $value)
+ * @method \CrCms\Foundation\MicroService\Routing\Route single(string $name, \Closure | array | string | null $action = null)
+ * @method \CrCms\Foundation\MicroService\Routing\Route register(string $name, \Closure | array | string | null $action = null)
+ * @method \CrCms\Foundation\MicroService\Routing\Route multiple(string $name, \Closure | array | string | null $action = null)
+ * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar middleware(array | string | null $middleware)
  * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar namespace(string $value)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar prefix(string  $prefix)
- * @method \CrCms\Foundation\MicroService\Routing\RouteRegistrar where(array  $where)
  */
 class RouteRegistrar
 {
@@ -45,7 +35,7 @@ class RouteRegistrar
      * @var array
      */
     protected $passthru = [
-        'single', 'register','multiple',//'post', 'put', 'patch', 'delete', 'options', 'any',
+        'single', 'register', 'multiple',
     ];
 
     /**
@@ -54,22 +44,13 @@ class RouteRegistrar
      * @var array
      */
     protected $allowedAttributes = [
-        'middleware',  'namespace',//'name','as',  'domain', 'where',
-    ];
-
-    /**
-     * The attributes that are aliased.
-     *
-     * @var array
-     */
-    protected $aliases = [
-        'name' => 'as',
+        'middleware', 'namespace',
     ];
 
     /**
      * Create a new route registrar instance.
      *
-     * @param  \CrCms\Foundation\MicroService\Routing\Router  $router
+     * @param  \CrCms\Foundation\MicroService\Routing\Router $router
      * @return void
      */
     public function __construct(Router $router)
@@ -80,40 +61,27 @@ class RouteRegistrar
     /**
      * Set the value for a given attribute.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param  string $key
+     * @param  mixed $value
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
     public function attribute($key, $value)
     {
-        if (! in_array($key, $this->allowedAttributes)) {
+        if (!in_array($key, $this->allowedAttributes)) {
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
-        $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
+        $this->attributes[$key] = $value;
 
         return $this;
     }
 
     /**
-     * Route a resource to a controller.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array  $options
-     * @return \CrCms\Foundation\MicroService\Routing\PendingResourceRegistration
-     */
-//    public function resource($name, $controller, array $options = [])
-//    {
-//        return $this->router->resource($name, $controller, $this->attributes + $options);
-//    }
-
-    /**
      * Create a route group with shared attributes.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string $callback
      * @return void
      */
     public function group($callback)
@@ -122,29 +90,16 @@ class RouteRegistrar
     }
 
     /**
-     * Register a new route with the given verbs.
-     *
-     * @param  array|string  $methods
-     * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
-     * @return \CrCms\Foundation\MicroService\Routing\Route
-     */
-//    public function match($methods, $uri, $action = null)
-//    {
-//        return $this->router->match($methods, $uri, $this->compileAction($action));
-//    }
-
-    /**
      * Register a new route with the router.
      *
-     * @param  string  $method
-     * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  string $method
+     * @param  string $uri
+     * @param  \Closure|array|string|null $action
      * @return \CrCms\Foundation\MicroService\Routing\Route
      */
     protected function registerRoute($method, $uri, $action = null)
     {
-        if (! is_array($action)) {
+        if (!is_array($action)) {
             $action = array_merge($this->attributes, $action ? ['uses' => $action] : []);
         }
 
@@ -154,7 +109,7 @@ class RouteRegistrar
     /**
      * Compile the action into an array including the attributes.
      *
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|null $action
      * @return array
      */
     protected function compileAction($action)
@@ -173,8 +128,8 @@ class RouteRegistrar
     /**
      * Dynamically handle calls into the route registrar.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param  string $method
+     * @param  array $parameters
      * @return \CrCms\Foundation\MicroService\Routing\Route|$this
      *
      * @throws \BadMethodCallException
