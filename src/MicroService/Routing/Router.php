@@ -8,7 +8,7 @@ use CrCms\Foundation\MicroService\Contracts\ServiceContract;
 use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+//use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
@@ -24,6 +24,7 @@ use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use CrCms\Foundation\MicroService\Routing\Route;
+use CrCms\Foundation\MicroService\Http\Response;
 
 class Router implements BindingRegistrar
 {
@@ -527,7 +528,7 @@ class Router implements BindingRegistrar
 
     public function prepareResponse(ServiceContract $service, $response)
     {
-        $response = new \CrCms\Foundation\MicroService\Http\Response($response);
+        $response = new Response($response);
         $service->setResponse($response);
         return $response;
     }
