@@ -43,7 +43,7 @@ class Start
      */
     public static function run(array $params = [], ?string $basePath = null): void
     {
-        static::instance()->handle($params);
+        static::instance()->handle($params, $basePath);
     }
 
     /**
