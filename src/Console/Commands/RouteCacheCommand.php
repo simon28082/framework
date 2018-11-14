@@ -2,7 +2,7 @@
 
 namespace CrCms\Framework\Console\Commands;
 
-use CrCms\Framework\Bootstrap\Start;
+use CrCms\Framework\Start;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\RouteCacheCommand as BaseRouteCacheCommand;
 

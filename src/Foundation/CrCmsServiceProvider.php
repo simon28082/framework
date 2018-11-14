@@ -2,11 +2,10 @@
 
 namespace CrCms\Framework\Foundation;
 
-use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
-use CrCms\Foundation\Transporters\DataProvider;
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
-use CrCms\Framework\Console\Commands\ServerCommand;
+use CrCms\Framework\Transporters\Contracts\DataProviderContract;
+use CrCms\Framework\Transporters\DataProvider;
 use Illuminate\Support\ServiceProvider;
 
 class CrCmsServiceProvider extends ServiceProvider
@@ -14,7 +13,7 @@ class CrCmsServiceProvider extends ServiceProvider
     /**
      * @var bool
      */
-    protected $defer = true;
+    protected $defer = false;
 
     /**
      * Bootstrap any application services.
@@ -61,10 +60,6 @@ class CrCmsServiceProvider extends ServiceProvider
         $this->app->extend('command.config.cache', function () {
             return new ConfigCacheCommand($this->app['files']);
         });
-
-        $this->app->singleton('command.swoole.server', function () {
-            return new ServerCommand();
-        });
     }
 
     /**
@@ -83,7 +78,6 @@ class CrCmsServiceProvider extends ServiceProvider
         $this->app->alias('data.provider', DataProviderContract::class);
 //        $this->app->alias('command.crcms.make.directory', DirectoryMakeCommand::class);
         $this->app->alias('command.route.cache', RouteCacheCommand::class);
-        $this->app->alias('command.swoole.server', ServerCommand::class);
     }
 
     /**
@@ -92,7 +86,8 @@ class CrCmsServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [
-            'command.swoole.server',
+            'data.provider',
+//            'command.crcms.make.directory',
         ];
     }
 }

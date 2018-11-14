@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
      */
     protected function dispatch(Schedule $schedule)
     {
-        foreach (config('console.schedules') as $scheduleCommand) {
+        foreach (config('mount.schedules') as $scheduleCommand) {
             (new $scheduleCommand)->handle($schedule);
         }
     }

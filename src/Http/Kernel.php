@@ -2,6 +2,7 @@
 
 namespace CrCms\Framework\Http;
 
+use CrCms\Framework\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -13,7 +14,8 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
         \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
         \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
-        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        //\Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \CrCms\Framework\Bootstrap\RegisterFacades::class,
         \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
@@ -75,31 +77,4 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
-
-    /**
-     * @return void
-     */
-    public function bootstrap(): void
-    {
-        parent::bootstrap();
-
-        // Reload each time
-        //$this->reloadProviders();
-    }
-
-    /**
-     * @return void
-     */
-    protected function reloadProviders(): void
-    {
-        $providers = $this->app->config['http.reload_providers'];
-
-        foreach ($providers as $provider) {
-            $this->app->register($provider,true);
-            $provider = $this->app->getProvider($provider);
-            if (method_exists($provider, 'boot')) {
-                $provider->boot();
-            }
-        }
-    }
 }

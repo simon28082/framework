@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as BaseApplication;
+use Illuminate\Foundation\ProviderRepository;
 
 /**
  * Class Application
@@ -68,6 +69,22 @@ class Application extends BaseApplication implements Container
     {
         parent::registerCoreContainerAliases();
         $this->alias('app', static::class);
+    }
+
+    /**
+     * @return void
+     */
+    public function registerConfiguredProviders()
+    {
+        $providers = Collection::make($this->config['mount.providers'])
+            ->partition(function ($provider) {
+                return Str::startsWith($provider, 'Illuminate\\');
+            });
+
+        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
+
+        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
+            ->load($providers->collapse()->toArray());
     }
 
     /**
