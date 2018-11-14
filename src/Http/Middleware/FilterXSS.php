@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Framework\App\Http\Middleware;
+namespace CrCms\Framework\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\JsonResponse;

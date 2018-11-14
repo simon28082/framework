@@ -1,9 +1,9 @@
 <?php
 
-namespace CrCms\Framework\Http\Commands;
+namespace CrCms\Framework\Console\Commands;
 
-use CrCms\Framework\Swoole\AbstractServerCommand;
-use CrCms\Framework\Swoole\Server\Contracts\ServerContract;
+use CrCms\Server\AbstractServerCommand;
+use CrCms\Server\Server\Contracts\ServerContract;
 use Illuminate\Filesystem\Filesystem;
 
 /**
@@ -15,7 +15,12 @@ class ServerCommand extends AbstractServerCommand
     /**
      * @var string
      */
-    protected $server = 'http';
+    protected $signature = 'server {action : start or stop or restart}';
+
+    /**
+     * @var string
+     */
+    protected $description = 'Swoole server';
 
     /**
      * @return ServerContract
@@ -26,8 +31,8 @@ class ServerCommand extends AbstractServerCommand
 
         return new \CrCms\Framework\Http\Server(
             $this->getLaravel(),
-            config("swoole.servers.{$this->server}"),
-            $this->server
+            config("swoole.servers.http"),
+            'server.http'
         );
     }
 
