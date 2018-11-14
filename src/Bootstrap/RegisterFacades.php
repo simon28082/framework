@@ -2,7 +2,7 @@
 
 namespace CrCms\Framework\Bootstrap;
 
-use CrCms\Framework\Foundation\PackageManifest;
+use Illuminate\Foundation\PackageManifest;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;

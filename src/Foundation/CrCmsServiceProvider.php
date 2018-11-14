@@ -67,7 +67,7 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        $this->commands('command.crcms.make.directory');
+        //$this->commands('command.crcms.make.directory');
     }
 
     /**

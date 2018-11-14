@@ -7,6 +7,8 @@ use Illuminate\Foundation\PackageManifest as BasePackageManifest;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as BaseApplication;
 use Illuminate\Foundation\ProviderRepository;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class Application
@@ -81,7 +83,7 @@ class Application extends BaseApplication implements Container
                 return Str::startsWith($provider, 'Illuminate\\');
             });
 
-        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
+        $providers->splice(1, 0, [$this->make(BasePackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
             ->load($providers->collapse()->toArray());
