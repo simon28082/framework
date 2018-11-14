@@ -2,11 +2,9 @@
   "name": "crcms/framework",
   "description": "The CrCms Framework.",
   "keywords": [
+    "framework",
     "crcms",
     "laravel",
-    "swoole",
-    "rpc",
-    "microservice",
     "php"
   ],
   "license": "MIT",
@@ -16,7 +14,6 @@
     "doctrine/dbal": "^2.8",
     "fideloper/proxy": "^4.0",
     "laravel/framework": "5.7.*",
-    "laravel/tinker": "^1.0",
     "predis/predis": "^1.1",
     "crcms/foundation": "dev-master",
     "crcms/repository": "dev-master"
@@ -27,10 +24,10 @@
     "classmap": [
     ],
     "psr-4": {
-      "CrCms\\Foundation\\": "src/"
+      "CrCms\\Framework\\": "src/"
     },
     "files": [
-      "src/App/Helpers/helper.php"
+
     ]
   },
   "autoload-dev": {
