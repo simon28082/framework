@@ -2,8 +2,8 @@
 
 namespace CrCms\Framework\Http\Controllers;
 
-use CrCms\Framework\App\Helpers\InstanceConcern;
-use CrCms\Framework\App\Services\ResponseFactory;
+use CrCms\Foundation\Helpers\InstanceConcern;
+use CrCms\Foundation\Services\ResponseFactory;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

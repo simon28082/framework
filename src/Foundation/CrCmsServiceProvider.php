@@ -2,10 +2,10 @@
 
 namespace CrCms\Framework\Foundation;
 
+use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
+use CrCms\Foundation\Transporters\DataProvider;
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
-use CrCms\Framework\Transporters\Contracts\DataProviderContract;
-use CrCms\Framework\Transporters\DataProvider;
 use Illuminate\Support\ServiceProvider;
 
 class CrCmsServiceProvider extends ServiceProvider
