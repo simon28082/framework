@@ -7,14 +7,14 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Tasks;
+namespace CrCms\Framework\App\Tasks;
 
-use CrCms\Foundation\App\Helpers\InstanceConcern;
-use CrCms\Foundation\App\Tasks\Contracts\TaskContract;
+use CrCms\Framework\App\Helpers\InstanceConcern;
+use CrCms\Framework\App\Tasks\Contracts\TaskContract;
 
 /**
  * Class AbstractTask
- * @package CrCms\Foundation\App\Tasks
+ * @package CrCms\Framework\App\Tasks
  */
 abstract class AbstractTask implements TaskContract
 {

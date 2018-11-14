@@ -1,13 +1,13 @@
 <?php
 
-namespace CrCms\Foundation\App\Providers;
+namespace CrCms\Framework\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use CrCms\Foundation\Providers\ModuleServiceProvider as BaseModuleServiceProvider;
+use CrCms\Framework\Providers\ModuleServiceProvider as BaseModuleServiceProvider;
 
 /**
  * Class ModuleServiceProvider
- * @package CrCms\Foundation\App\Providers
+ * @package CrCms\Framework\App\Providers
  */
 class ModuleServiceProvider extends BaseModuleServiceProvider
 {

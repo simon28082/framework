@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Models;
+namespace CrCms\Framework\App\Models;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 

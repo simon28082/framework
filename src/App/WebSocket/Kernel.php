@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\WebSocket;
+namespace CrCms\Framework\App\WebSocket;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -16,9 +16,9 @@ class Kernel extends HttpKernel
     protected $middleware = [
         \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \CrCms\Foundation\App\Http\Middleware\TrimStrings::class,
+        \CrCms\Framework\App\Http\Middleware\TrimStrings::class,
         //\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \CrCms\Foundation\App\Http\Middleware\TrustProxies::class,
+        \CrCms\Framework\App\Http\Middleware\TrustProxies::class,
     ];
 
     /**
@@ -28,12 +28,12 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \CrCms\Foundation\App\Http\Middleware\EncryptCookies::class,
+            \CrCms\Framework\App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \CrCms\Foundation\App\Http\Middleware\VerifyCsrfToken::class,
+            \CrCms\Framework\App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

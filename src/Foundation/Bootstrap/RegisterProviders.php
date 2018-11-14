@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Foundation\Bootstrap;
+namespace CrCms\Framework\Foundation\Bootstrap;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\RegisterProviders as BaseRegisterProviders;

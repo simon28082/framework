@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\Foundation;
+namespace CrCms\Framework\Foundation;
 
 use Exception;
 use Illuminate\Foundation\PackageManifest as BasePackageManifest;

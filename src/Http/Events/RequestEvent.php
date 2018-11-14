@@ -1,10 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\Http\Events;
+namespace CrCms\Framework\Http\Events;
 
 use Carbon\Carbon;
-use CrCms\Foundation\Swoole\Server\Events\AbstractEvent;
-use CrCms\Foundation\Swoole\Server\Contracts\EventContract;
+use CrCms\Framework\Swoole\Server\Events\AbstractEvent;
+use CrCms\Framework\Swoole\Server\Contracts\EventContract;
 use Illuminate\Http\Response as IlluminateResponse;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
@@ -13,11 +13,11 @@ use Illuminate\Contracts\Http\Kernel;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use CrCms\Foundation\Swoole\Server\AbstractServer;
+use CrCms\Framework\Swoole\Server\AbstractServer;
 
 /**
  * Class RequestEvent
- * @package CrCms\Foundation\Swoole\Events
+ * @package CrCms\Framework\Swoole\Events
  */
 class RequestEvent extends AbstractEvent implements EventContract
 {

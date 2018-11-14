@@ -1,8 +1,8 @@
 <?php
 
-namespace CrCms\Foundation\App\Handlers\Contracts;
+namespace CrCms\Framework\App\Handlers\Contracts;
 
-use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
+use CrCms\Framework\Transporters\Contracts\DataProviderContract;
 
 interface HandlerContract
 {

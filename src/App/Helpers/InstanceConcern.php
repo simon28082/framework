@@ -7,9 +7,9 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Helpers;
+namespace CrCms\Framework\App\Helpers;
 
-use CrCms\Foundation\Helpers\Concerns\InstanceConcern as BaseInstanceConcern;
+use CrCms\Framework\Helpers\Concerns\InstanceConcern as BaseInstanceConcern;
 
 /**
  * @property-read Container $app
@@ -22,7 +22,7 @@ use CrCms\Foundation\Helpers\Concerns\InstanceConcern as BaseInstanceConcern;
  * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
  * Trait InstanceConcern
- * @package CrCms\Foundation\App\Helpers
+ * @package CrCms\Framework\App\Helpers
  */
 trait InstanceConcern
 {

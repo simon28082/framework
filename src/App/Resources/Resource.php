@@ -1,9 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\Resources;
+namespace CrCms\Framework\App\Http\Resources;
 
-use CrCms\Foundation\App\Resources\Concerns\FieldConcern;
-use CrCms\Foundation\App\Resources\Concerns\IncludeConcern;
+use CrCms\Framework\App\Resources\Concerns\FieldConcern;
+use CrCms\Framework\App\Resources\Concerns\IncludeConcern;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;

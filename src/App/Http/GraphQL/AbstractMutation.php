@@ -7,12 +7,12 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Http\GraqhQL;
+namespace CrCms\Framework\App\Http\GraqhQL;
 
-use CrCms\Foundation\App\Http\GraphQL\Traits\FieldTrait;
-use CrCms\Foundation\App\Http\GraphQL\Traits\InputTrait;
-use CrCms\Foundation\App\Http\GraphQL\Traits\NameTrait;
-use CrCms\Foundation\App\Http\GraphQL\Traits\ShouldValidateExtendTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\FieldTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\InputTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\NameTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\ShouldValidateExtendTrait;
 use Folklore\GraphQL\Support\Mutation;
 
 /**

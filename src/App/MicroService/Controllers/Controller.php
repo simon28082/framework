@@ -1,9 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\App\MicroService\Controllers;
+namespace CrCms\Framework\App\MicroService\Controllers;
 
-use CrCms\Foundation\App\Helpers\InstanceConcern;
-use CrCms\Foundation\App\Services\ResponseFactory;
+use CrCms\Framework\App\Helpers\InstanceConcern;
+use CrCms\Framework\App\Services\ResponseFactory;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,7 +13,7 @@ use InvalidArgumentException;
  * @property-read ResponseFactory $response
  *
  * Class Controller
- * @package CrCms\Foundation\App\MicroService\Controllers
+ * @package CrCms\Framework\App\MicroService\Controllers
  */
 class Controller extends BaseController
 {

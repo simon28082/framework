@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\WebSocket;
+namespace CrCms\Framework\App\WebSocket;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
@@ -9,7 +9,7 @@ use Illuminate\Routing\Route;
 
 /**
  * Class WebSocketControllerDispatcher
- * @package CrCms\Foundation\App\WebSocket
+ * @package CrCms\Framework\App\WebSocket
  */
 class WebSocketControllerDispatcher implements ControllerDispatcherContract
 {

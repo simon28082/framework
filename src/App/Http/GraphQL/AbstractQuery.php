@@ -1,9 +1,9 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\GraqhQL;
+namespace CrCms\Framework\App\Http\GraqhQL;
 
-use CrCms\Foundation\App\Http\GraphQL\Traits\NameTrait;
-use CrCms\Foundation\App\Http\GraphQL\Traits\ShouldValidateExtendTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\NameTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\ShouldValidateExtendTrait;
 use Folklore\GraphQL\Support\Query;
 use Folklore\GraphQL\Support\Traits\ShouldValidate;
 

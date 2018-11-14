@@ -1,10 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\App\Services;
+namespace CrCms\Framework\App\Services;
 
-use CrCms\Foundation\App\Http\Resources\ResourceCollection;
+use CrCms\Framework\App\Http\Resources\ResourceCollection;
 use Illuminate\Http\JsonResponse;
-use CrCms\Foundation\App\Http\Resources\Resource;
+use CrCms\Framework\App\Http\Resources\Resource;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,7 +16,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
 /**
  * Class ResponseFactory
- * @package CrCms\Foundation\App\Services
+ * @package CrCms\Framework\App\Services
  */
 class ResponseFactory
 {

@@ -7,13 +7,13 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Http\Controllers\Traits;
+namespace CrCms\Framework\App\Http\Controllers\Traits;
 
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Trait AttributeTrait
- * @package CrCms\Foundation\App\Http\Controllers\Traits
+ * @package CrCms\Framework\App\Http\Controllers\Traits
  */
 trait AttributeTrait
 {

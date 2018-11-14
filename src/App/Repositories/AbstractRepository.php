@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Repositories;
+namespace CrCms\Framework\App\Repositories;
 
 use CrCms\Repository\AbstractRepository as BaseRepository;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Tasks\Contracts;
+namespace CrCms\Framework\App\Tasks\Contracts;
 
 interface TaskContract
 {

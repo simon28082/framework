@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Framework\Providers;
+namespace CrCms\Framework\Foundation;
 
 use Illuminate\Support\ServiceProvider;
 

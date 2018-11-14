@@ -1,9 +1,8 @@
 <?php
 
-namespace CrCms\Framework\Providers;
+namespace CrCms\Framework\Foundation;
 
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
-use CrCms\Framework\Console\Commands\DirectoryMakeCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
 use CrCms\Framework\Transporters\Contracts\DataProviderContract;
 use CrCms\Framework\Transporters\DataProvider;
@@ -50,9 +49,9 @@ class CrCmsServiceProvider extends ServiceProvider
             return new DataProvider($app['request']);
         });
 
-        $this->app->singleton('command.crcms.make.directory', function ($app) {
-            return new DirectoryMakeCommand($app['files']);
-        });
+//        $this->app->singleton('command.crcms.make.directory', function ($app) {
+//            return new DirectoryMakeCommand($app['files']);
+//        });
 
         $this->app->extend('command.route.cache', function () {
             return new RouteCacheCommand($this->app['files']);
@@ -77,7 +76,7 @@ class CrCmsServiceProvider extends ServiceProvider
     protected function registerAlias(): void
     {
         $this->app->alias('data.provider', DataProviderContract::class);
-        $this->app->alias('command.crcms.make.directory', DirectoryMakeCommand::class);
+//        $this->app->alias('command.crcms.make.directory', DirectoryMakeCommand::class);
         $this->app->alias('command.route.cache', RouteCacheCommand::class);
     }
 
@@ -88,7 +87,7 @@ class CrCmsServiceProvider extends ServiceProvider
     {
         return [
             'data.provider',
-            'command.crcms.make.directory',
+//            'command.crcms.make.directory',
         ];
     }
 }

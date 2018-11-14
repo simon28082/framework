@@ -1,15 +1,15 @@
 <?php
 
-namespace CrCms\Foundation;
+namespace CrCms\Framework;
 
-use CrCms\Foundation\Foundation\Contracts\ApplicationContract;
+use CrCms\Framework\Foundation\Contracts\ApplicationContract;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Class Start
- * @package CrCms\Foundation
+ * @package CrCms\Framework
  */
 class Start
 {
@@ -32,8 +32,8 @@ class Start
      * @var array
      */
     const DRIVERS = [
-        'ms' => \CrCms\Foundation\MicroService\Application::class,
-        'http' => \CrCms\Foundation\Http\Application::class,
+        'ms' => \CrCms\Framework\MicroService\Application::class,
+        'http' => \CrCms\Framework\Http\Application::class,
     ];
 
     /**
@@ -82,7 +82,7 @@ class Start
 
         $this->app->singleton(
             \Illuminate\Contracts\Console\Kernel::class,
-            \CrCms\Foundation\Console\Kernel::class
+            \CrCms\Framework\Console\Kernel::class
         );
 
         return $this;

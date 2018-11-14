@@ -1,10 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\Foundation\Contracts;
+namespace CrCms\Framework\Foundation\Contracts;
 
 /**
  * Interface ApplicationContract
- * @package CrCms\Foundation\Contracts
+ * @package CrCms\Framework\Contracts
  */
 interface ApplicationContract
 {

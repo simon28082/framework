@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\Middleware;
+namespace CrCms\Framework\App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TrimStrings as Middleware;
 

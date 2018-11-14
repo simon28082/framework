@@ -7,14 +7,14 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Handlers;
+namespace CrCms\Framework\App\Handlers;
 
-use CrCms\Foundation\App\Handlers\Contracts\HandlerContract;
-use CrCms\Foundation\App\Helpers\InstanceConcern;
+use CrCms\Framework\App\Handlers\Contracts\HandlerContract;
+use CrCms\Framework\App\Helpers\InstanceConcern;
 
 /**
  * Class AbstractHandler
- * @package CrCms\Foundation\App\Actions
+ * @package CrCms\Framework\App\Actions
  */
 abstract class AbstractHandler implements HandlerContract
 {

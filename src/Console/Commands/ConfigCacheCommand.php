@@ -1,15 +1,14 @@
 <?php
 
-namespace CrCms\Foundation\Console\Commands;
+namespace CrCms\Framework\Console\Commands;
 
-use CrCms\Foundation\Application;
-use CrCms\Foundation\Start;
+use CrCms\Framework\Start;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\ConfigCacheCommand as BaseConfigCacheCommand;
 
 /**
  * Class ConfigCacheCommand
- * @package CrCms\Foundation\Console\Commands
+ * @package CrCms\Framework\Console\Commands
  */
 class ConfigCacheCommand extends BaseConfigCacheCommand
 {
@@ -20,7 +19,7 @@ class ConfigCacheCommand extends BaseConfigCacheCommand
      */
     protected function getFreshConfiguration()
     {
-        $app = tap(Start::instance()->bootstrap()->getApp(), function ($app) {
+        $app = tap(Start::instance()->bootstrap()->getApplication(), function ($app) {
             $app->make(Kernel::class)->bootstrap();
         });
 

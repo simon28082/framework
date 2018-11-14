@@ -1,14 +1,14 @@
 <?php
 
-namespace CrCms\Foundation\Http\Commands;
+namespace CrCms\Framework\Http\Commands;
 
-use CrCms\Foundation\Swoole\AbstractServerCommand;
-use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
+use CrCms\Framework\Swoole\AbstractServerCommand;
+use CrCms\Framework\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Filesystem\Filesystem;
 
 /**
  * Class ServerCommand
- * @package CrCms\Foundation\Http\Commands
+ * @package CrCms\Framework\Http\Commands
  */
 class ServerCommand extends AbstractServerCommand
 {
@@ -24,7 +24,7 @@ class ServerCommand extends AbstractServerCommand
     {
         $this->cleanRunCache();
 
-        return new \CrCms\Foundation\Http\Server(
+        return new \CrCms\Framework\Http\Server(
             $this->getLaravel(),
             config("swoole.servers.{$this->server}"),
             $this->server

@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Exceptions;
+namespace CrCms\Framework\App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;

@@ -7,14 +7,14 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Http\Providers;
+namespace CrCms\Framework\Http\Providers;
 
-use CrCms\Foundation\Http\Commands\ServerCommand;
+use CrCms\Framework\Http\Commands\ServerCommand;
 use Illuminate\Support\ServiceProvider;
 
 /**
  * Class HttpServiceProvider
- * @package CrCms\Foundation\MicroService\Providers
+ * @package CrCms\Framework\MicroService\Providers
  */
 class HttpServiceProvider extends ServiceProvider
 {

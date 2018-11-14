@@ -7,17 +7,17 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Http;
+namespace CrCms\Framework\Http;
 
-use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Http\Events\RequestEvent;
-use CrCms\Foundation\Swoole\Server\Contracts\ServerContract;
+use CrCms\Framework\Swoole\Server\AbstractServer;
+use CrCms\Framework\Http\Events\RequestEvent;
+use CrCms\Framework\Swoole\Server\Contracts\ServerContract;
 use Illuminate\Contracts\Http\Kernel;
 use Swoole\Http\Server as HttpServer;
 
 /**
  * Class Server
- * @package CrCms\Foundation\Swoole\Http
+ * @package CrCms\Framework\Swoole\Http
  */
 class Server extends AbstractServer implements ServerContract
 {

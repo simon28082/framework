@@ -7,13 +7,13 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\App\Http\GraphQL\Traits;
+namespace CrCms\Framework\App\Http\GraphQL\Traits;
 
 use Illuminate\Validation\Validator;
 
 /**
  * Trait ShouldValidateExtendTrait
- * @package CrCms\Foundation\App\Http\GraphQL\Traits
+ * @package CrCms\Framework\App\Http\GraphQL\Traits
  */
 trait ShouldValidateExtendTrait
 {

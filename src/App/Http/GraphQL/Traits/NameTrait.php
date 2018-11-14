@@ -1,10 +1,10 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\GraphQL\Traits;
+namespace CrCms\Framework\App\Http\GraphQL\Traits;
 
 /**
  * Trait NameTrait
- * @package CrCms\Foundation\App\Http\GraphQL\Traits
+ * @package CrCms\Framework\App\Http\GraphQL\Traits
  */
 trait NameTrait
 {

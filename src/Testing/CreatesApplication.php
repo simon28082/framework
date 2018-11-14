@@ -1,8 +1,8 @@
 <?php
 
-namespace CrCms\Foundation\Testing;
+namespace CrCms\Framework\Testing;
 
-use CrCms\Foundation\Start;
+use CrCms\Framework\Start;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Console\Kernel;
 

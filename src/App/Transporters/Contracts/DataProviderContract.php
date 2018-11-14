@@ -7,11 +7,11 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Transporters\Contracts;
+namespace CrCms\Framework\Transporters\Contracts;
 
 /**
  * Interface DataProviderContract
- * @package CrCms\Foundation\Transporters\Contracts
+ * @package CrCms\Framework\Transporters\Contracts
  */
 interface DataProviderContract
 {

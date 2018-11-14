@@ -1,8 +1,8 @@
 <?php
 
-namespace CrCms\Foundation\App\Providers;
+namespace CrCms\Framework\App\Providers;
 
-use CrCms\Foundation\App\WebSocket\WebSocketControllerDispatcher;
+use CrCms\Framework\App\WebSocket\WebSocketControllerDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

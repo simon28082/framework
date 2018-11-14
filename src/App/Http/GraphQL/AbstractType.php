@@ -1,14 +1,14 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\GraphQL;
+namespace CrCms\Framework\App\Http\GraphQL;
 
-use CrCms\Foundation\App\Http\GraphQL\Traits\FieldTrait;
-use CrCms\Foundation\App\Http\GraphQL\Traits\NameTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\FieldTrait;
+use CrCms\Framework\App\Http\GraphQL\Traits\NameTrait;
 use Folklore\GraphQL\Support\Type as GraphQLType;
 
 /**
  * Class AbstractType
- * @package CrCms\Foundation\App\Http\GraphQL
+ * @package CrCms\Framework\App\Http\GraphQL
  */
 abstract class AbstractType extends GraphQLType
 {

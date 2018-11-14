@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\Middleware;
+namespace CrCms\Framework\App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\JsonResponse;
@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class FilterXss
- * @package CrCms\Foundation\App\Http\Middleware
+ * @package CrCms\Framework\App\Http\Middleware
  */
 class FilterXSS
 {

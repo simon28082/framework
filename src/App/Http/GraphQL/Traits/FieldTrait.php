@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\GraphQL\Traits;
+namespace CrCms\Framework\App\Http\GraphQL\Traits;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -8,7 +8,7 @@ use TypeError;
 
 /**
  * Trait FieldTrait
- * @package CrCms\Foundation\App\Http\GraphQL\Traits
+ * @package CrCms\Framework\App\Http\GraphQL\Traits
  */
 trait FieldTrait
 {

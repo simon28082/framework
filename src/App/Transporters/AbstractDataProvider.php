@@ -7,10 +7,10 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Transporters;
+namespace CrCms\Framework\Transporters;
 
-use CrCms\Foundation\Transporters\Concerns\InteractsWithData;
-use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
+use CrCms\Framework\Transporters\Concerns\InteractsWithData;
+use CrCms\Framework\Transporters\Contracts\DataProviderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use DomainException;
@@ -19,7 +19,7 @@ use ArrayAccess;
 
 /**
  * Class AbstractDataProvider
- * @package CrCms\Foundation\Transporters
+ * @package CrCms\Framework\Transporters
  */
 abstract class AbstractDataProvider implements DataProviderContract, ArrayAccess
 {

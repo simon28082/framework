@@ -7,13 +7,13 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Transporters\Concerns;
+namespace CrCms\Framework\Transporters\Concerns;
 
 use Illuminate\Support\Arr;
 
 /**
  * Trait InteractsWithData
- * @package CrCms\Foundation\Transporters\Concerns
+ * @package CrCms\Framework\Transporters\Concerns
  */
 trait InteractsWithData
 {

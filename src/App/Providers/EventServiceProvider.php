@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Providers;
+namespace CrCms\Framework\App\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

@@ -1,12 +1,12 @@
 <?php
 
-namespace CrCms\Foundation\Console;
+namespace CrCms\Framework\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 
 /**
  * Interface ScheduleDispatchContract
- * @package CrCms\Foundation\Artisan
+ * @package CrCms\Framework\Artisan
  */
 interface ScheduleDispatchContract
 {

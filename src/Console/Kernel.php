@@ -1,11 +1,11 @@
 <?php
 
-namespace CrCms\Foundation\Console;
+namespace CrCms\Framework\Console;
 
-use CrCms\Foundation\MicroService\Commands\ServerCommand;
+use CrCms\Framework\MicroService\Commands\ServerCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
-use CrCms\Foundation\Application;
+use CrCms\Framework\Application;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel

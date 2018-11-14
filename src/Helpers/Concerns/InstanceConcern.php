@@ -7,10 +7,10 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Helpers\Concerns;
+namespace CrCms\Framework\Helpers\Concerns;
 
-use CrCms\Foundation\Swoole\Server\AbstractServer;
-use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
+use CrCms\Framework\Swoole\Server\AbstractServer;
+use CrCms\Framework\Transporters\Contracts\DataProviderContract;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Str;
@@ -32,7 +32,7 @@ use InvalidArgumentException;
  * @property-read AbstractServer|Server|\Swoole\Http\Server|\Swoole\WebSocket\Server $server
  *
  * Trait InstanceConcern
- * @package CrCms\Foundation\App\Helpers
+ * @package CrCms\Framework\App\Helpers
  */
 trait InstanceConcern
 {

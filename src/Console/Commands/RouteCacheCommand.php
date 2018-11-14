@@ -1,24 +1,23 @@
 <?php
 
-namespace CrCms\Foundation\Console\Commands;
+namespace CrCms\Framework\Console\Commands;
 
-use CrCms\Foundation\Application;
-use CrCms\Foundation\Start;
+use CrCms\Framework\Start;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\RouteCacheCommand as BaseRouteCacheCommand;
 
 /**
  * Class RouteCacheCommand
- * @package CrCms\Foundation\Console\Commands
+ * @package CrCms\Framework\Console\Commands
  */
 class RouteCacheCommand extends BaseRouteCacheCommand
 {
     /**
-     * @return \Illuminate\Foundation\Application|Application
+     * @return \Illuminate\Foundation\Application
      */
     protected function getFreshApplication()
     {
-        return tap(Start::instance()->bootstrap()->getApp(), function ($app) {
+        return tap(Start::instance()->bootstrap()->getApplication(), function ($app) {
             $app->make(Kernel::class)->bootstrap();
         });
     }

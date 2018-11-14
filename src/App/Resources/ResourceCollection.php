@@ -1,14 +1,14 @@
 <?php
 
-namespace CrCms\Foundation\App\Http\Resources;
+namespace CrCms\Framework\App\Http\Resources;
 
-use CrCms\Foundation\App\Resources\Concerns\FieldConcern;
+use CrCms\Framework\App\Resources\Concerns\FieldConcern;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection as BaseResourceCollection;
 
 /**
  * Class ResourceCollection
- * @package CrCms\Foundation\Http\Resources
+ * @package CrCms\Framework\Http\Resources
  */
 class ResourceCollection extends BaseResourceCollection
 {

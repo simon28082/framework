@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Foundation\App\Providers;
+namespace CrCms\Framework\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Broadcast;

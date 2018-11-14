@@ -7,14 +7,14 @@
  * @copyright Copyright &copy; 2018 Rights Reserved CRCMS
  */
 
-namespace CrCms\Foundation\Transporters;
+namespace CrCms\Framework\Transporters;
 
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 /**
  * Class DataProvider
- * @package CrCms\Foundation\Transporters
+ * @package CrCms\Framework\Transporters
  */
 class DataProvider extends AbstractDataProvider// implements ValidatesWhenResolved
 {
