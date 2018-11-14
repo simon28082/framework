@@ -2,7 +2,7 @@
 
 namespace CrCms\Framework\Console\Commands;
 
-use CrCms\Framework\Start;
+use CrCms\Framework\Bootstrap\Start;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\ConfigCacheCommand as BaseConfigCacheCommand;
 
