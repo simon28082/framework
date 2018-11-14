@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Framework\App\MicroService\Controllers;
+namespace CrCms\Framework\Http\Controllers;
 
 use CrCms\Framework\App\Helpers\InstanceConcern;
 use CrCms\Framework\App\Services\ResponseFactory;
@@ -13,7 +13,7 @@ use InvalidArgumentException;
  * @property-read ResponseFactory $response
  *
  * Class Controller
- * @package CrCms\Framework\App\MicroService\Controllers
+ * @package CrCms\Framework\App\Http\Controllers
  */
 class Controller extends BaseController
 {

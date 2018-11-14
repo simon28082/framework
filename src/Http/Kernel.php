@@ -84,7 +84,7 @@ class Kernel extends HttpKernel
         parent::bootstrap();
 
         // Reload each time
-        $this->reloadProviders();
+        //$this->reloadProviders();
     }
 
     /**

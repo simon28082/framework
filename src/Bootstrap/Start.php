@@ -1,6 +1,6 @@
 <?php
 
-namespace CrCms\Framework;
+namespace CrCms\Framework\Bootstrap;
 
 use CrCms\Framework\Console\Kernel;
 use CrCms\Framework\Foundation\Application;
