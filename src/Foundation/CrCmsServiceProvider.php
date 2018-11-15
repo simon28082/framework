@@ -2,18 +2,18 @@
 
 namespace CrCms\Framework\Foundation;
 
+use CrCms\Foundation\Transporters\AbstractValidateDataProvider;
 use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
-use CrCms\Foundation\Transporters\DataProvider;
+use CrCms\Foundation\Transporters\DataServiceProvider;
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\AggregateServiceProvider;
 
-class CrCmsServiceProvider extends ServiceProvider
+class CrCmsServiceProvider extends AggregateServiceProvider
 {
-    /**
-     * @var bool
-     */
-    protected $defer = false;
+    protected $providers = [
+        DataServiceProvider::class,
+    ];
 
     /**
      * Bootstrap any application services.
@@ -22,9 +22,12 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->app->resolving(AbstractValidateDataProvider::class, function (AbstractValidateDataProvider $dataProvider, $app) {
+            $dataProvider->setObject(
+                array_merge($this->app['request']->route()->parameters() ?? [], $this->app['request']->all())
+            );
+        });
     }
-
 
     /**
      * Register any application services.
@@ -33,6 +36,8 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        parent::register();
+
         $this->registerAlias();
 
         $this->registerServices();
@@ -45,13 +50,11 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     protected function registerServices(): void
     {
-        $this->app->bind('data.provider', function ($app) {
-            return new DataProvider($app['request']);
+        $this->app->extend('data.provider', function (DataProviderContract $dataProvider) {
+            return $dataProvider->setObject(
+                array_merge($this->app['request']->route()->parameters() ?? [], $this->app['request']->all())
+            );
         });
-
-//        $this->app->singleton('command.crcms.make.directory', function ($app) {
-//            return new DirectoryMakeCommand($app['files']);
-//        });
 
         $this->app->extend('command.route.cache', function () {
             return new RouteCacheCommand($this->app['files']);
@@ -67,7 +70,6 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        //$this->commands('command.crcms.make.directory');
     }
 
     /**
@@ -75,19 +77,5 @@ class CrCmsServiceProvider extends ServiceProvider
      */
     protected function registerAlias(): void
     {
-        $this->app->alias('data.provider', DataProviderContract::class);
-//        $this->app->alias('command.crcms.make.directory', DirectoryMakeCommand::class);
-        $this->app->alias('command.route.cache', RouteCacheCommand::class);
-    }
-
-    /**
-     * @return array
-     */
-    public function provides(): array
-    {
-        return [
-            'data.provider',
-//            'command.crcms.make.directory',
-        ];
     }
 }
