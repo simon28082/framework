@@ -28,7 +28,7 @@ class Start
      */
     public static function run(array $params = [], ?string $basePath = null): void
     {
-        $instance = new static;
+        $instance = static::instance();
 
         $instance->bootstrap($basePath);
 
@@ -111,8 +111,8 @@ class Start
         );
 
         $this->app->singleton(\Illuminate\Contracts\Http\Kernel::class,
-            \CrCms\Framework\Http\Kernel::class
-            );
+        \CrCms\Framework\Http\Kernel::class
+        );
     }
 
     /**
