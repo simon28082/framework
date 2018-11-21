@@ -22,7 +22,6 @@ class Kernel extends ConsoleKernel
         \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
         \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
         \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-        //\Illuminate\Foundation\Bootstrap\RegisterProviders::class,
         \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
@@ -40,20 +39,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
-
-        $this->dispatch($schedule);
-    }
-
-    /**
-     * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
-     * @return void
-     */
-    protected function dispatch(Schedule $schedule)
-    {
         foreach (config('mount.schedules') as $scheduleCommand) {
             (new $scheduleCommand)->handle($schedule);
         }
@@ -70,6 +55,13 @@ class Kernel extends ConsoleKernel
 
         if (file_exists(base_path('routes/console.php'))) {
             require base_path('routes/console.php');
+        }
+
+        $commands = config('mount.commands', []);
+        if ($commands) {
+            Artisan::starting(function ($artisan) use ($commands) {
+                $artisan->resolveCommands($commands);
+            });
         }
     }
 }
