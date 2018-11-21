@@ -9,11 +9,12 @@
 
 namespace CrCms\Framework\Http;
 
-use CrCms\Framework\Swoole\Server\AbstractServer;
+use CrCms\Framework\Http\Events\MessageEvent;
 use CrCms\Framework\Http\Events\RequestEvent;
-use CrCms\Framework\Swoole\Server\Contracts\ServerContract;
+use CrCms\Server\Server\AbstractServer;
+use CrCms\Server\Server\Contracts\ServerContract;
 use Illuminate\Contracts\Http\Kernel;
-use Swoole\Http\Server as HttpServer;
+use Swoole\WebSocket\Server as WebSocketServer;
 
 /**
  * Class Server
@@ -25,6 +26,7 @@ class Server extends AbstractServer implements ServerContract
      * @var array
      */
     protected $events = [
+        'message' => MessageEvent::class,
         'request' => RequestEvent::class,
     ];
 
@@ -49,7 +51,7 @@ class Server extends AbstractServer implements ServerContract
             $this->config['type'] ?? SWOOLE_SOCK_TCP,
         ];
 
-        $this->server = new HttpServer(...$serverParams);
+        $this->server = new WebSocketServer(...$serverParams);
         $this->setPidFile();
         $this->setSettings($this->config['settings'] ?? []);
         $this->eventDispatcher($this->config['events'] ?? []);
