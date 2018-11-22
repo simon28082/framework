@@ -2,10 +2,7 @@
 
 namespace CrCms\Framework\Console;
 
-use CrCms\Framework\MicroService\Commands\ServerCommand;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Events\Dispatcher;
-use CrCms\Framework\Application;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -57,11 +54,7 @@ class Kernel extends ConsoleKernel
             require base_path('routes/console.php');
         }
 
-        $commands = config('mount.commands', []);
-        if ($commands) {
-            Artisan::starting(function ($artisan) use ($commands) {
-                $artisan->resolveCommands($commands);
-            });
-        }
+        //mount
+        $this->getArtisan()->resolveCommands(config('mount.commands', []));
     }
 }
