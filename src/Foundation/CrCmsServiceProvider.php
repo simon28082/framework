@@ -8,6 +8,7 @@ use CrCms\Foundation\Transporters\DataServiceProvider;
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
 use CrCms\Framework\Http\Commands\ServerCommand;
+use CrCms\Server\AbstractServerCommand;
 use Illuminate\Support\AggregateServiceProvider;
 
 class CrCmsServiceProvider extends AggregateServiceProvider
@@ -71,7 +72,10 @@ class CrCmsServiceProvider extends AggregateServiceProvider
      */
     protected function registerCommands(): void
     {
-        $this->commands(ServerCommand::class);
+        //require swoole-server
+        if (class_exists(AbstractServerCommand::class)) {
+            $this->commands(ServerCommand::class);
+        }
     }
 
     /**
