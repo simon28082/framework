@@ -7,6 +7,7 @@ use CrCms\Foundation\Transporters\Contracts\DataProviderContract;
 use CrCms\Foundation\Transporters\DataServiceProvider;
 use CrCms\Framework\Console\Commands\ConfigCacheCommand;
 use CrCms\Framework\Console\Commands\RouteCacheCommand;
+use Illuminate\Routing\Route;
 use Illuminate\Support\AggregateServiceProvider;
 
 class CrCmsServiceProvider extends AggregateServiceProvider
@@ -23,8 +24,14 @@ class CrCmsServiceProvider extends AggregateServiceProvider
     public function boot()
     {
         $this->app->resolving(AbstractValidateDataProvider::class, function (AbstractValidateDataProvider $dataProvider, $app) {
+            if ($this->app['request']->route() instanceof Route) {
+                $parameters = (array)$this->app['request']->route()->parameters();
+            } else {
+                $parameters = [];
+            }
+
             $dataProvider->setObject(
-                array_merge($this->app['request']->route()->parameters() ?? [], $this->app['request']->all())
+                array_merge($parameters, $this->app['request']->all())
             );
         });
     }
