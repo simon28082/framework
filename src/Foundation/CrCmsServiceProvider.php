@@ -24,14 +24,8 @@ class CrCmsServiceProvider extends AggregateServiceProvider
     public function boot()
     {
         $this->app->resolving(AbstractValidateDataProvider::class, function (AbstractValidateDataProvider $dataProvider, $app) {
-            if ($this->app['request']->route() instanceof Route) {
-                $parameters = (array)$this->app['request']->route()->parameters();
-            } else {
-                $parameters = [];
-            }
-
             $dataProvider->setObject(
-                array_merge($parameters, $this->app['request']->all())
+                array_merge($this->routeParameters(), $this->app['request']->all())
             );
         });
     }
@@ -59,7 +53,7 @@ class CrCmsServiceProvider extends AggregateServiceProvider
     {
         $this->app->extend('data.provider', function (DataProviderContract $dataProvider) {
             return $dataProvider->setObject(
-                array_merge($this->app['request']->route()->parameters() ?? [], $this->app['request']->all())
+                array_merge($this->routeParameters(), $this->app['request']->all())
             );
         });
 
@@ -84,5 +78,17 @@ class CrCmsServiceProvider extends AggregateServiceProvider
      */
     protected function registerAlias(): void
     {
+    }
+
+    /**
+     * @return array
+     */
+    protected function routeParameters(): array
+    {
+        if ($this->app['request']->route() instanceof Route) {
+            $parameters = (array)$this->app['request']->route()->parameters();
+        } else {
+            $parameters = [];
+        }
     }
 }
