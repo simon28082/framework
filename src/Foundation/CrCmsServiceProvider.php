@@ -90,5 +90,7 @@ class CrCmsServiceProvider extends AggregateServiceProvider
         } else {
             $parameters = [];
         }
+
+        return $parameters;
     }
 }
